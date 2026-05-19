@@ -1,249 +1,74 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../core/utils/custom_snackbar.dart';
-import '../domain/models/user_model.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../routes/route_helper.dart';
-import '../domain/services/auth_service.dart';
 
 class AuthController extends GetxController {
-  final LoginUseCase _loginUseCase;
-  final RegisterUseCase _registerUseCase;
-  final VerifyOtpUseCase _verifyOtpUseCase;
-  final LogoutUseCase _logoutUseCase;
-  final CheckLoginStatusUseCase _checkLoginStatusUseCase;
-  final GetUserInfoUseCase _getUserInfoUseCase;
-
-  AuthController({
-    required LoginUseCase loginUseCase,
-    required RegisterUseCase registerUseCase,
-    required VerifyOtpUseCase verifyOtpUseCase,
-    required LogoutUseCase logoutUseCase,
-    required CheckLoginStatusUseCase checkLoginStatusUseCase,
-    required GetUserInfoUseCase getUserInfoUseCase,
-  })  : _loginUseCase = loginUseCase,
-        _registerUseCase = registerUseCase,
-        _verifyOtpUseCase = verifyOtpUseCase,
-        _logoutUseCase = logoutUseCase,
-        _checkLoginStatusUseCase = checkLoginStatusUseCase,
-        _getUserInfoUseCase = getUserInfoUseCase;
-
   final isLoading = false.obs;
-  final currentMobile = ''.obs;
-  Rx<UserModel?> currentUser = Rx<UserModel?>(null);
+  final imagePath = ''.obs;
+  final _picker = ImagePicker();
 
-  final formKey = GlobalKey<FormState>();
-  final nameController = TextEditingController();
-  final mobileController = TextEditingController();
-  final otpController = TextEditingController();
-
-  @override
-  void onInit() {
-    super.onInit();
-    checkLoginStatus();
+  Future<void> pickImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      imagePath.value = image.path;
+    }
   }
+  final emailController = TextEditingController(text: 'test@blessapp.com');
+  final otpController = TextEditingController();
+  final nameController = TextEditingController(text: 'Firoz Mohammad');
+  final phoneController = TextEditingController(text: '9876543210');
+  final selectedCountryCode = '+91'.obs;
+  final selectedCountryFlag = '🇮🇳'.obs;
+  final selectedCountryName = 'India'.obs;
+
+  final List<Map<String, String>> countries = [
+    {'name': 'India', 'code': '+91', 'flag': '🇮🇳'},
+    {'name': 'United States', 'code': '+1', 'flag': '🇺🇸'},
+    {'name': 'United Kingdom', 'code': '+44', 'flag': '🇬🇧'},
+    {'name': 'United Arab Emirates', 'code': '+971', 'flag': '🇦🇪'},
+    {'name': 'Australia', 'code': '+61', 'flag': '🇦🇺'},
+    {'name': 'Canada', 'code': '+1', 'flag': '🇨🇦'},
+    {'name': 'Germany', 'code': '+49', 'flag': '🇩🇪'},
+    {'name': 'France', 'code': '+33', 'flag': '🇫🇷'},
+    {'name': 'Japan', 'code': '+81', 'flag': '🇯🇵'},
+    {'name': 'China', 'code': '+86', 'flag': '🇨🇳'},
+    {'name': 'Brazil', 'code': '+55', 'flag': '🇧🇷'},
+    {'name': 'Russia', 'code': '+7', 'flag': '🇷🇺'},
+    {'name': 'South Africa', 'code': '+27', 'flag': '🇿🇦'},
+    {'name': 'Singapore', 'code': '+65', 'flag': '🇸🇬'},
+    {'name': 'Malaysia', 'code': '+60', 'flag': '🇲🇾'},
+    {'name': 'Pakistan', 'code': '+92', 'flag': '🇵🇰'},
+    {'name': 'Bangladesh', 'code': '+880', 'flag': '🇧🇩'},
+    {'name': 'Sri Lanka', 'code': '+94', 'flag': '🇱🇰'},
+    {'name': 'Nepal', 'code': '+977', 'flag': '🇳🇵'},
+    {'name': 'Saudi Arabia', 'code': '+966', 'flag': '🇸🇦'},
+  ];
+  
+  final formKey = GlobalKey<FormState>();
 
   @override
   void onClose() {
-    nameController.dispose();
-    mobileController.dispose();
+    emailController.dispose();
     otpController.dispose();
+    nameController.dispose();
+    phoneController.dispose();
     super.onClose();
   }
 
-  Future<void> checkLoginStatus() async {
-    final isLoggedIn = await _checkLoginStatusUseCase.execute();
-    if (isLoggedIn) {
-      final user = await _getUserInfoUseCase.execute();
-      if (user != null) currentUser.value = user;
-    }
+  void login() {
+    Get.toNamed(RouteHelper.getOtpRoute());
   }
 
-  Future<void> signup() async {
-    if (!formKey.currentState!.validate()) return;
-
-    try {
-      isLoading.value = true;
-      final user = await _registerUseCase.execute(
-        nameController.text.trim(),
-        mobileController.text.trim(),
-      );
-
-      if (user != null) {
-        currentUser.value = user;
-        currentMobile.value = mobileController.text.trim();
-        CustomSnackbar.showSuccess('OTP sent to your mobile number');
-        Get.toNamed(RouteHelper.getOtpRoute());
-      } else {
-        CustomSnackbar.showError('Signup failed. Please try again.');
-      }
-    } catch (e) {
-      CustomSnackbar.showError(e.toString());
-    } finally {
-      isLoading.value = false;
-    }
+  void verifyOtp() {
+    Get.toNamed(RouteHelper.getProfileSetupRoute());
   }
 
-  Future<void> login() async {
-    if (!formKey.currentState!.validate()) return;
-
-    try {
-      isLoading.value = true;
-      final user = await _loginUseCase.execute(mobileController.text.trim());
-
-      if (user != null) {
-        currentUser.value = user;
-        currentMobile.value = mobileController.text.trim();
-        // CustomSnackbar.showSuccess('OTP sent to your mobile number');
-        Get.toNamed(RouteHelper.getOtpRoute());
-      }
-    } catch (e) {
-      CustomSnackbar.showError(e.toString());
-    } finally {
-      isLoading.value = false;
-    }
+  void saveProfile() {
+    Get.offAllNamed(RouteHelper.getDashboardRoute());
   }
 
-  Future<void> verifyOtp() async {
-    if (otpController.text.isEmpty) {
-      CustomSnackbar.showError('Please enter OTP');
-      return;
-    }
-
-    try {
-      isLoading.value = true;
-      final user = await _verifyOtpUseCase.execute(
-        currentMobile.value,
-        otpController.text.trim(),
-      );
-
-      if (user != null) {
-        currentUser.value = user;
-        otpController.clear();
-        CustomSnackbar.showSuccess('OTP verified successfully');
-        Get.offAllNamed(RouteHelper.getHomeRoute());
-      }
-    } catch (e) {
-      CustomSnackbar.showError(e.toString());
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  Future<void> logout() async {
-    try {
-      isLoading.value = true;
-      await _logoutUseCase.execute();
-      currentUser.value = null;
-      Get.offAllNamed(RouteHelper.getLoginRoute());
-    } catch (e) {
-      CustomSnackbar.showError(e.toString());
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  String? validateName(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your name';
-    }
-    return null;
-  }
-
-  String? validateMobile(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your mobile number';
-    }
-    if (value.length != 10 || !RegExp(r'^[0-9]+$').hasMatch(value)) {
-      return 'Please enter a valid 10-digit mobile number';
-    }
-    return null;
+  void logout() {
+    Get.offAllNamed(RouteHelper.getLoginRoute());
   }
 }
-
-
-class LoginUseCase {
-  final AuthService _authService;
-
-  LoginUseCase(this._authService);
-
-  Future<UserModel?> execute(String mobile) async {
-    final response = await _authService.login(mobile);
-    if (response.isSuccess && response.body != null) {
-      return UserModel.fromJson(response.body);
-    }
-    return null;
-  }
-}
-
-
-class VerifyOtpUseCase {
-  final AuthService _authService;
-
-  VerifyOtpUseCase(this._authService);
-
-  Future<UserModel?> execute(String mobile, String otp) async {
-    final response = await _authService.verifyOtp(mobile, otp);
-    if (response.isSuccess && response.body != null) {
-      return UserModel.fromJson(response.body);
-    }
-    return null;
-  }
-}
-
-
-
-class LogoutUseCase {
-  final AuthService _authService;
-
-  LogoutUseCase(this._authService);
-
-  Future<void> execute() async {
-    await _authService.clearUserInfo();
-  }
-}
-
-
-class CheckLoginStatusUseCase {
-  final AuthService _authService;
-
-  CheckLoginStatusUseCase(this._authService);
-
-  Future<bool> execute() async {
-    return await _authService.isLoggedIn();
-  }
-}
-
-
-
-class GetUserInfoUseCase {
-  final AuthService _authService;
-
-  GetUserInfoUseCase(this._authService);
-
-  Future<UserModel?> execute() async {
-    return await _authService.getUserInfo();
-  }
-}
-
-class RegisterUseCase {
-  final AuthService _authService;
-
-  RegisterUseCase(this._authService);
-
-  Future<UserModel?> execute(String name, String mobile) async {
-    final response = await _authService.signup(name, mobile);
-
-    if (response.isSuccess && response.body != null) {
-      try {
-        return UserModel.fromJson(response.body);
-      } catch (e) {
-        print('Error parsing user data: $e');
-      }
-    }
-
-    return null;
-  }
-}
-
-
-

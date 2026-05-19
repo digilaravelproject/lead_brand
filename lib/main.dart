@@ -1,6 +1,6 @@
-import 'package:hash_code/core/constants/app_constants.dart';
-import 'package:hash_code/core/theme/dark_theme.dart';
-import 'package:hash_code/core/theme/light_theme.dart';
+import 'package:bless_app/core/constants/app_constants.dart';
+import 'package:bless_app/core/theme/dark_theme.dart';
+import 'package:bless_app/core/theme/light_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'core/theme/theme_controller.dart';
@@ -9,8 +9,21 @@ import 'init_app.dart';
 import 'routes/route_helper.dart';
 import 'core/bindings/initial_bindings.dart';
 
+import 'package:flutter/services.dart';
+
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await initApp();
+  
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.dark,
+    systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarIconBrightness: Brightness.dark,
+  ));
+  
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  
   runApp(const MyApp());
 }
 

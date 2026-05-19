@@ -1,4 +1,4 @@
-import 'package:hash_code/core/constants/image_constants.dart';
+import 'package:bless_app/core/constants/image_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_constants.dart';

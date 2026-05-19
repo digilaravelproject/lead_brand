@@ -6,7 +6,7 @@
 
     <!-- Application -->
     <application
-        android:label="Demo App"
+        android:label="BLISS"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
@@ -42,7 +42,7 @@
 
         <!-- Activity aliases for alternate icons -->
         <activity-alias
-            android:label="Demo App"
+            android:label="BLISS"
             android:icon="@mipmap/ic_launcher"
             android:roundIcon="@mipmap/ic_launcher"
             android:name=".icon_1"
@@ -50,7 +50,7 @@
             android:enabled="false"
             android:targetActivity=".MainActivity"/>
         <activity-alias
-            android:label="Demo App"
+            android:label="BLISS"
             android:icon="@mipmap/ic_launcher"
             android:roundIcon="@mipmap/ic_launcher"
             android:name=".icon_2"

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:dio/dio.dart' hide FormData, MultipartFile;
 import 'package:dio/dio.dart' as dio;
 import 'package:file_picker/file_picker.dart';
-import 'package:hash_code/core/constants/app_constants.dart';
+import 'package:bless_app/core/constants/app_constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';

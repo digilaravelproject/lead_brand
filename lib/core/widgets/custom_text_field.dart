@@ -1,64 +1,59 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
-  final IconData prefixIcon;
   final TextInputType keyboardType;
-  final String? Function(String?)? validator;
-  final int? maxLength;
   final bool obscureText;
-  final Color borderColor;
-  final double borderRadius;
-  final Color? iconColor;
-  final TextStyle? textStyle;
+  final IconData? prefixIcon;
+
+  final bool readOnly;
 
   const CustomTextField({
     Key? key,
     required this.controller,
     required this.hintText,
-    required this.prefixIcon,
     this.keyboardType = TextInputType.text,
-    this.validator,
-    this.maxLength,
     this.obscureText = false,
-    required this.borderColor,
-    this.borderRadius = 30.0,
-    this.iconColor,
-    this.textStyle,
+    this.prefixIcon,
+    this.readOnly = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      style: textStyle ?? const TextStyle(color: Colors.white, fontSize: 16),
-      obscureText: obscureText,
-      maxLength: maxLength,
-      decoration: InputDecoration(
-        hintText: hintText,
-        prefixIcon: Icon(prefixIcon, color: iconColor ?? borderColor),
-        counterText: "",
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: borderColor, width: 2),
-          borderRadius: BorderRadius.circular(borderRadius),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: borderColor, width: 2),
-          borderRadius: BorderRadius.circular(borderRadius),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.red, width: 2),
-          borderRadius: BorderRadius.circular(borderRadius),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.red, width: 2),
-          borderRadius: BorderRadius.circular(borderRadius),
-        ),
-        filled: false,
+    final theme = Theme.of(context);
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.borderColor, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      validator: validator,
+      child: TextField(
+        controller: controller,
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        readOnly: readOnly,
+        style: TextStyle(
+          fontSize: 16, 
+          fontWeight: FontWeight.w500,
+          color: theme.textTheme.bodyLarge?.color ?? Colors.white,
+        ),
+        decoration: InputDecoration(
+          hintText: hintText,
+          hintStyle: TextStyle(color: AppColors.textColorHint, fontWeight: FontWeight.w400),
+          prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: AppColors.textColorHint, size: 20) : null,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        ),
+      ),
     );
   }
 }

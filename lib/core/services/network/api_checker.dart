@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:dio/dio.dart';
-import 'package:hash_code/core/services/storage/token_manger.dart';
+import 'package:bless_app/core/services/storage/token_manger.dart';
 import 'package:get/get.dart' as getx;
 import '../../../routes/route_helper.dart';
 import '../../constants/app_constants.dart';

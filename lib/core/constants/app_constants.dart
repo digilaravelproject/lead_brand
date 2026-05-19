@@ -25,4 +25,12 @@ class AppConstants {
     static const String token = 'token';
     static const String userData = 'user_data';
     static const String isLoggedIn = 'is_logged_in';
+
+    // App URLs
+    static const String websiteUrl = 'https://google.com';
+    static const String termsUrl = 'https://google.com';
+    static const String privacyUrl = 'https://google.com';
+    static const String aboutUrl = 'https://google.com';
+    static const String packageId = 'com.leadbrandhub';
+    static const String playStoreUrl = 'https://play.google.com/store/apps/details?id=$packageId';
 }
