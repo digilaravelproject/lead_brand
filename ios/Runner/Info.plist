@@ -46,6 +46,11 @@
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
 
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>We need access to your photo library to pick profile pictures and save branded videos.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>We need permission to save branded videos to your photo library.</string>
+
     <!-- App Icon Setup -->
     <key>CFBundleIcons</key>
     <dict>

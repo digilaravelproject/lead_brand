@@ -514,7 +514,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
                     ),
             ),
           ),
-          const SizedBox(width: 8),
+         // const SizedBox(width: 8),
 
           // 2. Right-side content (Info Section, Consultancy Section, and Disclaimer)
           Expanded(
@@ -677,7 +677,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
                             ],
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 5),
 
                         // Servicing Consultancy Section (Right-most)
                         Expanded(
