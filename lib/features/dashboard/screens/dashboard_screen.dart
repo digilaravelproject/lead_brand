@@ -260,7 +260,7 @@ class DashboardScreen extends GetView<DashboardController> {
             const SizedBox(height: 20),
 
             // Horizontal Stats Card Row
-            SingleChildScrollView(
+           /* SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -304,7 +304,7 @@ class DashboardScreen extends GetView<DashboardController> {
               ),
             ),
 
-            const SizedBox(height: 25),
+            const SizedBox(height: 25),*/
 
             // Quick Access header
             Padding(
@@ -446,7 +446,7 @@ class DashboardScreen extends GetView<DashboardController> {
               ),
             ),
 
-            const SizedBox(height: 25),
+            /*const SizedBox(height: 25),
 
             // Today's Activity Section
             Padding(
@@ -535,7 +535,7 @@ class DashboardScreen extends GetView<DashboardController> {
                   ),
                 ],
               ),
-            ),
+            ),*/
 
             const SizedBox(height: 30),
           ],

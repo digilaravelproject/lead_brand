@@ -45,46 +45,116 @@ class ProfileScreen extends GetView<AuthController> {
                 child: Column(
                   children: [
                     const SizedBox(height: 20),
-                    // Modern Profile Image Section
-                    Center(
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Obx(() => Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: theme.cardColor,
-                              border: Border.all(color: AppColors.borderColor, width: 2),
-                              image: controller.imagePath.value.isNotEmpty
-                                  ? DecorationImage(
-                                      image: FileImage(File(controller.imagePath.value)),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : null,
-                            ),
-                            child: controller.imagePath.value.isEmpty
-                                ? const Icon(Icons.person, size: 50, color: AppColors.textColorHint)
-                                : null,
-                          )),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: InkWell(
-                              onTap: () => controller.pickImage(),
-                              child: Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: const BoxDecoration(
-                                  color: AppColors.primaryColor,
-                                  shape: BoxShape.circle,
+                    // Modern Profile & Logo Image Section
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Profile Image Upload
+                        Column(
+                          children: [
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Obx(() => Container(
+                                  width: 100,
+                                  height: 100,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: theme.cardColor,
+                                    border: Border.all(color: AppColors.borderColor, width: 2),
+                                    image: controller.imagePath.value.isNotEmpty
+                                        ? DecorationImage(
+                                            image: FileImage(File(controller.imagePath.value)),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : null,
+                                  ),
+                                  child: controller.imagePath.value.isEmpty
+                                      ? const Icon(Icons.person, size: 50, color: AppColors.textColorHint)
+                                      : null,
+                                )),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: InkWell(
+                                    onTap: () => controller.pickImage(),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: const BoxDecoration(
+                                        color: AppColors.primaryColor,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(Icons.camera_alt, color: Colors.black, size: 16),
+                                    ),
+                                  ),
                                 ),
-                                child: const Icon(Icons.camera_alt, color: Colors.black, size: 16),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Profile Picture',
+                              style: TextStyle(
+                                color: AppColors.textColorSecondary,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                        const SizedBox(width: 40),
+                        // Logo Upload
+                        Column(
+                          children: [
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Obx(() => Container(
+                                  width: 100,
+                                  height: 100,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: theme.cardColor,
+                                    border: Border.all(color: AppColors.borderColor, width: 2),
+                                    image: controller.logoPath.value.isNotEmpty
+                                        ? DecorationImage(
+                                            image: FileImage(File(controller.logoPath.value)),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : null,
+                                  ),
+                                  child: controller.logoPath.value.isEmpty
+                                      ? const Icon(Icons.business, size: 50, color: AppColors.textColorHint)
+                                      : null,
+                                )),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: InkWell(
+                                    onTap: () => controller.pickLogo(),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: const BoxDecoration(
+                                        color: AppColors.primaryColor,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(Icons.camera_alt, color: Colors.black, size: 16),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Company Logo',
+                              style: TextStyle(
+                                color: AppColors.textColorSecondary,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 30),
 
@@ -120,6 +190,22 @@ class ProfileScreen extends GetView<AuthController> {
                           controller: controller.emailController,
                           hintText: 'Email address',
                           prefixIcon: Icons.email_outlined,
+                          readOnly: true,
+                        ),
+                        const SizedBox(height: 15),
+                        const Text(
+                          'Designation',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        CustomTextField(
+                          controller: controller.designationController,
+                          hintText: 'Designation',
+                          prefixIcon: Icons.work_history_outlined,
                           readOnly: true,
                         ),
                         const SizedBox(height: 15),

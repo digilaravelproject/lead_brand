@@ -6,6 +6,7 @@ import '../../../routes/route_helper.dart';
 class AuthController extends GetxController {
   final isLoading = false.obs;
   final imagePath = ''.obs;
+  final logoPath = ''.obs;
   final _picker = ImagePicker();
 
   Future<void> pickImage() async {
@@ -14,9 +15,17 @@ class AuthController extends GetxController {
       imagePath.value = image.path;
     }
   }
+
+  Future<void> pickLogo() async {
+    final XFile? logo = await _picker.pickImage(source: ImageSource.gallery);
+    if (logo != null) {
+      logoPath.value = logo.path;
+    }
+  }
   final emailController = TextEditingController(text: 'test@blessapp.com');
   final otpController = TextEditingController();
   final nameController = TextEditingController(text: 'Firoz Mohammad');
+  final designationController = TextEditingController(text: 'Software Developer');
   final phoneController = TextEditingController(text: '9876543210');
   final selectedCountryCode = '+91'.obs;
   final selectedCountryFlag = '🇮🇳'.obs;

@@ -40,7 +40,7 @@ class DashboardController extends GetxController {
 
   final List<DashboardFeature> features = [
     DashboardFeature(
-      title: 'Combo Plan',
+      title: 'Combo King',
       icon: Icons.auto_awesome_motion,
       route: RouteHelper.getComboPlanRoute(),
       color: Colors.blue,

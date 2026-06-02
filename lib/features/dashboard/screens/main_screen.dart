@@ -21,7 +21,7 @@ class MainScreen extends StatelessWidget {
       const DashboardScreen(),
       const ToolsScreen(),
       const TrainingScreen(),
-      const LeadsScreen(),
+     // const LeadsScreen(),
       const SettingsScreen(),
     ];
 
@@ -88,7 +88,7 @@ class MainScreen extends StatelessWidget {
           left: 2,
           right: 2,
           top: 8,
-          bottom: MediaQuery.of(context).padding.bottom + 5,
+          bottom: MediaQuery.of(context).padding.bottom + 4,
         ),
         decoration: BoxDecoration(
           color: const Color(0xFF0F121A), // Dark obsidian bar background
@@ -112,8 +112,8 @@ class MainScreen extends StatelessWidget {
             Expanded(child: buildNavItem(0, Icons.grid_view_rounded, 'Home')),
             Expanded(child: buildNavItem(1, Icons.build_rounded, 'Tools')),
             Expanded(child: buildNavItem(2, Icons.play_circle_fill_rounded, 'Training')),
-            Expanded(child: buildNavItem(3, Icons.people_rounded, 'Leads')),
-            Expanded(child: buildNavItem(4, Icons.settings_rounded, 'Settings')),
+       //     Expanded(child: buildNavItem(3, Icons.people_rounded, 'Leads')),
+            Expanded(child: buildNavItem(3, Icons.settings_rounded, 'Settings')),
           ],
         ),
       ),
