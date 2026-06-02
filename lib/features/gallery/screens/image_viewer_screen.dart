@@ -480,36 +480,39 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // 1. Profile Image (Left-most, spans full height of the banner)
-          Container(
-            width: 100,
-            decoration: BoxDecoration(
-              color: Colors.black,
-              border: Border(right: BorderSide(color: Colors.grey[200]!, width: 1.5)),
+          Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Container(
+              width: 100,
+              decoration: BoxDecoration(
+                color: Colors.black,
+                border: Border(right: BorderSide(color: Colors.grey[200]!, width: 1.5)),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: controller.imagePath.value.isNotEmpty
+                  ? Image.file(
+                      File(controller.imagePath.value),
+                      fit: BoxFit.cover,
+                    )
+                  : CachedNetworkImage(
+                      imageUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Center(
+                        child: Icon(
+                          Icons.person,
+                          color: Colors.grey[600],
+                          size: 38,
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Center(
+                        child: Icon(
+                          Icons.person,
+                          color: Colors.grey[600],
+                          size: 38,
+                        ),
+                      ),
+                    ),
             ),
-            clipBehavior: Clip.antiAlias,
-            child: controller.imagePath.value.isNotEmpty
-                ? Image.file(
-                    File(controller.imagePath.value),
-                    fit: BoxFit.cover,
-                  )
-                : CachedNetworkImage(
-                    imageUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Center(
-                      child: Icon(
-                        Icons.person,
-                        color: Colors.grey[600],
-                        size: 38,
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => Center(
-                      child: Icon(
-                        Icons.person,
-                        color: Colors.grey[600],
-                        size: 38,
-                      ),
-                    ),
-                  ),
           ),
           const SizedBox(width: 8),
 
