@@ -297,6 +297,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
   }
 
   double _getFooterHeight(int index) {
+    if (index == 0) return 125;
     if (index >= 75) return 60;
     if (index >= 50) return 80;
     return 105;
@@ -340,6 +341,11 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
   }
 
   Widget _generateUniqueDesign(int index, String name, String phone, String email) {
+    if (index == 0) {
+      final authController = Get.find<AuthController>();
+      return _buildFirstBanner(authController, name, phone, email);
+    }
+
     final List<Color> accentColors = [
       const Color(0xFFE68A00), const Color(0xFF1A73E8), const Color(0xFF2DA94F), const Color(0xFFEA4335),
       const Color(0xFF673AB7), const Color(0xFF00ACC1), const Color(0xFFD81B60), const Color(0xFFF4511E),
@@ -465,5 +471,304 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildFirstBanner(AuthController controller, String name, String phone, String email) {
+    return Container(
+      color: Colors.white,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // 1. Profile Image (Left-most, spans full height of the banner)
+          Container(
+            width: 100,
+            decoration: BoxDecoration(
+              color: Colors.black,
+              border: Border(right: BorderSide(color: Colors.grey[200]!, width: 1.5)),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: controller.imagePath.value.isNotEmpty
+                ? Image.file(
+                    File(controller.imagePath.value),
+                    fit: BoxFit.cover,
+                  )
+                : CachedNetworkImage(
+                    imageUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Center(
+                      child: Icon(
+                        Icons.person,
+                        color: Colors.grey[600],
+                        size: 38,
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => Center(
+                      child: Icon(
+                        Icons.person,
+                        color: Colors.grey[600],
+                        size: 38,
+                      ),
+                    ),
+                  ),
+          ),
+          const SizedBox(width: 8),
+
+          // 2. Right-side content (Info Section, Consultancy Section, and Disclaimer)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 6, bottom: 6, right: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Info Section (Slogan, Name, Designation at top; Phone, Email, Logo at bottom)
+                        Expanded(
+                          flex: 6,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              // Slogan
+                              const Text(
+                                "Doctors Save Lives, We Save Lifestyle",
+                                style: TextStyle(
+                                  color: Color(0xFF2E7D32), // Premium Green
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w900,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 2),
+                              // Name
+                              Text(
+                                name.toUpperCase(),
+                                style: const TextStyle(
+                                  color: Color(0xFF1E3A8A), // Dark Indigo/Blue
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0.3,
+                                  height: 1.1,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 2),
+                              // Designation
+                              Text(
+                                controller.designationController.text.toUpperCase().isNotEmpty 
+                                    ? controller.designationController.text.toUpperCase() 
+                                    : "SOFTWARE COMPANY",
+                                style: const TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.3,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              // Phone, Email and Logo positioned side-by-side
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        // WhatsApp & Phone
+                                        Row(
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.all(1.5),
+                                              decoration: const BoxDecoration(
+                                                color: Color(0xFF25D366),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(
+                                                Icons.phone,
+                                                color: Colors.white,
+                                                size: 8,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Expanded(
+                                              child: Text(
+                                                phone,
+                                                style: const TextStyle(
+                                                  color: Color(0xFFD32F2F), // Dark Red
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w900,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 2),
+                                        // Email
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.email,
+                                              color: Colors.black87,
+                                              size: 10,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Expanded(
+                                              child: Text(
+                                                email,
+                                                style: const TextStyle(
+                                                  color: Colors.black87,
+                                                  fontSize: 8,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  // Logo Section (Yellow Circle, next to contact info)
+                                  Container(
+                                    width: 42,
+                                    height: 42,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: const Color(0xFFFBBF24), // Premium Yellow Background
+                                      border: Border.all(color: Colors.white, width: 1.5),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.1),
+                                          blurRadius: 3,
+                                          offset: const Offset(0, 1.5),
+                                        ),
+                                      ],
+                                    ),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: controller.logoPath.value.isNotEmpty
+                                        ? Image.file(
+                                            File(controller.logoPath.value),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : const Center(
+                                            child: Icon(
+                                              Icons.business,
+                                              color: Colors.white,
+                                              size: 24,
+                                            ),
+                                          ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+
+                        // Servicing Consultancy Section (Right-most)
+                        Expanded(
+                          flex: 4,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Servicing Consultancy",
+                                style: TextStyle(
+                                  color: Color(0xFF1E3A8A), // Dark Indigo/Blue
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 2),
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: _buildConsultancyItems(),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  // Disclaimer Section (at the bottom of right-side content)
+                  const Text(
+                    "DISCLAIMER: The above concept has been developed after research by financial experts. Results are based on current bonus & FAB rates announced by respective company. For Premium budget, nearest sum assured has been taken. This is a special concept designed only for training purpose, Terms & Conditions will be apply. Depending on age, actual premium may increase or decrease. This is not a single policy but combination of policy design for cater people special needs and requirements.",
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 5,
+                      fontWeight: FontWeight.w500,
+                      height: 1.1,
+                    ),
+                    textAlign: TextAlign.justify,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildConsultancyItems() {
+    final List<String> items = [
+      "Premium Payment",
+      "Maturity Claim",
+      "Policy Revival",
+      "Policy Loan",
+      "Change in Address",
+      "Change in Nomination",
+      "Policy Branch Transfer",
+      "Change in Premium Mode",
+    ];
+
+    return items.map((item) => Padding(
+      padding: const EdgeInsets.symmetric(vertical: 0.5),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.diamond,
+            size: 6,
+            color: Colors.blue[800],
+          ),
+          const SizedBox(width: 3),
+          Expanded(
+            child: Text(
+              item,
+              style: const TextStyle(
+                color: Colors.black87,
+                fontSize: 7.5,
+                fontWeight: FontWeight.w700,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    )).toList();
   }
 }
