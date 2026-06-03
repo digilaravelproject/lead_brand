@@ -14,8 +14,12 @@ class SplashController extends GetxController {
   void _navigateToNext() async {
     await Future.delayed(const Duration(seconds: 3));
     bool isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
+    bool isNew = SharedPrefs.getBool('is_new') ?? false;
     if (isLoggedIn) {
       Get.offAllNamed(RouteHelper.getDashboardRoute());
+    } else if (isNew) {
+      final tempEmail = SharedPrefs.getString('temp_email') ?? '';
+      Get.offAllNamed(RouteHelper.getProfileSetupRoute(), arguments: tempEmail);
     } else {
       Get.offAllNamed(RouteHelper.getLoginRoute());
     }

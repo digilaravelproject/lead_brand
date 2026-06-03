@@ -109,6 +109,13 @@ class AuthController extends GetxController {
         // Ignore parsing errors
       }
     }
+
+    final tempEmail = SharedPrefs.getString('temp_email');
+    if (tempEmail != null && tempEmail.isNotEmpty) {
+      if (emailController.text.isEmpty) {
+        emailController.text = tempEmail;
+      }
+    }
   }
 
   final emailController = TextEditingController();
@@ -201,6 +208,8 @@ class AuthController extends GetxController {
         }
 
         if (isNew == 1) {
+          await SharedPrefs.setBool('is_new', true);
+          await SharedPrefs.setString('temp_email', email);
           Get.offAllNamed(RouteHelper.getProfileSetupRoute());
         } else {
           if (response.body != null && response.body is Map) {
@@ -308,6 +317,8 @@ class AuthController extends GetxController {
 
         // Set is logged in to true
         await SharedPrefs.setBool(AppConstants.isLoggedIn, true);
+        await SharedPrefs.remove('is_new');
+        await SharedPrefs.remove('temp_email');
 
         // Success snackbar
         Future.delayed(const Duration(milliseconds: 300), () {
@@ -434,6 +445,8 @@ class AuthController extends GetxController {
       await TokenManager.clearToken();
       await SharedPrefs.remove(AppConstants.userData);
       await SharedPrefs.setBool(AppConstants.isLoggedIn, false);
+      await SharedPrefs.remove('is_new');
+      await SharedPrefs.remove('temp_email');
 
       // Reset controller variables
       emailController.clear();
