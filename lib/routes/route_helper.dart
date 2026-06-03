@@ -20,6 +20,8 @@ import '../features/legal/screens/terms_condition_screen.dart';
 import '../features/legal/screens/privacy_policy_screen.dart';
 import '../features/legal/screens/about_us_screen.dart';
 import '../features/legal/bindings/legal_binding.dart';
+import '../features/notifications/screens/notifications_screen.dart';
+import '../features/notifications/bindings/notifications_binding.dart';
 import 'app_routes.dart';
 
 class RouteHelper {
@@ -40,6 +42,7 @@ class RouteHelper {
   static String getTermsConditionRoute() => AppRoutes.termsCondition;
   static String getPrivacyPolicyRoute() => AppRoutes.privacyPolicy;
   static String getAboutUsRoute() => AppRoutes.aboutUs;
+  static String getNotificationRoute() => AppRoutes.notifications;
   static String getPromotionalVideosRoute() => '/promotional-videos';
   static String getVideoPlayerRoute() => '/video-player';
 
@@ -129,6 +132,12 @@ class RouteHelper {
       name: AppRoutes.aboutUs,
       page: () => const AboutUsScreen(),
       binding: LegalBinding(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: AppRoutes.notifications,
+      page: () => const NotificationsScreen(),
+      binding: NotificationsBinding(),
       transition: Transition.rightToLeft,
     ),
     GetPage(

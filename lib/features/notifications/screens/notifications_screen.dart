@@ -1,113 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
+import '../domain/models/notification_model.dart';
+import '../controllers/notifications_controller.dart';
 import 'notification_detail_screen.dart';
 
-class AppNotification {
-  final String id;
-  final String title;
-  final String message;
-  final String time;
-  final String type; // 'lead', 'promo', 'system', 'training'
-  bool isRead;
-
-  AppNotification({
-    required this.id,
-    required this.title,
-    required this.message,
-    required this.time,
-    required this.type,
-    this.isRead = false,
-  });
-}
-
-class NotificationsScreen extends StatefulWidget {
+class NotificationsScreen extends GetView<NotificationsController> {
   const NotificationsScreen({Key? key}) : super(key: key);
-
-  @override
-  State<NotificationsScreen> createState() => _NotificationsScreenState();
-}
-
-class _NotificationsScreenState extends State<NotificationsScreen> {
-  final List<AppNotification> _notifications = [
-    AppNotification(
-      id: '1',
-      title: '🔥 New Hot Lead Added',
-      message: 'Rahul Sharma has been marked as a Hot Lead. Take action now before they cool off.',
-      time: '2 min ago',
-      type: 'lead',
-      isRead: false,
-    ),
-    AppNotification(
-      id: '2',
-      title: '📅 Follow-up Reminder',
-      message: 'You have a follow-up scheduled with Priya Mehta today at 4:00 PM. Don\'t miss it!',
-      time: '15 min ago',
-      type: 'lead',
-      isRead: false,
-    ),
-    AppNotification(
-      id: '3',
-      title: '🎬 New Training Video Added',
-      message: 'A new video "Handling Sales Objections" has been added to the Training Hub.',
-      time: '1 hr ago',
-      type: 'training',
-      isRead: false,
-    ),
-    AppNotification(
-      id: '4',
-      title: '🎉 Plan Promotion Live!',
-      message: 'New combo plan posters are available. Share them now to attract more clients.',
-      time: '3 hrs ago',
-      type: 'promo',
-      isRead: true,
-    ),
-    AppNotification(
-      id: '5',
-      title: '✅ Lead Status Updated',
-      message: 'Anita Singh\'s status has been changed from "Follow Up" to "Appointment".',
-      time: 'Yesterday',
-      type: 'lead',
-      isRead: true,
-    ),
-    AppNotification(
-      id: '6',
-      title: '📣 System Update',
-      message: 'LeadBrandHub has been updated to v2.1. Enjoy new features and bug fixes.',
-      time: '2 days ago',
-      type: 'system',
-      isRead: true,
-    ),
-  ];
 
   IconData _getTypeIcon(String type) {
     switch (type) {
-      case 'lead': return Icons.person_add_rounded;
-      case 'promo': return Icons.campaign_rounded;
-      case 'training': return Icons.play_circle_rounded;
-      case 'system': return Icons.info_rounded;
-      default: return Icons.notifications_rounded;
+      case 'tools':
+        return Icons.collections_outlined;
+      case 'training':
+        return Icons.play_circle_rounded;
+      case 'system_update':
+        return Icons.system_update_alt_rounded;
+      case 'lead_status':
+        return Icons.assignment_turned_in_rounded;
+      case 'promotion':
+        return Icons.campaign_rounded;
+      case 'follow_up':
+        return Icons.event_note_rounded;
+      case 'hot_lead':
+        return Icons.local_fire_department_rounded;
+      default:
+        return Icons.notifications_rounded;
     }
   }
 
   Color _getTypeColor(String type) {
     switch (type) {
-      case 'lead': return AppColors.primaryColor;
-      case 'promo': return const Color(0xFF5B8DEF);
-      case 'training': return const Color(0xFF4CD964);
-      case 'system': return const Color(0xFFAA8CFF);
-      default: return Colors.grey;
+      case 'tools':
+        return const Color(0xFF5B8DEF); // Premium Blue
+      case 'training':
+        return const Color(0xFF4CD964); // Premium Green
+      case 'system_update':
+        return const Color(0xFFAA8CFF); // Premium Purple
+      case 'lead_status':
+        return AppColors.primaryColor; // Amber/Orange
+      case 'promotion':
+        return const Color(0xFFFF5252); // Soft Red
+      case 'follow_up':
+        return const Color(0xFFFFB74D); // Soft Orange
+      case 'hot_lead':
+        return const Color(0xFFE040FB); // Magenta/Pink
+      default:
+        return Colors.grey;
     }
-  }
-
-  int get _unreadCount => _notifications.where((n) => !n.isRead).length;
-
-  void _markAllRead() {
-    setState(() {
-      for (final n in _notifications) {
-        n.isRead = true;
-      }
-    });
   }
 
   @override
@@ -122,7 +62,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Get.back(),
         ),
-        title: Column(
+        title: Obx(() => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
@@ -134,9 +74,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 letterSpacing: 1.2,
               ),
             ),
-            if (_unreadCount > 0)
+            if (controller.unreadCount.value > 0)
               Text(
-                '$_unreadCount unread',
+                '${controller.unreadCount.value} unread',
                 style: const TextStyle(
                   color: AppColors.primaryColor,
                   fontSize: 11,
@@ -144,47 +84,66 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 ),
               ),
           ],
-        ),
+        )),
         actions: [
-          if (_unreadCount > 0)
-            TextButton(
-              onPressed: _markAllRead,
-              child: const Text(
-                'Mark all read',
-                style: TextStyle(
-                  color: AppColors.primaryColor,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
+          Obx(() {
+            if (controller.unreadCount.value > 0) {
+              return TextButton(
+                onPressed: controller.markAllAsRead,
+                child: const Text(
+                  'Mark all read',
+                  style: TextStyle(
+                    color: AppColors.primaryColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
           const SizedBox(width: 8),
         ],
       ),
-      body: _notifications.isEmpty
-          ? _buildEmptyState()
-          : ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              itemCount: _notifications.length,
-              itemBuilder: (context, index) {
-                final notif = _notifications[index];
-                return _buildNotificationCard(notif);
-              },
-            ),
+      body: Obx(() {
+        if (controller.isLoading.value && controller.notifications.isEmpty) {
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.primaryColor),
+          );
+        }
+
+        if (controller.notifications.isEmpty) {
+          return _buildEmptyState();
+        }
+
+        return RefreshIndicator(
+          color: AppColors.primaryColor,
+          backgroundColor: const Color(0xFF0F121A),
+          onRefresh: controller.fetchNotifications,
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            itemCount: controller.notifications.length,
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              final notif = controller.notifications[index];
+              return _buildNotificationCard(notif, index);
+            },
+          ),
+        );
+      }),
     );
   }
 
-  Widget _buildNotificationCard(AppNotification notif) {
+  Widget _buildNotificationCard(NotificationModel notif, int index) {
     final iconColor = _getTypeColor(notif.type);
     final icon = _getTypeIcon(notif.type);
 
     return GestureDetector(
       onTap: () {
-        setState(() => notif.isRead = true);
+        controller.markAsRead(index);
         Get.to(() => NotificationDetailScreen(notification: notif));
       },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+      child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
           color: notif.isRead ? const Color(0xFF0F121A) : const Color(0xFF13171F),
@@ -262,7 +221,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      notif.time,
+                      notif.timeAgo,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.3),
                         fontSize: 11,

@@ -8,6 +8,7 @@ import '../../auth/controllers/auth_controller.dart';
 import '../controllers/main_screen_controller.dart';
 import '../controllers/dashboard_controller.dart';
 import '../../notifications/screens/notifications_screen.dart';
+import '../../notifications/controllers/notifications_controller.dart';
 import '../../training/screens/training_pdfs_screen.dart';
 
 class DashboardScreen extends GetView<DashboardController> {
@@ -135,35 +136,40 @@ class DashboardScreen extends GetView<DashboardController> {
           ],
         ),
         actions: [
-          // Notification Bell with badge
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              IconButton(
-                onPressed: () => Get.to(() => const NotificationsScreen()),
-                icon: const Icon(Icons.notifications_none_outlined, color: Colors.white, size: 26),
-              ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: AppColors.primaryColor,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Text(
-                    "3",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 8,
-                      fontWeight: FontWeight.bold,
+          Obx(() {
+            final notificationsController = Get.find<NotificationsController>();
+            final unreadCount = notificationsController.unreadCount.value;
+            
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                IconButton(
+                  onPressed: () => Get.toNamed(RouteHelper.getNotificationRoute()),
+                  icon: const Icon(Icons.notifications_none_outlined, color: Colors.white, size: 26),
+                ),
+                if (unreadCount > 0)
+                  Positioned(
+                    right: 8,
+                    top: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: AppColors.primaryColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        "$unreadCount",
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ],
-          ),
+              ],
+            );
+          }),
         ],
       ),
       body: SingleChildScrollView(

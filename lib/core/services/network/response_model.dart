@@ -16,7 +16,11 @@ class ResponseModel {
   /// Factory method to create ResponseModel from JSON
   factory ResponseModel.fromJson(Map<String, dynamic> json, {int? statusCode}) {
     final res = json['res']?.toString().toLowerCase();
-    final success = res == 'success' || (json['success'] == true) || (json['status'] == true);
+    final statusVal = json['status']?.toString().toLowerCase();
+    final success = res == 'success' ||
+        statusVal == 'success' ||
+        (json['success'] == true) ||
+        (json['status'] == true);
 
     List<ErrorDetail>? errors;
     if (json['errors'] is List) {
@@ -30,7 +34,7 @@ class ResponseModel {
       message: json['msg']?.toString() ??
           json['message']?.toString() ??
           (success ? 'Success' : 'Something went wrong'),
-      body: json['data'],
+      body: json['data'] ?? json,
       statusCode: statusCode,
       errors: errors,
     );

@@ -1,25 +1,12 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/custom_web_view.dart';
-
-class TrainingPdf {
-  final String title;
-  final String category;
-  final String pdfUrl;
-  final String size;
-  final int pages;
-  final String description;
-
-  TrainingPdf({
-    required this.title,
-    required this.category,
-    required this.pdfUrl,
-    required this.size,
-    required this.pages,
-    required this.description,
-  });
-}
+import '../controllers/category_controller.dart';
+import '../domain/models/category_model.dart';
+import '../domain/models/training_model.dart';
+import '../controllers/training_controller.dart';
+import 'training_pdf_details_screen.dart';
 
 class TrainingPdfsScreen extends StatefulWidget {
   const TrainingPdfsScreen({Key? key}) : super(key: key);
@@ -29,75 +16,32 @@ class TrainingPdfsScreen extends StatefulWidget {
 }
 
 class _TrainingPdfsScreenState extends State<TrainingPdfsScreen> {
-  final List<TrainingPdf> _allPdfs = [
-    TrainingPdf(
-      title: "Lead Generation Playbook",
-      category: "Lead Gen",
-      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-      size: "1.4 MB",
-      pages: 12,
-      description: "Proven strategies and scripts for generating high-quality life insurance leads daily.",
-    ),
-    TrainingPdf(
-      title: "Handling Objections Guide",
-      category: "Sales",
-      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-      size: "980 KB",
-      pages: 8,
-      description: "How to confidently overcome common client objections regarding premium prices and policy terms.",
-    ),
-    TrainingPdf(
-      title: "Personal Branding Toolkit",
-      category: "Branding",
-      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-      size: "2.1 MB",
-      pages: 18,
-      description: "Step-by-step instructions to position yourself as the trustable insurance advisor in your community.",
-    ),
-    TrainingPdf(
-      title: "Combo Plans Pitching Deck",
-      category: "Product Pitch",
-      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-      size: "3.2 MB",
-      pages: 25,
-      description: "Beautiful visual presentations and customer benefit calculations for combo insurance plans.",
-    ),
-    TrainingPdf(
-      title: "LIC Policy Comparison Sheet",
-      category: "Product Pitch",
-      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-      size: "820 KB",
-      pages: 6,
-      description: "Quick reference guide comparing returns, maturity benefits, and risk coverage of top plans.",
-    ),
-    TrainingPdf(
-      title: "Cold Calling Scripts & Templates",
-      category: "Lead Gen",
-      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-      size: "1.1 MB",
-      pages: 10,
-      description: "High-converting script templates to turn cold calls into booked appointments.",
-    ),
-  ];
-
-  final List<String> _categories = ["All", "Lead Gen", "Sales", "Branding", "Product Pitch"];
+  final CategoryController _categoryController = Get.find<CategoryController>();
+  final TrainingController _trainingController = Get.find<TrainingController>();
   String _selectedCategory = "All";
-  String _searchQuery = "";
+  Timer? _debounce;
 
-  List<TrainingPdf> get _filteredPdfs {
-    return _allPdfs.where((pdf) {
-      final matchesCategory = _selectedCategory == "All" || pdf.category == _selectedCategory;
-      final matchesSearch = pdf.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          pdf.description.toLowerCase().contains(_searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
-    }).toList();
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
   }
 
-  void _viewPdf(TrainingPdf pdf) {
-    // Standard web URL for viewing PDF in Mobile WebView via Google Docs Viewer
-    final String gDocsUrl = "https://docs.google.com/gview?embedded=true&url=${Uri.encodeComponent(pdf.pdfUrl)}";
-    Get.to(() => CustomWebView(
-          url: gDocsUrl,
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _trainingController.fetchPdfTrainings(categoryId: 'all');
+    });
+  }
+
+  List<TrainingModel> get _filteredPdfs {
+    return _trainingController.pdfs;
+  }
+
+  void _viewPdf(TrainingModel pdf) {
+    Get.to(() => TrainingPdfDetailsScreen(
+          trainingId: pdf.id,
           title: pdf.title,
         ));
   }
@@ -137,8 +81,23 @@ class _TrainingPdfsScreenState extends State<TrainingPdfsScreen> {
               ),
               child: TextField(
                 onChanged: (val) {
-                  setState(() {
-                    _searchQuery = val;
+                  _debounce?.cancel();
+                  _debounce = Timer(const Duration(milliseconds: 500), () {
+                    if (val.trim().isEmpty) {
+                      if (_selectedCategory == 'All') {
+                        _trainingController.fetchPdfTrainings(categoryId: 'all');
+                      } else {
+                        final catObj = _categoryController.categories.firstWhere(
+                          (c) => c.categoryName == _selectedCategory,
+                          orElse: () => TrainingCategoryModel(id: 0, categoryName: ''),
+                        );
+                        if (catObj.id != 0) {
+                          _trainingController.fetchPdfTrainings(categoryId: catObj.id.toString());
+                        }
+                      }
+                    } else {
+                      _trainingController.searchPdfTrainings(val.trim());
+                    }
                   });
                 },
                 style: const TextStyle(color: Colors.white, fontSize: 14),
@@ -154,72 +113,95 @@ class _TrainingPdfsScreenState extends State<TrainingPdfsScreen> {
           ),
 
           // Categories Selector
-          SizedBox(
-            height: 38,
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              scrollDirection: Axis.horizontal,
-              itemCount: _categories.length,
-              itemBuilder: (context, index) {
-                final category = _categories[index];
-                final isSelected = _selectedCategory == category;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedCategory = category;
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primaryColor : AppColors.cardColor,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: isSelected
-                              ? AppColors.primaryColor
-                              : Colors.white.withOpacity(0.04),
+          Obx(() {
+            final categoriesList = ["All", ..._categoryController.categories.map((c) => c.categoryName)];
+            return SizedBox(
+              height: 38,
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                scrollDirection: Axis.horizontal,
+                itemCount: categoriesList.length,
+                itemBuilder: (context, index) {
+                  final category = categoriesList[index];
+                  final isSelected = _selectedCategory == category;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedCategory = category;
+                        });
+                        if (category == 'All') {
+                          _trainingController.fetchPdfTrainings(categoryId: 'all');
+                        } else {
+                          final catObj = _categoryController.categories.firstWhere(
+                            (c) => c.categoryName == category,
+                            orElse: () => TrainingCategoryModel(id: 0, categoryName: ''),
+                          );
+                          if (catObj.id != 0) {
+                            _trainingController.fetchPdfTrainings(categoryId: catObj.id.toString());
+                          }
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppColors.primaryColor : AppColors.cardColor,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: isSelected
+                                ? AppColors.primaryColor
+                                : Colors.white.withOpacity(0.04),
+                          ),
                         ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          category,
-                          style: TextStyle(
-                            color: isSelected ? Colors.black : Colors.white70,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                        child: Center(
+                          child: Text(
+                            category,
+                            style: TextStyle(
+                              color: isSelected ? Colors.black : Colors.white70,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              },
-            ),
-          ),
+                  );
+                },
+              ),
+            );
+          }),
 
           const SizedBox(height: 16),
 
           // Document List
           Expanded(
-            child: _filteredPdfs.isEmpty
-                ? _buildEmptyState()
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: _filteredPdfs.length,
-                    itemBuilder: (context, index) {
-                      final pdf = _filteredPdfs[index];
-                      return _buildPdfCard(pdf);
-                    },
-                  ),
+            child: Obx(() {
+              if (_trainingController.isPdfsLoading.value) {
+                return const Center(
+                  child: CircularProgressIndicator(color: AppColors.primaryColor),
+                );
+              }
+              final pdfList = _filteredPdfs;
+              if (pdfList.isEmpty) {
+                return _buildEmptyState();
+              }
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: pdfList.length,
+                itemBuilder: (context, index) {
+                  final pdf = pdfList[index];
+                  return _buildPdfCard(pdf);
+                },
+              );
+            }),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPdfCard(TrainingPdf pdf) {
+  Widget _buildPdfCard(TrainingModel pdf) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -254,22 +236,23 @@ class _TrainingPdfsScreenState extends State<TrainingPdfsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Category Tag
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryColor.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          pdf.category.toUpperCase(),
-                          style: const TextStyle(
-                            color: AppColors.primaryColor,
-                            fontSize: 9,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.5,
+                      if (pdf.category != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryColor.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            pdf.category!.categoryName.toUpperCase(),
+                            style: const TextStyle(
+                              color: AppColors.primaryColor,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ),
-                      ),
                       const SizedBox(height: 8),
                       // Title
                       Text(
@@ -301,14 +284,7 @@ class _TrainingPdfsScreenState extends State<TrainingPdfsScreen> {
                           Icon(Icons.insert_drive_file_outlined, size: 12, color: Colors.white.withOpacity(0.35)),
                           const SizedBox(width: 4),
                           Text(
-                            "${pdf.pages} Pages",
-                            style: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 11, fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(width: 14),
-                          Icon(Icons.save_alt_rounded, size: 12, color: Colors.white.withOpacity(0.35)),
-                          const SizedBox(width: 4),
-                          Text(
-                            pdf.size,
+                            "PDF Document",
                             style: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 11, fontWeight: FontWeight.w500),
                           ),
                         ],

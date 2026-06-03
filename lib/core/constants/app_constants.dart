@@ -28,6 +28,10 @@ class AppConstants {
     static const String termsConditionUrl = '/api/pages/terms_condition';
     static const String privacyPolicyUrl = '/api/pages/privacy_policy';
     static const String aboutUsUrl = '/api/pages/about_us';
+    static const String notificationsUrl = '/api/notifications';
+    static const String trainingCategoriesUrl = '/api/training-categories';
+    static const String trainingsUrl = '/api/trainings';
+    static const String trainingsSearchUrl = '/api/trainings/search';
 
     // Shared Preferences keys
     static const String theme = 'theme';
