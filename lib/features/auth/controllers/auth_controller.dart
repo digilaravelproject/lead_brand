@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -30,15 +31,35 @@ class AuthController extends GetxController {
   final _picker = ImagePicker();
 
   Future<void> pickImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+    );
     if (image != null) {
+      final file = File(image.path);
+      final sizeInBytes = await file.length();
+      final sizeInMb = sizeInBytes / (1024 * 1024);
+      if (sizeInMb > 5) {
+        CustomSnackbar.showError('Selected image is too large. Please select an image under 5MB.');
+        return;
+      }
       imagePath.value = image.path;
     }
   }
 
   Future<void> pickLogo() async {
-    final XFile? logo = await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? logo = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+    );
     if (logo != null) {
+      final file = File(logo.path);
+      final sizeInBytes = await file.length();
+      final sizeInMb = sizeInBytes / (1024 * 1024);
+      if (sizeInMb > 5) {
+        CustomSnackbar.showError('Selected logo is too large. Please select an image under 5MB.');
+        return;
+      }
       logoPath.value = logo.path;
     }
   }
@@ -287,6 +308,17 @@ class AuthController extends GetxController {
       return;
     }
 
+    if (imagePath.value.isNotEmpty) {
+      final file = File(imagePath.value);
+      if (await file.exists()) {
+        final sizeInBytes = await file.length();
+        if (sizeInBytes > 5 * 1024 * 1024) {
+          CustomSnackbar.showError('Profile photo is too large. Please select an image under 5MB.');
+          return;
+        }
+      }
+    }
+
     final email = Get.arguments as String? ?? emailController.text.trim();
 
     isLoading.value = true;
@@ -341,7 +373,19 @@ class AuthController extends GetxController {
     try {
       final response = await authRepository.getUserProfile();
       if (response.isSuccess && response.body != null) {
-        final userData = response.body['user'];
+        Map<String, dynamic>? userData;
+        if (response.body['user'] != null) {
+          userData = response.body['user'] as Map<String, dynamic>;
+        } else if (response.body['data'] != null) {
+          final dataObj = response.body['data'];
+          if (dataObj is Map<String, dynamic>) {
+            if (dataObj['user'] != null) {
+              userData = dataObj['user'] as Map<String, dynamic>;
+            } else {
+              userData = dataObj;
+            }
+          }
+        }
         if (userData != null) {
           final user = UserSetupModel.fromJson(userData);
           nameController.text = user.name;
@@ -387,6 +431,28 @@ class AuthController extends GetxController {
       return false;
     }
 
+    if (imagePath.value.isNotEmpty) {
+      final file = File(imagePath.value);
+      if (await file.exists()) {
+        final sizeInBytes = await file.length();
+        if (sizeInBytes > 5 * 1024 * 1024) {
+          CustomSnackbar.showError('Profile photo is too large. Please select an image under 5MB.');
+          return false;
+        }
+      }
+    }
+
+    if (logoPath.value.isNotEmpty) {
+      final file = File(logoPath.value);
+      if (await file.exists()) {
+        final sizeInBytes = await file.length();
+        if (sizeInBytes > 5 * 1024 * 1024) {
+          CustomSnackbar.showError('Company logo is too large. Please select an image under 5MB.');
+          return false;
+        }
+      }
+    }
+
     isLoading.value = true;
     try {
       final response = await authRepository.updateProfile(
@@ -397,8 +463,22 @@ class AuthController extends GetxController {
         logoPath: logoPath.value,
       );
 
-      if (response.isSuccess && response.body != null) {
-        final userData = response.body['user'];
+      if (response.isSuccess) {
+        Map<String, dynamic>? userData;
+        if (response.body != null) {
+          if (response.body['user'] != null) {
+            userData = response.body['user'] as Map<String, dynamic>;
+          } else if (response.body['data'] != null) {
+            final dataObj = response.body['data'];
+            if (dataObj is Map<String, dynamic>) {
+              if (dataObj['user'] != null) {
+                userData = dataObj['user'] as Map<String, dynamic>;
+              } else {
+                userData = dataObj;
+              }
+            }
+          }
+        }
         if (userData != null) {
           final user = UserSetupModel.fromJson(userData);
 
@@ -418,12 +498,34 @@ class AuthController extends GetxController {
           logoPath.value = '';
           profilePhotoUrl.value = user.profilePhoto ?? '';
           logoUrl.value = user.logo ?? '';
-
-          Future.delayed(const Duration(milliseconds: 300), () {
-            CustomSnackbar.showSuccess(response.message);
-          });
-          return true;
+        } else {
+          // Update local state fallback if backend doesn't return user object directly
+          final currentUserVal = rxUser.value;
+          if (currentUserVal != null) {
+            final updatedUser = UserSetupModel(
+              id: currentUserVal.id,
+              name: name,
+              email: currentUserVal.email,
+              destination: dest.isNotEmpty ? dest : currentUserVal.destination,
+              phoneNumber: phone.isNotEmpty ? phone : currentUserVal.phoneNumber,
+              profilePhoto: profilePhotoUrl.value,
+              logo: logoUrl.value,
+              emailVerifiedAt: currentUserVal.emailVerifiedAt,
+            );
+            final userJson = jsonEncode(updatedUser.toJson());
+            await SharedPrefs.setString(AppConstants.userData, userJson);
+            rxUser.value = updatedUser;
+            currentUser.value = UserInfoModel(
+              name: name,
+              mobile: phone,
+            );
+          }
         }
+
+        Future.delayed(const Duration(milliseconds: 300), () {
+          CustomSnackbar.showSuccess(response.message);
+        });
+        return true;
       } else {
         CustomSnackbar.showError(response.message);
       }

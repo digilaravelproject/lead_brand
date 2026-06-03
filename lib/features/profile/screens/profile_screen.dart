@@ -286,8 +286,8 @@ class ProfileScreen extends GetView<AuthController> {
                       isLoading: controller.isLoading.value,
                       onPressed: () async {
                         final success = await controller.updateProfileChanges();
-                        if (success) {
-                          Get.back();
+                        if (success && context.mounted) {
+                          Navigator.pop(context);
                         }
                       },
                     )),
