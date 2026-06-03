@@ -4,7 +4,6 @@ import '../features/auth/otp/otp_screen.dart';
 import '../features/auth/bindings/auth_binding.dart';
 import '../features/splash/screens/splash_screen.dart';
 import '../features/splash/bindings/splash_binding.dart';
-import '../features/dashboard/screens/dashboard_screen.dart';
 import '../features/dashboard/screens/main_screen.dart';
 import '../features/profile/screens/profile_setup_screen.dart';
 import '../features/profile/screens/profile_screen.dart';
@@ -17,6 +16,10 @@ import '../../features/promotional_videos/screens/video_viewer_screen.dart';
 import '../features/pdf_calendar/screens/pdf_calendar_screen.dart';
 import '../features/settings/screens/settings_screen.dart';
 import '../features/settings/screens/faq_screen.dart';
+import '../features/legal/screens/terms_condition_screen.dart';
+import '../features/legal/screens/privacy_policy_screen.dart';
+import '../features/legal/screens/about_us_screen.dart';
+import '../features/legal/bindings/legal_binding.dart';
 import 'app_routes.dart';
 
 class RouteHelper {
@@ -34,6 +37,9 @@ class RouteHelper {
   static String getSettingsRoute() => AppRoutes.settings;
   static String getLicPlansRoute() => AppRoutes.licPlans;
   static String getFaqRoute() => AppRoutes.faq;
+  static String getTermsConditionRoute() => AppRoutes.termsCondition;
+  static String getPrivacyPolicyRoute() => AppRoutes.privacyPolicy;
+  static String getAboutUsRoute() => AppRoutes.aboutUs;
   static String getPromotionalVideosRoute() => '/promotional-videos';
   static String getVideoPlayerRoute() => '/video-player';
 
@@ -105,6 +111,24 @@ class RouteHelper {
     GetPage(
       name: AppRoutes.faq,
       page: () => FaqScreen(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: AppRoutes.termsCondition,
+      page: () => const TermsConditionScreen(),
+      binding: LegalBinding(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: AppRoutes.privacyPolicy,
+      page: () => const PrivacyPolicyScreen(),
+      binding: LegalBinding(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: AppRoutes.aboutUs,
+      page: () => const AboutUsScreen(),
+      binding: LegalBinding(),
       transition: Transition.rightToLeft,
     ),
     GetPage(

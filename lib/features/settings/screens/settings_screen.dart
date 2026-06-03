@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
@@ -9,7 +10,7 @@ import '../../../routes/route_helper.dart';
 import '../../../core/widgets/custom_web_view.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   void _openInternalWebView(String url, String title) {
     Get.to(() => CustomWebView(url: url, title: title));
@@ -129,12 +130,12 @@ class SettingsScreen extends StatelessWidget {
           _buildSettingItem(
             icon: Icons.description_outlined,
             title: 'Terms & Conditions',
-            onTap: () => _openInternalWebView(AppConstants.termsUrl, 'Terms & Conditions'),
+            onTap: () => Get.toNamed(RouteHelper.getTermsConditionRoute()),
           ),
           _buildSettingItem(
             icon: Icons.privacy_tip_outlined,
             title: 'Privacy Policy',
-            onTap: () => _openInternalWebView(AppConstants.privacyUrl, 'Privacy Policy'),
+            onTap: () => Get.toNamed(RouteHelper.getPrivacyPolicyRoute()),
           ),
           
           const Divider(thickness: 1, height: 30, color: AppColors.borderColor),
@@ -143,7 +144,7 @@ class SettingsScreen extends StatelessWidget {
           _buildSettingItem(
             icon: Icons.info_outline,
             title: 'About App',
-            onTap: () => _openInternalWebView(AppConstants.aboutUrl, 'About App'),
+            onTap: () => Get.toNamed(RouteHelper.getAboutUsRoute()),
           ),
           
           const SizedBox(height: 40),
@@ -181,41 +182,55 @@ class SettingsScreen extends StatelessWidget {
       borderRadius: BorderRadius.circular(15),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 32,
-              backgroundColor: AppColors.primaryColor.withOpacity(0.12),
-              child: const Icon(Icons.person, size: 38, color: AppColors.primaryColor),
-            ),
-            const SizedBox(width: 18),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    controller.nameController.text.isNotEmpty ? controller.nameController.text : 'User Name',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    controller.emailController.text.isNotEmpty ? controller.emailController.text : 'user@example.com',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textColorSecondary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+        child: Obx(() {
+          final user = controller.rxUser.value;
+          final name = user?.name ?? 'User Name';
+          final email = user?.email ?? 'user@example.com';
+          final photo = user?.profilePhoto;
+
+          return Row(
+            children: [
+              CircleAvatar(
+                radius: 32,
+                backgroundColor: AppColors.primaryColor.withValues(alpha: 0.12),
+                backgroundImage: photo != null && photo.isNotEmpty
+                    ? (photo.startsWith('/') 
+                        ? NetworkImage('${AppConstants.baseUrl}$photo') as ImageProvider
+                        : FileImage(File(photo)) as ImageProvider)
+                    : null,
+                child: photo == null || photo.isEmpty
+                    ? const Icon(Icons.person, size: 38, color: AppColors.primaryColor)
+                    : null,
               ),
-            ),
-            const Icon(Icons.chevron_right, color: AppColors.textColorHint, size: 22),
-          ],
-        ),
+              const SizedBox(width: 18),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      email,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textColorSecondary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: AppColors.textColorHint, size: 22),
+            ],
+          );
+        }),
       ),
     );
   }

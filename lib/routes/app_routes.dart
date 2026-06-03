@@ -13,4 +13,7 @@ class AppRoutes {
   static const String settings = '/settings';
   static const String licPlans = '/lic-plans';
   static const String faq = '/faq';
+  static const String termsCondition = '/terms-condition';
+  static const String privacyPolicy = '/privacy-policy';
+  static const String aboutUs = '/about-us';
 }

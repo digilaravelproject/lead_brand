@@ -5,6 +5,7 @@ import '../../features/plans/controllers/plans_controller.dart';
 import '../../features/gallery/controllers/gallery_controller.dart';
 import '../../features/video_ads/controllers/video_ads_controller.dart';
 import '../../features/pdf_calendar/controllers/pdf_calendar_controller.dart';
+import '../../features/settings/controllers/faq_controller.dart';
 
 class InitialBindings extends Bindings {
   @override
@@ -26,5 +27,8 @@ class InitialBindings extends Bindings {
     
     // PDF Calendar
     Get.lazyPut(() => PdfCalendarController(), fenix: true);
+    
+    // FAQs
+    Get.lazyPut(() => FaqController(), fenix: true);
   }
 }

@@ -2,19 +2,25 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../../../core/widgets/custom_text_field.dart';
 import '../../auth/controllers/auth_controller.dart';
 
 class ProfileScreen extends GetView<AuthController> {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     if (!Get.isRegistered<AuthController>()) {
       Get.put(AuthController());
     }
+
+    // Fetch user profile on screen load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.fetchUserProfile();
+    });
 
     final theme = Theme.of(context);
     return Scaffold(
@@ -37,8 +43,10 @@ class ProfileScreen extends GetView<AuthController> {
         ),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
+        child: Obx(() => controller.isProfileLoading.value
+            ? const Center(child: CircularProgressIndicator(color: AppColors.primaryColor))
+            : Column(
+                children: [
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
@@ -67,9 +75,14 @@ class ProfileScreen extends GetView<AuthController> {
                                             image: FileImage(File(controller.imagePath.value)),
                                             fit: BoxFit.cover,
                                           )
-                                        : null,
+                                        : (controller.profilePhotoUrl.value.isNotEmpty
+                                            ? DecorationImage(
+                                                image: NetworkImage('${AppConstants.baseUrl}${controller.profilePhotoUrl.value}'),
+                                                fit: BoxFit.cover,
+                                              )
+                                            : null),
                                   ),
-                                  child: controller.imagePath.value.isEmpty
+                                  child: controller.imagePath.value.isEmpty && controller.profilePhotoUrl.value.isEmpty
                                       ? const Icon(Icons.person, size: 50, color: AppColors.textColorHint)
                                       : null,
                                 )),
@@ -120,9 +133,14 @@ class ProfileScreen extends GetView<AuthController> {
                                             image: FileImage(File(controller.logoPath.value)),
                                             fit: BoxFit.cover,
                                           )
-                                        : null,
+                                        : (controller.logoUrl.value.isNotEmpty
+                                            ? DecorationImage(
+                                                image: NetworkImage('${AppConstants.baseUrl}${controller.logoUrl.value}'),
+                                                fit: BoxFit.cover,
+                                              )
+                                            : null),
                                   ),
-                                  child: controller.logoPath.value.isEmpty
+                                  child: controller.logoPath.value.isEmpty && controller.logoUrl.value.isEmpty
                                       ? const Icon(Icons.business, size: 50, color: AppColors.textColorHint)
                                       : null,
                                 )),
@@ -194,7 +212,7 @@ class ProfileScreen extends GetView<AuthController> {
                         ),
                         const SizedBox(height: 15),
                         const Text(
-                          'Designation',
+                          'Destination',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
@@ -203,10 +221,10 @@ class ProfileScreen extends GetView<AuthController> {
                         ),
                         const SizedBox(height: 8),
                         CustomTextField(
-                          controller: controller.designationController,
-                          hintText: 'Designation',
-                          prefixIcon: Icons.work_history_outlined,
-                          readOnly: true,
+                          controller: controller.destinationController,
+                          hintText: 'Destination',
+                          prefixIcon: Icons.location_on_outlined,
+                          readOnly: false,
                         ),
                         const SizedBox(height: 15),
                         const Text(
@@ -259,24 +277,19 @@ class ProfileScreen extends GetView<AuthController> {
             // Pinned Save Button
             Padding(
               padding: const EdgeInsets.all(25.0),
-              child: CustomButton(
+              child: Obx(() => CustomButton(
                 text: 'SAVE CHANGES',
-                onPressed: () {
-                  Get.back();
-                  Get.snackbar(
-                    'Success',
-                    'Profile updated successfully',
-                    snackPosition: SnackPosition.TOP,
-                    backgroundColor: AppColors.successColor,
-                    colorText: Colors.white,
-                    margin: const EdgeInsets.all(15),
-                    borderRadius: 12,
-                  );
+                isLoading: controller.isLoading.value,
+                onPressed: () async {
+                  final success = await controller.updateProfileChanges();
+                  if (success) {
+                    Get.back();
+                  }
                 },
-              ),
+              )),
             ),
           ],
-        ),
+        )),
       ),
     );
   }

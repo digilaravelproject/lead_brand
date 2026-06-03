@@ -5,4 +5,13 @@ abstract class AuthRepositoryInterface {
   Future<ResponseModel> verifyOtp(String email, String otp);
   Future<ResponseModel> resendOtp(String email);
   Future<ResponseModel> completeSetup(String email, String name, String? profilePhotoPath);
+  Future<ResponseModel> getUserProfile();
+  Future<ResponseModel> updateProfile({
+    required String name,
+    required String phoneNumber,
+    required String destination,
+    String? profilePhotoPath,
+    String? logoPath,
+  });
+  Future<ResponseModel> logout();
 }

@@ -563,8 +563,8 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
                               const SizedBox(height: 2),
                               // Designation
                               Text(
-                                controller.designationController.text.toUpperCase().isNotEmpty 
-                                    ? controller.designationController.text.toUpperCase() 
+                                controller.destinationController.text.toUpperCase().isNotEmpty
+                                    ? controller.destinationController.text.toUpperCase()
                                     : "SOFTWARE COMPANY",
                                 style: const TextStyle(
                                   color: Colors.black87,

@@ -63,4 +63,44 @@ class AuthRepository implements AuthRepositoryInterface {
       );
     }
   }
+
+  @override
+  Future<ResponseModel> getUserProfile() async {
+    return await apiClient.get(AppConstants.getUserUrl);
+  }
+
+  @override
+  Future<ResponseModel> updateProfile({
+    required String name,
+    required String phoneNumber,
+    required String destination,
+    String? profilePhotoPath,
+    String? logoPath,
+  }) async {
+    final body = {
+      'name': name,
+      'phone_number': phoneNumber,
+      'destination': destination,
+    };
+
+    final List<MultipartBody> multipartBody = [];
+    if (profilePhotoPath != null && profilePhotoPath.isNotEmpty) {
+      multipartBody.add(MultipartBody('profile_photo', XFile(profilePhotoPath)));
+    }
+    if (logoPath != null && logoPath.isNotEmpty) {
+      multipartBody.add(MultipartBody('logo', XFile(logoPath)));
+    }
+
+    return await apiClient.postMultipartData(
+      AppConstants.updateProfileUrl,
+      body,
+      multipartBody,
+      [],
+    );
+  }
+
+  @override
+  Future<ResponseModel> logout() async {
+    return await apiClient.post(AppConstants.logoutUrl);
+  }
 }
