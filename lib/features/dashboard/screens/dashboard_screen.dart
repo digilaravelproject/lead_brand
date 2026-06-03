@@ -36,30 +36,44 @@ class DashboardScreen extends GetView<DashboardController> {
           child: Center(
             child: GestureDetector(
               onTap: () => Get.toNamed(RouteHelper.getProfileRoute()),
-              child: Obx(() => Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.primaryColor, width: 1.5),
-                  color: const Color(0xFF0F121A),
-                  image: authController.imagePath.value.isNotEmpty
-                      ? DecorationImage(
-                          image: FileImage(File(authController.imagePath.value)),
-                          fit: BoxFit.cover,
+              child: Obx(() {
+                final localPath = authController.imagePath.value;
+                final photo = authController.rxUser.value?.profilePhoto;
+                
+                ImageProvider? imageProvider;
+                if (localPath.isNotEmpty) {
+                  imageProvider = FileImage(File(localPath));
+                } else if (photo != null && photo.isNotEmpty) {
+                  imageProvider = photo.startsWith('/')
+                      ? NetworkImage('${AppConstants.baseUrl}$photo')
+                      : FileImage(File(photo)) as ImageProvider;
+                }
+
+                return Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.primaryColor, width: 1.5),
+                    color: const Color(0xFF0F121A),
+                    image: imageProvider != null
+                        ? DecorationImage(
+                            image: imageProvider,
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                  ),
+                  child: imageProvider == null
+                      ? const Center(
+                          child: Icon(
+                            Icons.person,
+                            color: AppColors.primaryColor,
+                            size: 24,
+                          ),
                         )
                       : null,
-                ),
-                child: authController.imagePath.value.isEmpty
-                    ? const Center(
-                        child: Icon(
-                          Icons.person,
-                          color: AppColors.primaryColor,
-                          size: 24,
-                        ),
-                      )
-                    : null,
-              )),
+                );
+              }),
             ),
           ),
         ),
