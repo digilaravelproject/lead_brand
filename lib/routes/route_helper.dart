@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../features/auth/login/login_screen.dart';
 import '../features/auth/otp/otp_screen.dart';
+import '../features/auth/bindings/auth_binding.dart';
 import '../features/splash/screens/splash_screen.dart';
 import '../features/splash/bindings/splash_binding.dart';
 import '../features/dashboard/screens/dashboard_screen.dart';
@@ -45,16 +46,19 @@ class RouteHelper {
     GetPage(
       name: AppRoutes.login,
       page: () => const LoginScreen(),
+      binding: AuthBinding(),
       transition: Transition.fadeIn,
     ),
     GetPage(
       name: AppRoutes.otp,
       page: () => const OtpScreen(),
+      binding: AuthBinding(),
       transition: Transition.rightToLeft,
     ),
     GetPage(
       name: AppRoutes.profileSetup,
       page: () => const ProfileSetupScreen(),
+      binding: AuthBinding(),
       transition: Transition.rightToLeft,
     ),
     GetPage(
@@ -90,6 +94,7 @@ class RouteHelper {
     GetPage(
       name: AppRoutes.profile,
       page: () => const ProfileScreen(),
+      binding: AuthBinding(),
       transition: Transition.rightToLeft,
     ),
     GetPage(

@@ -2,7 +2,7 @@ import '../services/config/env_config.dart';
 
 class AppConstants {
     static String appName = EnvConfig.appName;
-    static String baseUrl = EnvConfig.baseUrl;
+    static const String baseUrl = 'https://sienna-owl-749505.hostingersite.com';
     static const String fontFamily = 'Poppins';
     static const String defaultTag = 'PCB_APP'; // default tag for log checking
 
@@ -12,12 +12,16 @@ class AppConstants {
     static const bool showToaster = false; // manages UI-level notifications.
 
     // API base URLs
-    static  String imageUrl = '$baseUrl';
+    static const String imageUrl = baseUrl;
 
     // API endpoints
     static const String userSignupUrl = '/api/user_signup';
     static const String userLoginUrl = '/api/user_login';
     static const String otpVerifyUrl = '/api/otp_verify';
+    static const String sendOtpUrl = '/api/auth/send-otp';
+    static const String verifyOtpUrl = '/api/auth/verify-otp';
+    static const String resendOtpUrl = '/api/auth/resend-otp';
+    static const String completeSetupUrl = '/api/auth/complete-setup';
 
     // Shared Preferences keys
     static const String theme = 'theme';

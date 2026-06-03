@@ -8,7 +8,6 @@ class OtpScreen extends GetView<AuthController> {
   const OtpScreen({Key? key}) : super(key: key);
 
   @override
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
@@ -53,10 +52,32 @@ class OtpScreen extends GetView<AuthController> {
                       ),
                       const SizedBox(height: 50),
                       // OTP Input Fields
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: List.generate(4, (index) => _otpTextField(context, index)),
-                      ),
+                      Obx(() {
+                        final hasError = controller.otpErrorText.value != null;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: List.generate(4, (index) => _otpTextField(context, index)),
+                            ),
+                            if (hasError) ...[
+                              const SizedBox(height: 10),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  controller.otpErrorText.value!,
+                                  style: const TextStyle(
+                                    color: AppColors.errorColor,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        );
+                      }),
                       const SizedBox(height: 30),
                       Center(
                         child: Column(
@@ -66,7 +87,7 @@ class OtpScreen extends GetView<AuthController> {
                               style: TextStyle(color: AppColors.textColorSecondary, fontSize: 14),
                             ),
                             TextButton(
-                              onPressed: () {},
+                              onPressed: controller.resendOtp,
                               child: const Text(
                                 'Resend Code',
                                 style: TextStyle(
@@ -111,9 +132,12 @@ class OtpScreen extends GetView<AuthController> {
       ),
       child: Center(
         child: TextField(
+          controller: controller.otpControllers[index],
           onChanged: (value) {
             if (value.length == 1 && index < 3) {
               FocusScope.of(context).nextFocus();
+            } else if (value.isEmpty && index > 0) {
+              FocusScope.of(context).previousFocus();
             }
           },
           textAlign: TextAlign.center,

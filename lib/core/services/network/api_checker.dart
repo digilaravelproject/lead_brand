@@ -15,7 +15,7 @@ class ApiChecker {
   static Response checkResponse(Response response, {bool showToaster = false}) {
     switch (response.statusCode) {
       case 200:
-        if (response.data['res'] == 'success') {
+        if (response.data['res'] == 'success' || response.data['status'] == true || response.data['success'] == true) {
           return response;
         } else {
           if (showToaster) _showErrorMessage(response);
@@ -23,7 +23,7 @@ class ApiChecker {
             requestOptions: response.requestOptions,
             response: response,
             type: DioExceptionType.badResponse,
-            error: response.data['msg'] ?? 'Something went wrong',
+            error: response.data['msg'] ?? response.data['message'] ?? 'Something went wrong',
           );
         }
       case 401:
@@ -321,8 +321,11 @@ class ApiChecker {
       }
     }
 
-    if (response.data is Map && (response.data['res']?.toString().toLowerCase() != 'success')) {
-      final message = response.data['msg']?.toString() ?? 'Something went wrong';
+    if (response.data is Map &&
+        (response.data['res']?.toString().toLowerCase() != 'success' &&
+         response.data['status'] != true &&
+         response.data['success'] != true)) {
+      final message = response.data['msg']?.toString() ?? response.data['message']?.toString() ?? 'Something went wrong';
       if (showToaster) CustomSnackbar.showError(message);
 
       return ResponseModel(
@@ -337,7 +340,7 @@ class ApiChecker {
   }
 
   static void _showErrorMessage(Response response, [String? defaultMessage]) {
-    final message = response.data['msg'] ?? defaultMessage ?? 'Something went wrong';
+    final message = response.data['msg'] ?? response.data['message'] ?? defaultMessage ?? 'Something went wrong';
     CustomSnackbar.showError(message);
   }
 
@@ -349,12 +352,16 @@ class ApiChecker {
           CustomSnackbar.showError(responseModel.errors!.first.message ?? 'Validation Error');
         } else if (response.data['msg'] != null) {
           CustomSnackbar.showError(response.data['msg']);
+        } else if (response.data['message'] != null) {
+          CustomSnackbar.showError(response.data['message']);
         } else {
           CustomSnackbar.showError('Validation Error');
         }
       } catch (e) {
         if (response.data['msg'] != null) {
           CustomSnackbar.showError(response.data['msg']);
+        } else if (response.data['message'] != null) {
+          CustomSnackbar.showError(response.data['message']);
         } else {
           CustomSnackbar.showError('Validation Error');
         }

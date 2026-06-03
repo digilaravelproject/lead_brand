@@ -1,9 +1,26 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../routes/route_helper.dart';
+import '../domain/repositories/auth_repository_interface.dart';
+import '../domain/repositories/auth_repository.dart';
+import '../../../core/services/network/api_client.dart';
+import '../../../core/utils/app_validators.dart';
+import '../../../core/utils/custom_snackbar.dart';
+import '../../../core/services/storage/shared_prefs.dart';
+import '../../../core/services/storage/token_manger.dart';
+import '../../../core/constants/app_constants.dart';
+import '../domain/models/complete_setup_response.dart';
 
 class AuthController extends GetxController {
+  final AuthRepositoryInterface authRepository;
+
+  AuthController({AuthRepositoryInterface? authRepository})
+      : authRepository = authRepository ?? (Get.isRegistered<AuthRepositoryInterface>()
+            ? Get.find<AuthRepositoryInterface>()
+            : Get.put<AuthRepositoryInterface>(AuthRepository(apiClient: Get.find<ApiClient>())));
+
   final isLoading = false.obs;
   final imagePath = ''.obs;
   final logoPath = ''.obs;
@@ -22,11 +39,46 @@ class AuthController extends GetxController {
       logoPath.value = logo.path;
     }
   }
-  final emailController = TextEditingController(text: 'test@blessapp.com');
-  final otpController = TextEditingController();
-  final nameController = TextEditingController(text: 'Firoz Mohammad');
-  final designationController = TextEditingController(text: 'Software Developer');
-  final phoneController = TextEditingController(text: '9876543210');
+  final currentUser = Rxn<UserInfoModel>();
+  final emailErrorText = RxnString();
+  final nameErrorText = RxnString();
+  final otpErrorText = RxnString();
+  final List<TextEditingController> otpControllers = List.generate(4, (_) => TextEditingController());
+
+  @override
+  void onInit() {
+    super.onInit();
+    currentUser.value = UserInfoModel(
+      name: nameController.text,
+      mobile: phoneController.text,
+    );
+
+    // Clear error when user changes text
+    emailController.addListener(() {
+      if (emailErrorText.value != null) {
+        emailErrorText.value = null;
+      }
+    });
+
+    nameController.addListener(() {
+      if (nameErrorText.value != null) {
+        nameErrorText.value = null;
+      }
+    });
+
+    for (var c in otpControllers) {
+      c.addListener(() {
+        if (otpErrorText.value != null) {
+          otpErrorText.value = null;
+        }
+      });
+    }
+  }
+
+  final emailController = TextEditingController();
+  final nameController = TextEditingController();
+  final designationController = TextEditingController();
+  final phoneController = TextEditingController();
   final selectedCountryCode = '+91'.obs;
   final selectedCountryFlag = '🇮🇳'.obs;
   final selectedCountryName = 'India'.obs;
@@ -59,25 +111,176 @@ class AuthController extends GetxController {
   @override
   void onClose() {
     emailController.dispose();
-    otpController.dispose();
     nameController.dispose();
     phoneController.dispose();
+    designationController.dispose();
+    for (var c in otpControllers) {
+      c.dispose();
+    }
     super.onClose();
   }
 
-  void login() {
-    Get.toNamed(RouteHelper.getOtpRoute());
+  Future<void> login() async {
+    final email = emailController.text.trim();
+    final emailError = AppValidators.validateEmail(email);
+    emailErrorText.value = emailError;
+    if (emailError != null) {
+      return;
+    }
+
+    isLoading.value = true;
+    try {
+      final response = await authRepository.sendOtp(email);
+      if (response.isSuccess) {
+        for (var c in otpControllers) {
+          c.clear();
+        }
+        otpErrorText.value = null;
+        Get.toNamed(RouteHelper.getOtpRoute(), arguments: email);
+        Future.delayed(const Duration(milliseconds: 300), () {
+          CustomSnackbar.showSuccess(response.message);
+        });
+      } else {
+        emailErrorText.value = response.message;
+        CustomSnackbar.showError(response.message);
+      }
+    } catch (e) {
+      CustomSnackbar.showError('An error occurred. Please try again.');
+    } finally {
+      isLoading.value = false;
+    }
   }
 
-  void verifyOtp() {
-    Get.toNamed(RouteHelper.getProfileSetupRoute());
+  Future<void> verifyOtp() async {
+    final email = Get.arguments as String? ?? emailController.text.trim();
+    final otp = otpControllers.map((c) => c.text).join().trim();
+
+    if (otp.length < 4) {
+      otpErrorText.value = "Enter complete 4-digit OTP";
+      return;
+    }
+
+    isLoading.value = true;
+    try {
+      final response = await authRepository.verifyOtp(email, otp);
+      if (response.isSuccess) {
+        // Show success snackbar safely
+        Future.delayed(const Duration(milliseconds: 300), () {
+          CustomSnackbar.showSuccess(response.message);
+        });
+
+        int isNew = 1;
+        if (response.body != null && response.body is Map) {
+          isNew = response.body['is_new'] ?? 1;
+        }
+
+        if (isNew == 1) {
+          Get.offAllNamed(RouteHelper.getProfileSetupRoute());
+        } else {
+          Get.offAllNamed(RouteHelper.getDashboardRoute());
+        }
+      } else {
+        otpErrorText.value = response.message;
+        CustomSnackbar.showError(response.message);
+      }
+    } catch (e) {
+      CustomSnackbar.showError('An error occurred. Please try again.');
+    } finally {
+      isLoading.value = false;
+    }
   }
 
-  void saveProfile() {
-    Get.offAllNamed(RouteHelper.getDashboardRoute());
+  Future<void> resendOtp() async {
+    final email = Get.arguments as String? ?? emailController.text.trim();
+    if (email.isEmpty) {
+      CustomSnackbar.showError("Email is required to resend OTP");
+      return;
+    }
+
+    isLoading.value = true;
+    try {
+      final response = await authRepository.resendOtp(email);
+      if (response.isSuccess) {
+        for (var c in otpControllers) {
+          c.clear();
+        }
+        otpErrorText.value = null;
+
+        Future.delayed(const Duration(milliseconds: 300), () {
+          CustomSnackbar.showSuccess(response.message);
+        });
+      } else {
+        CustomSnackbar.showError(response.message);
+      }
+    } catch (e) {
+      CustomSnackbar.showError('An error occurred. Please try again.');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> saveProfile() async {
+    final name = nameController.text.trim();
+    final nameError = AppValidators.validateEmpty(name, fieldName: "Name");
+    nameErrorText.value = nameError;
+    if (nameError != null) {
+      return;
+    }
+
+    final email = Get.arguments as String? ?? emailController.text.trim();
+
+    isLoading.value = true;
+    try {
+      final response = await authRepository.completeSetup(email, name, imagePath.value);
+      if (response.isSuccess) {
+        if (response.body != null) {
+          final setupData = CompleteSetupData.fromJson(response.body);
+
+          // Save Access Token
+          if (setupData.accessToken.isNotEmpty) {
+            await TokenManager.saveToken(setupData.accessToken);
+          }
+
+          // Save User Data (in JSON string)
+          if (setupData.user != null) {
+            final userJson = jsonEncode(setupData.user!.toJson());
+            await SharedPrefs.setString(AppConstants.userData, userJson);
+
+            // Set currentUser info model in controller
+            currentUser.value = UserInfoModel(
+              name: setupData.user!.name,
+              mobile: setupData.user!.phoneNumber ?? '',
+            );
+          }
+        }
+
+        // Set is logged in to true
+        await SharedPrefs.setBool(AppConstants.isLoggedIn, true);
+
+        // Success snackbar
+        Future.delayed(const Duration(milliseconds: 300), () {
+          CustomSnackbar.showSuccess(response.message);
+        });
+
+        Get.offAllNamed(RouteHelper.getDashboardRoute());
+      } else {
+        CustomSnackbar.showError(response.message);
+      }
+    } catch (e) {
+      CustomSnackbar.showError('An error occurred. Please try again.');
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void logout() {
     Get.offAllNamed(RouteHelper.getLoginRoute());
   }
+}
+
+class UserInfoModel {
+  final String name;
+  final String mobile;
+
+  UserInfoModel({required this.name, required this.mobile});
 }

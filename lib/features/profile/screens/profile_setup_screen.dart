@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
@@ -6,9 +7,8 @@ import '../../../core/widgets/custom_text_field.dart';
 import '../../auth/controllers/auth_controller.dart';
 
 class ProfileSetupScreen extends GetView<AuthController> {
-  const ProfileSetupScreen({Key? key}) : super(key: key);
+  const ProfileSetupScreen({super.key});
 
-  @override
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -37,32 +37,43 @@ class ProfileSetupScreen extends GetView<AuthController> {
                   child: Column(
                     children: [
                       const SizedBox(height: 30),
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            width: 120,
-                            height: 120,
-                            decoration: BoxDecoration(
-                              color: theme.cardColor,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: AppColors.borderColor, width: 2),
-                            ),
-                            child: const Icon(Icons.person, size: 60, color: AppColors.textColorHint),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: const BoxDecoration(
-                                color: AppColors.primaryColor,
+                      GestureDetector(
+                        onTap: () => controller.pickImage(),
+                        child: Obx(() => Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              width: 120,
+                              height: 120,
+                              decoration: BoxDecoration(
+                                color: theme.cardColor,
                                 shape: BoxShape.circle,
+                                border: Border.all(color: AppColors.borderColor, width: 2),
+                                image: controller.imagePath.value.isNotEmpty
+                                    ? DecorationImage(
+                                        image: FileImage(File(controller.imagePath.value)),
+                                        fit: BoxFit.cover,
+                                      )
+                                    : null,
                               ),
-                              child: const Icon(Icons.camera_alt, color: Colors.black, size: 18),
+                              child: controller.imagePath.value.isEmpty
+                                  ? const Icon(Icons.person, size: 60, color: AppColors.textColorHint)
+                                  : null,
                             ),
-                          ),
-                        ],
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: const BoxDecoration(
+                                  color: AppColors.primaryColor,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.camera_alt, color: Colors.black, size: 18),
+                              ),
+                            ),
+                          ],
+                        )),
                       ),
                       const SizedBox(height: 50),
                       Column(
@@ -77,11 +88,12 @@ class ProfileSetupScreen extends GetView<AuthController> {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          CustomTextField(
+                          Obx(() => CustomTextField(
                             controller: controller.nameController,
                             hintText: 'Enter your full name',
                             prefixIcon: Icons.person_outline,
-                          ),
+                            errorText: controller.nameErrorText.value,
+                          )),
                           const SizedBox(height: 25),
                         ],
                       ),

@@ -51,11 +51,12 @@ class LoginScreen extends GetView<AuthController> {
                               ),
                             ),
                             const SizedBox(height: 40),
-                            CustomTextField(
+                            Obx(() => CustomTextField(
                               controller: controller.emailController,
                               hintText: 'Enter Email Address',
                               keyboardType: TextInputType.emailAddress,
-                            ),
+                              errorText: controller.emailErrorText.value,
+                            )),
                             const SizedBox(height: 25),
                             Obx(() => CustomButton(
                               text: 'SEND OTP',
