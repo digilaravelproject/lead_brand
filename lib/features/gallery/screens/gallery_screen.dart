@@ -43,48 +43,69 @@ class GalleryScreen extends GetView<GalleryController> {
           const SizedBox(width: 10),
         ],
       ),
-      body: Obx(() => GridView.builder(
-        padding: const EdgeInsets.fromLTRB(10, 15, 10, 20),
-        physics: const BouncingScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: controller.columnCount.value,
-          crossAxisSpacing: controller.columnCount.value == 3 ? 8 : 12,
-          mainAxisSpacing: controller.columnCount.value == 3 ? 8 : 12,
-          childAspectRatio: controller.columnCount.value == 3 ? 0.8 : 0.75,
-        ),
-        itemCount: controller.images.length,
-        itemBuilder: (context, index) {
-          final imageUrl = controller.images[index];
-          return GestureDetector(
-            onTap: () => controller.openImageViewer(imageUrl),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(controller.columnCount.value == 3 ? 12 : 16),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.04),
-                  width: 1.2,
-                ),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(controller.columnCount.value == 3 ? 11 : 15),
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Shimmer.fromColors(
-                    baseColor: const Color(0xFF151821),
-                    highlightColor: const Color(0xFF1F2430),
-                    child: Container(color: const Color(0xFF0F121A)),
+      body: Obx(() => controller.images.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.image_not_supported_outlined,
+                    size: 64,
+                    color: Colors.white.withOpacity(0.2),
                   ),
-                  errorWidget: (context, url, error) => Container(
-                    color: const Color(0xFF0F121A),
-                    child: const Icon(Icons.error_outline, color: Colors.white24),
+                  const SizedBox(height: 16),
+                  Text(
+                    "No image found",
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.5),
+                      fontSize: 16,
+                    ),
                   ),
-                ),
+                ],
               ),
-            ),
-          );
-        },
-      )),
+            )
+          : GridView.builder(
+              padding: const EdgeInsets.fromLTRB(10, 15, 10, 20),
+              physics: const BouncingScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: controller.columnCount.value,
+                crossAxisSpacing: controller.columnCount.value == 3 ? 8 : 12,
+                mainAxisSpacing: controller.columnCount.value == 3 ? 8 : 12,
+                childAspectRatio: controller.columnCount.value == 3 ? 0.8 : 0.75,
+              ),
+              itemCount: controller.images.length,
+              itemBuilder: (context, index) {
+                final imageUrl = controller.images[index];
+                return GestureDetector(
+                  onTap: () => controller.openImageViewer(imageUrl),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(controller.columnCount.value == 3 ? 12 : 16),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.04),
+                        width: 1.2,
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(controller.columnCount.value == 3 ? 11 : 15),
+                      child: CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Shimmer.fromColors(
+                          baseColor: const Color(0xFF151821),
+                          highlightColor: const Color(0xFF1F2430),
+                          child: Container(color: const Color(0xFF0F121A)),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: const Color(0xFF0F121A),
+                          child: const Icon(Icons.error_outline, color: Colors.white24),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            )),
     );
   }
 }

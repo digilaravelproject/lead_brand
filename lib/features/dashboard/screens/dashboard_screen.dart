@@ -179,7 +179,9 @@ class DashboardScreen extends GetView<DashboardController> {
           }),
         ],
       ),
-      body: SingleChildScrollView(
+      body: Stack(
+        children: [
+          SingleChildScrollView(
         child: Column(
           children: [
             // Greeting row
@@ -389,7 +391,7 @@ class DashboardScreen extends GetView<DashboardController> {
             // Features Grid
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: GridView.builder(
+              child: Obx(() => GridView.builder(
                 shrinkWrap: true,
                 padding: EdgeInsets.zero,
                 physics: const NeverScrollableScrollPhysics(),
@@ -399,12 +401,12 @@ class DashboardScreen extends GetView<DashboardController> {
                   mainAxisSpacing: 10,
                   childAspectRatio: 0.85,
                 ),
-                itemCount: 6,
+                itemCount: controller.features.length > 6 ? 6 : controller.features.length,
                 itemBuilder: (context, index) {
                   final feature = controller.features[index];
                   return _buildFeatureCard(feature);
                 },
-              ),
+              )),
             ),
 
             const SizedBox(height: 25),
@@ -578,6 +580,20 @@ class DashboardScreen extends GetView<DashboardController> {
           ],
         ),
       ),
+      Obx(() => controller.isFeaturesLoading.value
+          ? Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.5),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+            )
+          : const SizedBox.shrink()),
+        ],
+      ),
     );
   }
 
@@ -673,7 +689,7 @@ class DashboardScreen extends GetView<DashboardController> {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => controller.navigateToFeature(feature.route),
+        onTap: () => controller.navigateToFeature(feature),
         borderRadius: BorderRadius.circular(16),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),

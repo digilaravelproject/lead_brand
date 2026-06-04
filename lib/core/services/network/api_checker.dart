@@ -15,7 +15,12 @@ class ApiChecker {
   static Response checkResponse(Response response, {bool showToaster = false}) {
     switch (response.statusCode) {
       case 200:
-        if (response.data['res'] == 'success' || response.data['status'] == true || response.data['success'] == true) {
+        final statusVal = response.data is Map ? response.data['status']?.toString().toLowerCase() : null;
+        if (response.data is Map && (
+            response.data['res'] == 'success' ||
+            response.data['status'] == true ||
+            response.data['success'] == true ||
+            statusVal == 'success')) {
           return response;
         } else {
           if (showToaster) _showErrorMessage(response);
@@ -321,10 +326,12 @@ class ApiChecker {
       }
     }
 
+    final statusVal = response.data is Map ? response.data['status']?.toString().toLowerCase() : null;
     if (response.data is Map &&
         (response.data['res']?.toString().toLowerCase() != 'success' &&
          response.data['status'] != true &&
-         response.data['success'] != true)) {
+         response.data['success'] != true &&
+         statusVal != 'success')) {
       final message = response.data['msg']?.toString() ?? response.data['message']?.toString() ?? 'Something went wrong';
       if (showToaster) CustomSnackbar.showError(message);
 

@@ -31,22 +31,42 @@ class ComboPlanScreen extends GetView<PlansController> {
           ),
         )),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Obx(() => ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              itemCount: controller.currentPlans.length,
-              physics: const BouncingScrollPhysics(),
-              itemBuilder: (context, index) {
-                final plan = controller.currentPlans[index];
-                return _buildPlanCard(plan, index);
-              },
-            )),
-          ),
-        ],
-      ),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: Colors.blue,
+            ),
+          );
+        }
+        if (controller.currentPlans.isEmpty) {
+          return Center(
+            child: Text(
+              'No plans available',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.5),
+                fontSize: 16,
+              ),
+            ),
+          );
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                itemCount: controller.currentPlans.length,
+                physics: const BouncingScrollPhysics(),
+                itemBuilder: (context, index) {
+                  final plan = controller.currentPlans[index];
+                  return _buildPlanCard(plan, index);
+                },
+              ),
+            ),
+          ],
+        );
+      }),
     );
   }
 
