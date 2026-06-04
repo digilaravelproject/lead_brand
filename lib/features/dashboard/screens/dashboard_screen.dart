@@ -213,45 +213,55 @@ class DashboardScreen extends GetView<DashboardController> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
-                  child: Stack(
-                    children: [
-                      PageView.builder(
-                        controller: controller.pageController,
-                        onPageChanged: (index) {
-                          controller.currentBannerIndex.value = index;
-                        },
-                        itemCount: controller.bannerImages.length,
-                        itemBuilder: (context, index) {
-                          return Image.network(
-                            controller.bannerImages[index],
-                            fit: BoxFit.cover,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Container(
-                                color: const Color(0xFF0F121A),
-                                child: const Center(
-                                  child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
+                  child: Obx(() {
+                    if (controller.bannerImages.isEmpty) {
+                      return Container(
+                        color: const Color(0xFF0F121A),
+                        child: const Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
+                          ),
+                        ),
+                      );
+                    }
+                    return Stack(
+                      children: [
+                        PageView.builder(
+                          controller: controller.pageController,
+                          onPageChanged: (index) {
+                            controller.currentBannerIndex.value = index;
+                          },
+                          itemCount: controller.bannerImages.length,
+                          itemBuilder: (context, index) {
+                            return Image.network(
+                              controller.bannerImages[index],
+                              fit: BoxFit.cover,
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Container(
+                                  color: const Color(0xFF0F121A),
+                                  child: const Center(
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: const Color(0xFF0F121A),
-                                child: const Center(
-                                  child: Icon(Icons.broken_image, color: Colors.grey, size: 42),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                      Positioned(
-                        bottom: 12,
-                        left: 16,
-                        child: Obx(
-                          () => Row(
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: const Color(0xFF0F121A),
+                                  child: const Center(
+                                    child: Icon(Icons.broken_image, color: Colors.grey, size: 42),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                        Positioned(
+                          bottom: 12,
+                          left: 16,
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: List.generate(
                               controller.bannerImages.length,
@@ -270,9 +280,9 @@ class DashboardScreen extends GetView<DashboardController> {
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    );
+                  }),
                 ),
               ),
             ),

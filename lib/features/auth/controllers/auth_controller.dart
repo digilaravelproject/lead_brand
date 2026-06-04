@@ -234,7 +234,8 @@ class AuthController extends GetxController {
           Get.offAllNamed(RouteHelper.getProfileSetupRoute());
         } else {
           if (response.body != null && response.body is Map) {
-            final setupData = CompleteSetupData.fromJson(response.body);
+            final responseData = response.body['data'] ?? response.body;
+            final setupData = CompleteSetupData.fromJson(responseData);
 
             // Save Access Token
             if (setupData.accessToken.isNotEmpty) {
@@ -326,7 +327,8 @@ class AuthController extends GetxController {
       final response = await authRepository.completeSetup(email, name, imagePath.value);
       if (response.isSuccess) {
         if (response.body != null) {
-          final setupData = CompleteSetupData.fromJson(response.body);
+          final responseData = response.body['data'] ?? response.body;
+          final setupData = CompleteSetupData.fromJson(responseData);
 
           // Save Access Token
           if (setupData.accessToken.isNotEmpty) {

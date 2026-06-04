@@ -32,6 +32,7 @@ class AppConstants {
     static const String trainingCategoriesUrl = '/api/training-categories';
     static const String trainingsUrl = '/api/trainings';
     static const String trainingsSearchUrl = '/api/trainings/search';
+    static const String bannersUrl = '/api/banners';
 
     // Shared Preferences keys
     static const String theme = 'theme';

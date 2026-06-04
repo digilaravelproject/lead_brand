@@ -15,9 +15,13 @@ import 'package:share_plus/share_plus.dart';
 import 'package:gal/gal.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../core/services/storage/shared_prefs.dart';
 import '../../auth/controllers/auth_controller.dart';
+import '../../auth/domain/models/complete_setup_response.dart';
 import '../../video_ads/controllers/video_ads_controller.dart';
 import '../controllers/promotional_videos_controller.dart';
+import 'dart:convert';
 
 class VideoViewerScreen extends StatefulWidget {
   const VideoViewerScreen({Key? key}) : super(key: key);
@@ -99,15 +103,22 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authController = Get.find<AuthController>();
-    final String userName = authController.nameController.text.isNotEmpty 
-        ? authController.nameController.text 
+    final userJson = SharedPrefs.getString(AppConstants.userData);
+    UserSetupModel? user;
+    if (userJson != null && userJson.isNotEmpty) {
+      try {
+        user = UserSetupModel.fromJson(jsonDecode(userJson));
+      } catch (_) {}
+    }
+
+    final String userName = user?.name.isNotEmpty == true 
+        ? user!.name 
         : "Firoz Mohammad";
-    final String userPhone = authController.phoneController.text.isNotEmpty
-        ? authController.phoneController.text
+    final String userPhone = user?.phoneNumber?.isNotEmpty == true
+        ? user!.phoneNumber!
         : "+91 9876543210";
-    final String userEmail = authController.emailController.text.isNotEmpty
-        ? authController.emailController.text
+    final String userEmail = user?.email.isNotEmpty == true
+        ? user!.email
         : "test@blessapp.com";
 
     if (_youtubeController != null) {
@@ -723,6 +734,21 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
   }
 
   Widget _buildFirstBanner(AuthController controller, String name, String phone, String email) {
+    final userJson = SharedPrefs.getString(AppConstants.userData);
+    UserSetupModel? user;
+    if (userJson != null && userJson.isNotEmpty) {
+      try {
+        user = UserSetupModel.fromJson(jsonDecode(userJson));
+      } catch (_) {}
+    }
+
+    final String displayName = user?.name.isNotEmpty == true ? user!.name : name;
+    final String displayPhone = user?.phoneNumber?.isNotEmpty == true ? user!.phoneNumber! : phone;
+    final String displayEmail = user?.email.isNotEmpty == true ? user!.email : email;
+    final String displayDesignation = user?.destination?.isNotEmpty == true ? user!.destination! : "SOFTWARE COMPANY";
+    final String? profilePhoto = user?.profilePhoto;
+    final String? logo = user?.logo;
+
     return Container(
       color: Colors.white,
       child: Row(
@@ -736,11 +762,39 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
               border: Border(right: BorderSide(color: Colors.grey[200]!, width: 1.5)),
             ),
             clipBehavior: Clip.antiAlias,
-            child: controller.imagePath.value.isNotEmpty
-                ? Image.file(
-                    File(controller.imagePath.value),
-                    fit: BoxFit.cover,
-                  )
+            child: (profilePhoto != null && profilePhoto.isNotEmpty)
+                ? (profilePhoto.startsWith('/') || profilePhoto.startsWith('http')
+                    ? CachedNetworkImage(
+                        imageUrl: profilePhoto.startsWith('/')
+                            ? '${AppConstants.baseUrl}$profilePhoto'
+                            : profilePhoto,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Center(
+                          child: Icon(
+                            Icons.person,
+                            color: Colors.grey[600],
+                            size: 38,
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Center(
+                          child: Icon(
+                            Icons.person,
+                            color: Colors.grey[600],
+                            size: 38,
+                          ),
+                        ),
+                      )
+                    : Image.file(
+                        File(profilePhoto),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Center(
+                          child: Icon(
+                            Icons.person,
+                            color: Colors.grey[600],
+                            size: 38,
+                          ),
+                        ),
+                      ))
                 : CachedNetworkImage(
                     imageUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
                     fit: BoxFit.cover,
@@ -795,7 +849,7 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
                               const SizedBox(height: 2),
                               // Name
                               Text(
-                                name.toUpperCase(),
+                                displayName.toUpperCase(),
                                 style: const TextStyle(
                                   color: Color(0xFF1E3A8A), // Dark Indigo/Blue
                                   fontSize: 14,
@@ -809,9 +863,7 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
                               const SizedBox(height: 2),
                               // Designation
                               Text(
-                                controller.destinationController.text.toUpperCase().isNotEmpty
-                                    ? controller.destinationController.text.toUpperCase()
-                                    : "SOFTWARE COMPANY",
+                                displayDesignation.toUpperCase(),
                                 style: const TextStyle(
                                   color: Colors.black87,
                                   fontSize: 8,
@@ -848,7 +900,7 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
                                             const SizedBox(width: 4),
                                             Expanded(
                                               child: Text(
-                                                phone,
+                                                displayPhone,
                                                 style: const TextStyle(
                                                   color: Color(0xFFD32F2F), // Dark Red
                                                   fontSize: 10,
@@ -872,7 +924,7 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
                                             const SizedBox(width: 4),
                                             Expanded(
                                               child: Text(
-                                                email,
+                                                displayEmail,
                                                 style: const TextStyle(
                                                   color: Colors.black87,
                                                   fontSize: 8,
@@ -905,11 +957,39 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
                                       ],
                                     ),
                                     clipBehavior: Clip.antiAlias,
-                                    child: controller.logoPath.value.isNotEmpty
-                                        ? Image.file(
-                                            File(controller.logoPath.value),
-                                            fit: BoxFit.cover,
-                                          )
+                                    child: (logo != null && logo.isNotEmpty)
+                                        ? (logo.startsWith('/') || logo.startsWith('http')
+                                            ? CachedNetworkImage(
+                                                imageUrl: logo.startsWith('/')
+                                                    ? '${AppConstants.baseUrl}$logo'
+                                                    : logo,
+                                                fit: BoxFit.cover,
+                                                placeholder: (context, url) => const Center(
+                                                  child: Icon(
+                                                    Icons.business,
+                                                    color: Colors.white,
+                                                    size: 24,
+                                                  ),
+                                                ),
+                                                errorWidget: (context, url, error) => const Center(
+                                                  child: Icon(
+                                                    Icons.business,
+                                                    color: Colors.white,
+                                                    size: 24,
+                                                  ),
+                                                ),
+                                              )
+                                            : Image.file(
+                                                File(logo),
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error, stackTrace) => const Center(
+                                                  child: Icon(
+                                                    Icons.business,
+                                                    color: Colors.white,
+                                                    size: 24,
+                                                  ),
+                                                ),
+                                              ))
                                         : const Center(
                                             child: Icon(
                                               Icons.business,

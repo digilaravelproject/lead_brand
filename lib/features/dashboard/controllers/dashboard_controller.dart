@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../routes/route_helper.dart';
+import '../../../core/services/network/api_client.dart';
+import '../../../core/constants/app_constants.dart';
 
 class DashboardController extends GetxController {
   final PageController pageController = PageController();
   final RxInt currentBannerIndex = 0.obs;
+  final RxList<String> bannerImages = <String>[].obs;
+  final RxBool isBannersLoading = false.obs;
 
-  final List<String> bannerImages = [
+  final List<String> _fallbackBanners = [
     "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=600&auto=format&fit=crop",
     "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600&auto=format&fit=crop",
     "https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=600&auto=format&fit=crop",
@@ -15,18 +19,54 @@ class DashboardController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    fetchBanners();
     _startAutoPlay();
+  }
+
+  Future<void> fetchBanners() async {
+    isBannersLoading.value = true;
+    try {
+      final apiClient = Get.find<ApiClient>();
+      final response = await apiClient.get(AppConstants.bannersUrl);
+      if (response.isSuccess && response.body != null) {
+        List<dynamic>? data;
+        if (response.body is List) {
+          data = response.body as List;
+        } else if (response.body is Map && response.body['data'] is List) {
+          data = response.body['data'] as List;
+        }
+        if (data != null) {
+          final urls = data
+              .map((item) => item['image_url'] as String?)
+              .whereType<String>()
+              .toList();
+          if (urls.isNotEmpty) {
+            bannerImages.assignAll(urls);
+            return;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching banners: $e');
+    } finally {
+      isBannersLoading.value = false;
+      if (bannerImages.isEmpty) {
+        bannerImages.assignAll(_fallbackBanners);
+      }
+    }
   }
 
   void _startAutoPlay() {
     Future.delayed(const Duration(seconds: 4), () {
       if (pageController.hasClients) {
-        int nextPage = (currentBannerIndex.value + 1) % bannerImages.length;
-        pageController.animateToPage(
-          nextPage,
-          duration: const Duration(milliseconds: 350),
-          curve: Curves.easeInOut,
-        );
+        if (bannerImages.isNotEmpty) {
+          int nextPage = (currentBannerIndex.value + 1) % bannerImages.length;
+          pageController.animateToPage(
+            nextPage,
+            duration: const Duration(milliseconds: 350),
+            curve: Curves.easeInOut,
+          );
+        }
         _startAutoPlay();
       }
     });
