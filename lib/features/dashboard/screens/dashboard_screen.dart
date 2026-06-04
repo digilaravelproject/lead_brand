@@ -10,6 +10,7 @@ import '../controllers/dashboard_controller.dart';
 import '../../notifications/screens/notifications_screen.dart';
 import '../../notifications/controllers/notifications_controller.dart';
 import '../../training/screens/training_pdfs_screen.dart';
+import '../../language/controllers/localization_controller.dart';
 
 class DashboardScreen extends GetView<DashboardController> {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -136,6 +137,12 @@ class DashboardScreen extends GetView<DashboardController> {
           ],
         ),
         actions: [
+          IconButton(
+            onPressed: () {
+              Get.find<LocalizationController>().showLanguageBottomSheet(context);
+            },
+            icon: const Icon(Icons.g_translate_rounded, color: Colors.white, size: 24),
+          ),
           Obx(() {
             final notificationsController = Get.find<NotificationsController>();
             final unreadCount = notificationsController.unreadCount.value;

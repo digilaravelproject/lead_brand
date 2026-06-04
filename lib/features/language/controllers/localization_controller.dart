@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/services/storage/shared_prefs.dart';
+import '../../../core/services/network/api_client.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/custom_snackbar.dart';
 import '../domain/models/language_model.dart';
 import '../widget/language_bottom_sheet.dart';
 
@@ -27,6 +30,18 @@ class LocalizationController extends GetxController {
         imageUrl: ImageConstants.hindi,
         languageName: 'Hindi',
         languageCode: 'hi',
+        countryCode: 'IN',
+      ),
+      LanguageModel(
+        imageUrl: ImageConstants.hindi,
+        languageName: 'Marathi',
+        languageCode: 'mr',
+        countryCode: 'IN',
+      ),
+      LanguageModel(
+        imageUrl: ImageConstants.hindi,
+        languageName: 'Gujarati',
+        languageCode: 'gr',
         countryCode: 'IN',
       ),
     ]);
@@ -57,6 +72,48 @@ class LocalizationController extends GetxController {
     }
   }
 
+  Future<void> changeLanguage(LanguageModel language) async {
+    // Show a loading dialog
+    Get.dialog(
+      const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
+        ),
+      ),
+      barrierDismissible: false,
+    );
+
+    try {
+      final apiClient = Get.find<ApiClient>();
+      final response = await apiClient.post(
+        '/api/user/language',
+        data: {'language': language.languageCode},
+      );
+
+      // Dismiss loading dialog safely using Navigator pop
+      if (Get.overlayContext != null) {
+        Navigator.of(Get.overlayContext!).pop();
+      } else {
+        Get.back();
+      }
+
+      if (response.isSuccess) {
+        setLanguage(language);
+        CustomSnackbar.showSuccess('Language updated successfully');
+      } else {
+        CustomSnackbar.showError(response.message);
+      }
+    } catch (e) {
+      // Dismiss loading dialog safely if still open
+      if (Get.overlayContext != null) {
+        try {
+          Navigator.of(Get.overlayContext!).pop();
+        } catch (_) {}
+      }
+      debugPrint('Error changing language: $e');
+      CustomSnackbar.showError('Failed to update language');
+    }
+  }
 
   void showLanguageBottomSheet(BuildContext context) {
     Get.bottomSheet(

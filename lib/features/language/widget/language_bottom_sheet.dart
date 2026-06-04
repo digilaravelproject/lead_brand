@@ -53,7 +53,7 @@ class LanguageBottomSheet extends StatelessWidget {
                   style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 IconButton(
-                  onPressed: () => Get.back(),
+                  onPressed: () => Navigator.of(context).pop(),
                   icon: Icon(Icons.close, color: theme.iconTheme.color),
                 ),
               ],
@@ -82,8 +82,8 @@ class LanguageBottomSheet extends StatelessWidget {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(12),
                   onTap: () {
-                    controller.setLanguage(language);
-                    Get.back();
+                    Navigator.of(context).pop();
+                    controller.changeLanguage(language);
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
