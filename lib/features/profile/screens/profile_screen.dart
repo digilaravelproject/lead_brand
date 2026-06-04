@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -74,21 +75,31 @@ class ProfileScreen extends GetView<AuthController> {
                                           shape: BoxShape.circle,
                                           color: theme.cardColor,
                                           border: Border.all(color: AppColors.borderColor, width: 2),
-                                          image: controller.imagePath.value.isNotEmpty
-                                              ? DecorationImage(
-                                                  image: FileImage(File(controller.imagePath.value)),
+                                        ),
+                                        child: ClipOval(
+                                          child: controller.imagePath.value.isNotEmpty
+                                              ? Image.file(
+                                                  File(controller.imagePath.value),
                                                   fit: BoxFit.cover,
+                                                  errorBuilder: (context, error, stackTrace) =>
+                                                      const Icon(Icons.person, size: 50, color: AppColors.textColorHint),
                                                 )
                                               : (controller.profilePhotoUrl.value.isNotEmpty
-                                                  ? DecorationImage(
-                                                      image: NetworkImage('${AppConstants.baseUrl}${controller.profilePhotoUrl.value}'),
+                                                  ? CachedNetworkImage(
+                                                      imageUrl: '${AppConstants.baseUrl}${controller.profilePhotoUrl.value}',
                                                       fit: BoxFit.cover,
+                                                      placeholder: (context, url) => const Center(
+                                                        child: SizedBox(
+                                                          width: 24,
+                                                          height: 24,
+                                                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryColor),
+                                                        ),
+                                                      ),
+                                                      errorWidget: (context, url, error) =>
+                                                          const Icon(Icons.person, size: 50, color: AppColors.textColorHint),
                                                     )
-                                                  : null),
+                                                  : const Icon(Icons.person, size: 50, color: AppColors.textColorHint)),
                                         ),
-                                        child: controller.imagePath.value.isEmpty && controller.profilePhotoUrl.value.isEmpty
-                                            ? const Icon(Icons.person, size: 50, color: AppColors.textColorHint)
-                                            : null,
                                       )),
                                       Positioned(
                                         bottom: 0,
@@ -132,21 +143,31 @@ class ProfileScreen extends GetView<AuthController> {
                                           shape: BoxShape.circle,
                                           color: theme.cardColor,
                                           border: Border.all(color: AppColors.borderColor, width: 2),
-                                          image: controller.logoPath.value.isNotEmpty
-                                              ? DecorationImage(
-                                                  image: FileImage(File(controller.logoPath.value)),
+                                        ),
+                                        child: ClipOval(
+                                          child: controller.logoPath.value.isNotEmpty
+                                              ? Image.file(
+                                                  File(controller.logoPath.value),
                                                   fit: BoxFit.cover,
+                                                  errorBuilder: (context, error, stackTrace) =>
+                                                      const Icon(Icons.business, size: 50, color: AppColors.textColorHint),
                                                 )
                                               : (controller.logoUrl.value.isNotEmpty
-                                                  ? DecorationImage(
-                                                      image: NetworkImage('${AppConstants.baseUrl}${controller.logoUrl.value}'),
+                                                  ? CachedNetworkImage(
+                                                      imageUrl: '${AppConstants.baseUrl}${controller.logoUrl.value}',
                                                       fit: BoxFit.cover,
+                                                      placeholder: (context, url) => const Center(
+                                                        child: SizedBox(
+                                                          width: 24,
+                                                          height: 24,
+                                                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryColor),
+                                                        ),
+                                                      ),
+                                                      errorWidget: (context, url, error) =>
+                                                          const Icon(Icons.business, size: 50, color: AppColors.textColorHint),
                                                     )
-                                                  : null),
+                                                  : const Icon(Icons.business, size: 50, color: AppColors.textColorHint)),
                                         ),
-                                        child: controller.logoPath.value.isEmpty && controller.logoUrl.value.isEmpty
-                                            ? const Icon(Icons.business, size: 50, color: AppColors.textColorHint)
-                                            : null,
                                       )),
                                       Positioned(
                                         bottom: 0,

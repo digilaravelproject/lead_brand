@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
@@ -193,14 +194,44 @@ class SettingsScreen extends StatelessWidget {
               CircleAvatar(
                 radius: 32,
                 backgroundColor: AppColors.primaryColor.withValues(alpha: 0.12),
-                backgroundImage: photo != null && photo.isNotEmpty
-                    ? (photo.startsWith('/') 
-                        ? NetworkImage('${AppConstants.baseUrl}$photo') as ImageProvider
-                        : FileImage(File(photo)) as ImageProvider)
-                    : null,
-                child: photo == null || photo.isEmpty
-                    ? const Icon(Icons.person, size: 38, color: AppColors.primaryColor)
-                    : null,
+                child: ClipOval(
+                  child: SizedBox(
+                    width: 64,
+                    height: 64,
+                    child: photo != null && photo.isNotEmpty
+                        ? (photo.startsWith('/')
+                            ? CachedNetworkImage(
+                                imageUrl: '${AppConstants.baseUrl}$photo',
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => const Center(
+                                  child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryColor),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) => const Icon(
+                                  Icons.person,
+                                  size: 38,
+                                  color: AppColors.primaryColor,
+                                ),
+                              )
+                            : Image.file(
+                                File(photo),
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) => const Icon(
+                                  Icons.person,
+                                  size: 38,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ))
+                        : const Icon(
+                            Icons.person,
+                            size: 38,
+                            color: AppColors.primaryColor,
+                          ),
+                  ),
+                ),
               ),
               const SizedBox(width: 18),
               Expanded(

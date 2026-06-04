@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_constants.dart';
@@ -38,19 +39,10 @@ class DashboardScreen extends GetView<DashboardController> {
           child: Center(
             child: GestureDetector(
               onTap: () => Get.toNamed(RouteHelper.getProfileRoute()),
-              child: Obx(() {
+               child: Obx(() {
                 final localPath = authController.imagePath.value;
                 final photo = authController.rxUser.value?.profilePhoto;
                 
-                ImageProvider? imageProvider;
-                if (localPath.isNotEmpty) {
-                  imageProvider = FileImage(File(localPath));
-                } else if (photo != null && photo.isNotEmpty) {
-                  imageProvider = photo.startsWith('/')
-                      ? NetworkImage('${AppConstants.baseUrl}$photo')
-                      : FileImage(File(photo)) as ImageProvider;
-                }
-
                 return Container(
                   width: 44,
                   height: 44,
@@ -58,22 +50,51 @@ class DashboardScreen extends GetView<DashboardController> {
                     shape: BoxShape.circle,
                     border: Border.all(color: AppColors.primaryColor, width: 1.5),
                     color: const Color(0xFF0F121A),
-                    image: imageProvider != null
-                        ? DecorationImage(
-                            image: imageProvider,
-                            fit: BoxFit.cover,
-                          )
-                        : null,
                   ),
-                  child: imageProvider == null
-                      ? const Center(
-                          child: Icon(
-                            Icons.person,
-                            color: AppColors.primaryColor,
-                            size: 24,
-                          ),
-                        )
-                      : null,
+                  child: ClipOval(
+                    child: localPath.isNotEmpty
+                        ? Image.file(
+                            File(localPath),
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => const Icon(
+                              Icons.person,
+                              color: AppColors.primaryColor,
+                              size: 24,
+                            ),
+                          )
+                        : (photo != null && photo.isNotEmpty
+                            ? (photo.startsWith('/')
+                                ? CachedNetworkImage(
+                                    imageUrl: '${AppConstants.baseUrl}$photo',
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => const Center(
+                                      child: SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child: CircularProgressIndicator(strokeWidth: 1.5, color: AppColors.primaryColor),
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) => const Icon(
+                                      Icons.person,
+                                      color: AppColors.primaryColor,
+                                      size: 24,
+                                    ),
+                                  )
+                                : Image.file(
+                                    File(photo),
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) => const Icon(
+                                      Icons.person,
+                                      color: AppColors.primaryColor,
+                                      size: 24,
+                                    ),
+                                  ))
+                            : const Icon(
+                                Icons.person,
+                                color: AppColors.primaryColor,
+                                size: 24,
+                              )),
+                  ),
                 );
               }),
             ),
