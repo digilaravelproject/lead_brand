@@ -97,7 +97,7 @@ class AuthController extends GetxController {
       final String? image = googleUser.photoUrl;
       final String googleId = googleUser.id;
 
-      final response = await authRepository.googleLogin(email, name, image, googleId);
+      final response = await authRepository.googleLogin(email, googleId);
       if (response.isSuccess) {
         Future.delayed(const Duration(milliseconds: 300), () {
           CustomSnackbar.showSuccess(response.message);
@@ -113,7 +113,10 @@ class AuthController extends GetxController {
         }
 
         if (isNew == 1) {
-          Get.offAllNamed(RouteHelper.getProfileSetupRoute(), arguments: email);
+          Get.offAllNamed(RouteHelper.getProfileSetupRoute(), arguments: {
+            'email': email,
+            'name': name,
+          });
         } else {
           if (response.body != null && response.body is Map) {
             final responseData = response.body['data'] ?? response.body;

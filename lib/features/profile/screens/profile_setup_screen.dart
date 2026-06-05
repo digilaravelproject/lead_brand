@@ -12,6 +12,23 @@ class ProfileSetupScreen extends GetView<AuthController> {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<AuthController>();
+    
+    // Prefill name and email if coming from Google login, or only email (clearing name) if from OTP
+    if (Get.arguments != null) {
+      if (Get.arguments is Map) {
+        final Map args = Get.arguments;
+        if (args['email'] != null) {
+          controller.emailController.text = args['email'];
+        }
+        if (args['name'] != null) {
+          controller.nameController.text = args['name'];
+        }
+      } else if (Get.arguments is String) {
+        controller.emailController.text = Get.arguments;
+        controller.nameController.clear();
+      }
+    }
+
     final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,

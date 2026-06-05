@@ -109,46 +109,13 @@ class AuthRepository implements AuthRepositoryInterface {
   }
 
   @override
-  Future<ResponseModel> googleLogin(String email, String name, String? imageUrl, String googleId) async {
-    String? localImagePath;
-    if (imageUrl != null && imageUrl.isNotEmpty) {
-      try {
-        final tempDir = await getTemporaryDirectory();
-        final file = File('${tempDir.path}/google_avatar_${DateTime.now().millisecondsSinceEpoch}.jpg');
-        final response = await http.get(Uri.parse(imageUrl));
-        if (response.statusCode == 200) {
-          await file.writeAsBytes(response.bodyBytes);
-          localImagePath = file.path;
-        }
-      } catch (e) {
-        debugPrint("Error downloading Google avatar: $e");
-      }
-    }
-
-    if (localImagePath != null) {
-      final multipartBody = [
-        MultipartBody('image', XFile(localImagePath)),
-      ];
-      return await apiClient.postMultipartData(
-        AppConstants.googleLoginUrl,
-        {
-          'email': email,
-          'name': name,
-          'google_id': googleId,
-        },
-        multipartBody,
-        [],
-      );
-    } else {
-      return await apiClient.post(
-        AppConstants.googleLoginUrl,
-        data: {
-          'email': email,
-          'name': name,
-          'google_id': googleId,
-          'image': null,
-        },
-      );
-    }
+  Future<ResponseModel> googleLogin(String email, String googleId) async {
+    return await apiClient.post(
+      AppConstants.googleLoginUrl,
+      data: {
+        'email': email,
+        'google_id': googleId,
+      },
+    );
   }
 }
