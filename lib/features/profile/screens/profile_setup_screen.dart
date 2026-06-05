@@ -26,6 +26,7 @@ class ProfileSetupScreen extends GetView<AuthController> {
       } else if (Get.arguments is String) {
         controller.emailController.text = Get.arguments;
         controller.nameController.clear();
+        controller.imagePath.value = '';
       }
     }
 

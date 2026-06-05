@@ -14,6 +14,8 @@ import '../../../core/services/storage/token_manger.dart';
 import '../../../core/constants/app_constants.dart';
 import '../domain/models/complete_setup_response.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
 
 class AuthController extends GetxController {
   final AuthRepositoryInterface authRepository;
@@ -113,6 +115,26 @@ class AuthController extends GetxController {
         }
 
         if (isNew == 1) {
+          String? localImagePath;
+          if (image != null && image.isNotEmpty) {
+            try {
+              final tempDir = await getTemporaryDirectory();
+              final file = File('${tempDir.path}/google_avatar_${DateTime.now().millisecondsSinceEpoch}.jpg');
+              final downloadResponse = await http.get(Uri.parse(image));
+              if (downloadResponse.statusCode == 200) {
+                await file.writeAsBytes(downloadResponse.bodyBytes);
+                localImagePath = file.path;
+              }
+            } catch (e) {
+              debugPrint("Error downloading Google avatar for profile prefill: $e");
+            }
+          }
+          if (localImagePath != null) {
+            imagePath.value = localImagePath;
+          } else {
+            imagePath.value = '';
+          }
+
           Get.offAllNamed(RouteHelper.getProfileSetupRoute(), arguments: {
             'email': email,
             'name': name,
