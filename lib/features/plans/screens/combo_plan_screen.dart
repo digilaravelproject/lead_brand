@@ -20,7 +20,7 @@ class ComboPlanScreen extends GetView<PlansController> {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: Obx(() => Text(
           controller.title.value,

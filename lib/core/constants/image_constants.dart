@@ -15,4 +15,6 @@ class ImageConstants {
   // Language Images
   static const String english = '${language}english.png';
   static const String hindi = '${language}hindi.png';
+  static const String marathi = '${language}marathi.png';
+  static const String gujarati = '${language}gujarati.png';
 }

@@ -86,6 +86,7 @@ dependencies:
   ffmpeg_kit_flutter_new: ^4.2.1
   gal: ^2.2.3
   youtube_explode_dart: ^2.3.0
+  google_sign_in: ^7.2.0
 
 dev_dependencies:
   flutter_test:
@@ -116,10 +117,12 @@ flutter:
 
   assets:
     - .env
-    - assets/images/
-    - assets/icons/
     - assets/animations/
+    - assets/icons/
+    - assets/images/
     - assets/language/
+    - assets/language/gujarati.png
+    - assets/language/marathi.png
     - assets/translations/
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -138,19 +141,24 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Poppins
+    - family: Poppins-Bold
+      fonts:
+        - asset: assets/fonts/Poppins-Bold.ttf
+    - family: Poppins-Italic
+      fonts:
+        - asset: assets/fonts/Poppins-Italic.ttf
+    - family: Poppins-Light
+      fonts:
+        - asset: assets/fonts/Poppins-Light.ttf
+    - family: Poppins-Medium
+      fonts:
+        - asset: assets/fonts/Poppins-Medium.ttf
+    - family: Poppins-Regular
       fonts:
         - asset: assets/fonts/Poppins-Regular.ttf
-        - asset: assets/fonts/Poppins-Italic.ttf
-          style: italic
-        - asset: assets/fonts/Poppins-Light.ttf
-          weight: 300
-        - asset: assets/fonts/Poppins-Medium.ttf
-          weight: 500
+    - family: Poppins-SemiBold
+      fonts:
         - asset: assets/fonts/Poppins-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/Poppins-Bold.ttf
-          weight: 700
 
   # fonts:
   #   - family: Schyler

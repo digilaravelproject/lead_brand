@@ -13,6 +13,7 @@ import '../../../core/services/storage/shared_prefs.dart';
 import '../../../core/services/storage/token_manger.dart';
 import '../../../core/constants/app_constants.dart';
 import '../domain/models/complete_setup_response.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthController extends GetxController {
   final AuthRepositoryInterface authRepository;
@@ -31,36 +32,115 @@ class AuthController extends GetxController {
   final _picker = ImagePicker();
 
   Future<void> pickImage() async {
-    final XFile? image = await _picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 70,
-    );
-    if (image != null) {
-      final file = File(image.path);
-      final sizeInBytes = await file.length();
-      final sizeInMb = sizeInBytes / (1024 * 1024);
-      if (sizeInMb > 5) {
-        CustomSnackbar.showError('Selected image is too large. Please select an image under 5MB.');
-        return;
+    try {
+      print("pickImage called, controller hash = ${identityHashCode(this)}");
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+      );
+      print("pickImage result: ${image?.path}");
+      if (image != null) {
+        final file = File(image.path);
+        final sizeInBytes = await file.length();
+        final sizeInMb = sizeInBytes / (1024 * 1024);
+        print("Image size: $sizeInMb MB");
+        if (sizeInMb > 5) {
+          CustomSnackbar.showError('Selected image is too large. Please select an image under 5MB.');
+          return;
+        }
+        imagePath.value = image.path;
+        print("imagePath updated to: ${imagePath.value}");
+        if (SharedPrefs.getBool(AppConstants.isLoggedIn) == true) {
+          await updateProfileChanges();
+        }
       }
-      imagePath.value = image.path;
+    } catch (e) {
+      print("Error in pickImage: $e");
+      CustomSnackbar.showError('Error picking image: $e');
     }
   }
 
   Future<void> pickLogo() async {
-    final XFile? logo = await _picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 70,
-    );
-    if (logo != null) {
-      final file = File(logo.path);
-      final sizeInBytes = await file.length();
-      final sizeInMb = sizeInBytes / (1024 * 1024);
-      if (sizeInMb > 5) {
-        CustomSnackbar.showError('Selected logo is too large. Please select an image under 5MB.');
-        return;
+    try {
+      final XFile? logo = await _picker.pickImage(
+        source: ImageSource.gallery,
+      );
+      if (logo != null) {
+        final file = File(logo.path);
+        final sizeInBytes = await file.length();
+        final sizeInMb = sizeInBytes / (1024 * 1024);
+        if (sizeInMb > 5) {
+          CustomSnackbar.showError('Selected logo is too large. Please select an image under 5MB.');
+          return;
+        }
+        logoPath.value = logo.path;
+        if (SharedPrefs.getBool(AppConstants.isLoggedIn) == true) {
+          await updateProfileChanges();
+        }
       }
-      logoPath.value = logo.path;
+    } catch (e) {
+      print("Error in pickLogo: $e");
+      CustomSnackbar.showError('Error picking logo: $e');
+    }
+  }
+
+  Future<void> signInWithGoogle() async {
+    try {
+      await GoogleSignIn.instance.initialize(
+        serverClientId: AppConstants.googleServerClientId,
+      );
+      await GoogleSignIn.instance.signOut();
+      final GoogleSignInAccount googleUser = await GoogleSignIn.instance.authenticate(scopeHint: ['email']);
+      
+      isLoading.value = true;
+      final String email = googleUser.email;
+      final String name = googleUser.displayName ?? '';
+      final String? image = googleUser.photoUrl;
+      final String googleId = googleUser.id;
+
+      final response = await authRepository.googleLogin(email, name, image, googleId);
+      if (response.isSuccess) {
+        Future.delayed(const Duration(milliseconds: 300), () {
+          CustomSnackbar.showSuccess(response.message);
+        });
+
+        int isNew = 1;
+        if (response.body != null && response.body is Map) {
+          isNew = response.body['is_new'] ?? 1;
+        }
+
+        if (isNew == 1) {
+          Get.offAllNamed(RouteHelper.getProfileSetupRoute(), arguments: email);
+        } else {
+          if (response.body != null && response.body is Map) {
+            final responseData = response.body['data'] ?? response.body;
+            final setupData = CompleteSetupData.fromJson(responseData);
+
+            if (setupData.accessToken.isNotEmpty) {
+              await TokenManager.saveToken(setupData.accessToken);
+            }
+
+            if (setupData.user != null) {
+              final userJson = jsonEncode(setupData.user!.toJson());
+              await SharedPrefs.setString(AppConstants.userData, userJson);
+              rxUser.value = setupData.user;
+              currentUser.value = UserInfoModel(
+                name: setupData.user!.name,
+                mobile: setupData.user!.phoneNumber ?? '',
+              );
+            }
+          }
+
+          await SharedPrefs.setBool(AppConstants.isLoggedIn, true);
+          Get.offAllNamed(RouteHelper.getDashboardRoute());
+        }
+      } else {
+        CustomSnackbar.showError(response.message);
+      }
+    } catch (error) {
+      debugPrint("Google sign-in error: $error");
+      CustomSnackbar.showError("Google sign-in failed: $error");
+    } finally {
+      isLoading.value = false;
     }
   }
   final currentUser = Rxn<UserInfoModel>();
@@ -128,13 +208,6 @@ class AuthController extends GetxController {
         }
       } catch (e) {
         // Ignore parsing errors
-      }
-    }
-
-    final tempEmail = SharedPrefs.getString('temp_email');
-    if (tempEmail != null && tempEmail.isNotEmpty) {
-      if (emailController.text.isEmpty) {
-        emailController.text = tempEmail;
       }
     }
   }
@@ -229,9 +302,7 @@ class AuthController extends GetxController {
         }
 
         if (isNew == 1) {
-          await SharedPrefs.setBool('is_new', true);
-          await SharedPrefs.setString('temp_email', email);
-          Get.offAllNamed(RouteHelper.getProfileSetupRoute());
+          Get.offAllNamed(RouteHelper.getProfileSetupRoute(), arguments: email);
         } else {
           if (response.body != null && response.body is Map) {
             final responseData = response.body['data'] ?? response.body;
@@ -351,8 +422,6 @@ class AuthController extends GetxController {
 
         // Set is logged in to true
         await SharedPrefs.setBool(AppConstants.isLoggedIn, true);
-        await SharedPrefs.remove('is_new');
-        await SharedPrefs.remove('temp_email');
 
         // Success snackbar
         Future.delayed(const Duration(milliseconds: 300), () {
@@ -456,6 +525,7 @@ class AuthController extends GetxController {
     }
 
     isLoading.value = true;
+    isProfileLoading.value = true;
     try {
       final response = await authRepository.updateProfile(
         name: name,
@@ -535,6 +605,7 @@ class AuthController extends GetxController {
       CustomSnackbar.showError('Failed to update profile details.');
     } finally {
       isLoading.value = false;
+      isProfileLoading.value = false;
     }
     return false;
   }
@@ -549,8 +620,6 @@ class AuthController extends GetxController {
       await TokenManager.clearToken();
       await SharedPrefs.remove(AppConstants.userData);
       await SharedPrefs.setBool(AppConstants.isLoggedIn, false);
-      await SharedPrefs.remove('is_new');
-      await SharedPrefs.remove('temp_email');
 
       // Reset controller variables
       emailController.clear();

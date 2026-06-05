@@ -18,9 +18,11 @@ class ProfileScreen extends GetView<AuthController> {
     if (!Get.isRegistered<AuthController>()) {
       Get.put(AuthController());
     }
+    final controller = Get.find<AuthController>();
 
     // Fetch user profile on screen load
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      print("ProfileScreen build: controller hash = ${identityHashCode(controller)}");
       controller.fetchUserProfile();
     });
 
@@ -86,7 +88,7 @@ class ProfileScreen extends GetView<AuthController> {
                                                 )
                                               : (controller.profilePhotoUrl.value.isNotEmpty
                                                   ? CachedNetworkImage(
-                                                      imageUrl: '${AppConstants.baseUrl}${controller.profilePhotoUrl.value}',
+                                                      imageUrl: '${AppConstants.imageBaseUrl}${controller.profilePhotoUrl.value}',
                                                       fit: BoxFit.cover,
                                                       placeholder: (context, url) => const Center(
                                                         child: SizedBox(
@@ -128,7 +130,7 @@ class ProfileScreen extends GetView<AuthController> {
                                     ),
                                   ),
                                 ],
-                              ),
+                               ),
                               const SizedBox(width: 40),
                               // Logo Upload
                               Column(
@@ -154,7 +156,7 @@ class ProfileScreen extends GetView<AuthController> {
                                                 )
                                               : (controller.logoUrl.value.isNotEmpty
                                                   ? CachedNetworkImage(
-                                                      imageUrl: '${AppConstants.baseUrl}${controller.logoUrl.value}',
+                                                      imageUrl: '${AppConstants.imageBaseUrl}${controller.logoUrl.value}',
                                                       fit: BoxFit.cover,
                                                       placeholder: (context, url) => const Center(
                                                         child: SizedBox(

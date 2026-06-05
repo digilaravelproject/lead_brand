@@ -11,6 +11,7 @@ class ProfileSetupScreen extends GetView<AuthController> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<AuthController>();
     final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -39,26 +40,33 @@ class ProfileSetupScreen extends GetView<AuthController> {
                       const SizedBox(height: 30),
                       GestureDetector(
                         onTap: () => controller.pickImage(),
-                        child: Obx(() => Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Container(
-                              width: 120,
-                              height: 120,
-                              decoration: BoxDecoration(
-                                color: theme.cardColor,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: AppColors.borderColor, width: 2),
-                                image: controller.imagePath.value.isNotEmpty
-                                    ? DecorationImage(
-                                        image: FileImage(File(controller.imagePath.value)),
-                                        fit: BoxFit.cover,
-                                      )
-                                    : null,
+                        child: Obx(() {
+                          print("ProfileSetupScreen Obx build: controller hash = ${identityHashCode(controller)}, imagePath = ${controller.imagePath.value}");
+                          return Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                width: 120,
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppColors.borderColor, width: 2),
+                                ),
+                              child: ClipOval(
+                                child: Container(
+                                  color: theme.cardColor,
+                                  child: controller.imagePath.value.isNotEmpty
+                                      ? Image.file(
+                                          File(controller.imagePath.value),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            print("Image.file error: $error");
+                                            return const Icon(Icons.error, size: 60, color: Colors.red);
+                                          },
+                                        )
+                                      : const Icon(Icons.person, size: 60, color: AppColors.textColorHint),
+                                ),
                               ),
-                              child: controller.imagePath.value.isEmpty
-                                  ? const Icon(Icons.person, size: 60, color: AppColors.textColorHint)
-                                  : null,
                             ),
                             Positioned(
                               bottom: 0,
@@ -73,7 +81,8 @@ class ProfileSetupScreen extends GetView<AuthController> {
                               ),
                             ),
                           ],
-                        )),
+                        );
+                        }),
                       ),
                       const SizedBox(height: 50),
                       Column(

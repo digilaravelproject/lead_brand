@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../core/services/network/api_client.dart';
 
 class PromotionalVideo {
   final String title;
@@ -26,40 +29,50 @@ class PromotionalVideosController extends GetxController {
     _loadVideos();
   }
 
-  void _loadVideos() {
+  void _loadVideos() async {
     isLoading.value = true;
-    videos.assignAll([
-      PromotionalVideo(
-        title: "Life Insurance Benefits",
-        thumbnailUrl: "https://picsum.photos/seed/ins1/500/300",
-        videoUrl: "https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4?v=1",
-      ),
-      PromotionalVideo(
-        title: "Retirement Planning",
-        thumbnailUrl: "https://picsum.photos/seed/ret1/500/300",
-        videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4?v=2",
-      ),
-      PromotionalVideo(
-        title: "Child Education Fund",
-        thumbnailUrl: "https://picsum.photos/seed/edu1/500/300",
-        videoUrl: "https://www.w3schools.com/html/movie.mp4?v=3",
-      ),
-      PromotionalVideo(
-        title: "Health Insurance",
-        thumbnailUrl: "https://picsum.photos/seed/health1/500/300",
-        videoUrl: "https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4?v=4",
-      ),
-      PromotionalVideo(
-        title: "Tax Savings Guide",
-        thumbnailUrl: "https://picsum.photos/seed/tax1/500/300",
-        videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4?v=5",
-      ),
-      PromotionalVideo(
-        title: "Family Protection Plan",
-        thumbnailUrl: "https://picsum.photos/seed/fam1/500/300",
-        videoUrl: "https://www.w3schools.com/html/movie.mp4?v=6",
-      ),
-    ]);
-    isLoading.value = false;
+    try {
+      final apiClient = Get.find<ApiClient>();
+      final response = await apiClient.get(AppConstants.toolsUrl);
+      if (response.isSuccess && response.body != null) {
+        List<dynamic>? toolsList;
+        if (response.body is List) {
+          toolsList = response.body as List;
+        } else if (response.body is Map) {
+          toolsList = response.body['tools'] ?? response.body['data'];
+        }
+
+        if (toolsList != null) {
+          final promoTool = toolsList.firstWhere(
+            (t) => t['id'] == 6 || t['icon'] == 'promotional_videos' || t['title']?.toString().toLowerCase().contains('promotional') == true,
+            orElse: () => null,
+          );
+
+          if (promoTool != null && promoTool['media'] != null) {
+            final List<dynamic> mediaList = promoTool['media'] as List;
+            final List<PromotionalVideo> loadedVideos = [];
+            for (var m in mediaList) {
+              final String fullUrl = m['full_url'] ?? '';
+              final String title = m['title'] ?? 'Promotional Video';
+              final int id = m['id'] ?? 0;
+              final String thumbnail = m['thumbnail_url'] ?? "https://picsum.photos/seed/video_$id/500/300";
+
+              loadedVideos.add(PromotionalVideo(
+                title: title,
+                thumbnailUrl: thumbnail.isNotEmpty ? thumbnail : "https://picsum.photos/seed/video_$id/500/300",
+                videoUrl: fullUrl,
+              ));
+            }
+            if (loadedVideos.isNotEmpty) {
+              videos.assignAll(loadedVideos);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching promotional videos dynamically: $e');
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

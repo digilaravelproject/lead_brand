@@ -65,7 +65,7 @@ class DashboardScreen extends GetView<DashboardController> {
                         : (photo != null && photo.isNotEmpty
                             ? (photo.startsWith('/')
                                 ? CachedNetworkImage(
-                                    imageUrl: '${AppConstants.baseUrl}$photo',
+                                    imageUrl: '${AppConstants.imageBaseUrl}$photo',
                                     fit: BoxFit.cover,
                                     placeholder: (context, url) => const Center(
                                       child: SizedBox(
@@ -202,9 +202,18 @@ class DashboardScreen extends GetView<DashboardController> {
       ),
       body: Stack(
         children: [
-          SingleChildScrollView(
-        child: Column(
-          children: [
+          RefreshIndicator(
+            color: AppColors.primaryColor,
+            backgroundColor: const Color(0xFF0F121A),
+            onRefresh: () async {
+              await controller.fetchBanners();
+              await controller.fetchFeatures();
+              await authController.fetchUserProfile();
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                children: [
             // Greeting row
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
@@ -600,6 +609,7 @@ class DashboardScreen extends GetView<DashboardController> {
             const SizedBox(height: 30),
           ],
         ),
+      ),
       ),
       Obx(() => controller.isFeaturesLoading.value
           ? Positioned.fill(

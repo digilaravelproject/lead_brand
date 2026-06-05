@@ -9,6 +9,7 @@ class TrainingModel {
   final String filePath;
   final int status;
   final String fileUrl;
+  final String? thumbnailUrl;
   final TrainingCategoryModel? category;
 
   TrainingModel({
@@ -20,6 +21,7 @@ class TrainingModel {
     required this.filePath,
     required this.status,
     required this.fileUrl,
+    this.thumbnailUrl,
     this.category,
   });
 
@@ -33,6 +35,7 @@ class TrainingModel {
       filePath: json['file_path'] ?? '',
       status: json['status'] ?? 0,
       fileUrl: json['file_url'] ?? '',
+      thumbnailUrl: json['thumbnail_url'],
       category: json['category'] != null
           ? TrainingCategoryModel.fromJson(json['category'])
           : null,
@@ -49,6 +52,7 @@ class TrainingModel {
       'file_path': filePath,
       'status': status,
       'file_url': fileUrl,
+      'thumbnail_url': thumbnailUrl,
       'category': category?.toJson(),
     };
   }

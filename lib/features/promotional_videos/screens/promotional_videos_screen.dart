@@ -35,6 +35,22 @@ class PromotionalVideosScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator(color: AppColors.primaryColor));
         }
 
+        if (controller.videos.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.video_library_outlined, size: 64, color: Colors.white.withOpacity(0.2)),
+                const SizedBox(height: 16),
+                Text(
+                  "No promotional videos available",
+                  style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 14, fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+          );
+        }
+
         return GridView.builder(
           padding: const EdgeInsets.fromLTRB(10, 15, 10, 20),
           physics: const BouncingScrollPhysics(),

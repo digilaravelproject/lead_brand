@@ -13,7 +13,6 @@ class AppConstants {
     static const bool showToaster = false; // manages UI-level notifications.
 
     // API base URLs
-    static const String imageUrl = baseUrl;
 
     // API endpoints
 
@@ -21,6 +20,7 @@ class AppConstants {
     static const String verifyOtpUrl = '/api/auth/verify-otp';
     static const String resendOtpUrl = '/api/auth/resend-otp';
     static const String completeSetupUrl = '/api/auth/complete-setup';
+    static const String googleLoginUrl = '/api/auth/google-login';
     static const String getUserUrl = '/api/user';
     static const String updateProfileUrl = '/api/user/update-profile';
     static const String logoutUrl = '/api/logout';
@@ -33,6 +33,7 @@ class AppConstants {
     static const String trainingsUrl = '/api/trainings';
     static const String trainingsSearchUrl = '/api/trainings/search';
     static const String bannersUrl = '/api/banners';
+    static const String toolsUrl = '/api/tools';
 
     // Shared Preferences keys
     static const String theme = 'theme';
@@ -42,10 +43,9 @@ class AppConstants {
     static const String isLoggedIn = 'is_logged_in';
 
     // App URLs
-    static const String websiteUrl = 'https://google.com';
-    static const String termsUrl = 'https://google.com';
-    static const String privacyUrl = 'https://google.com';
-    static const String aboutUrl = 'https://google.com';
-    static const String packageId = 'com.leadbrandhub';
-    static const String playStoreUrl = 'https://play.google.com/store/apps/details?id=$packageId';
+    static const String playStoreUrl = 'https://play.google.com/store/apps/details?id=com.leadbrandhub';
+
+    // Google Sign-In Credentials (From Google Cloud Console -> APIs & Services -> Credentials -> OAuth 2.0 Web Client ID)
+    // NOTE: Even on Android, you must use the WEB Client ID here.
+    static const String googleServerClientId = '7458086472-dummywebclientid.apps.googleusercontent.com'; // Replace this with your actual Web Client ID
 }

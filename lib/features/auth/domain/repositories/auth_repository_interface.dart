@@ -14,4 +14,5 @@ abstract class AuthRepositoryInterface {
     String? logoPath,
   });
   Future<ResponseModel> logout();
+  Future<ResponseModel> googleLogin(String email, String name, String? image, String googleId);
 }

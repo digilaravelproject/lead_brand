@@ -67,10 +67,28 @@ class _TrainingScreenState extends State<TrainingScreen> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      body: RefreshIndicator(
+        color: AppColors.primaryColor,
+        backgroundColor: const Color(0xFF0F121A),
+        onRefresh: () async {
+          await _categoryController.fetchCategories();
+          if (_selectedCategory == 'All') {
+            await _trainingController.fetchVideoTrainings(categoryId: 'all');
+          } else {
+            final catObj = _categoryController.categories.firstWhere(
+              (c) => c.categoryName == _selectedCategory,
+              orElse: () => TrainingCategoryModel(id: 0, categoryName: ''),
+            );
+            if (catObj.id != 0) {
+              await _trainingController.fetchVideoTrainings(categoryId: catObj.id.toString());
+            }
+          }
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             // Search Input
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -247,21 +265,32 @@ class _TrainingScreenState extends State<TrainingScreen> {
                                           );
                                         },
                                       )
-                                    : Container(
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              const Color(0xFF1E293B),
-                                              const Color(0xFF0F172A),
-                                            ],
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                          ),
-                                        ),
-                                        child: const Center(
-                                          child: Icon(Icons.video_library_rounded, color: Colors.white24, size: 48),
-                                        ),
-                                      ),
+                                    : (video.thumbnailUrl != null && video.thumbnailUrl!.isNotEmpty
+                                        ? Image.network(
+                                            video.thumbnailUrl!,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, err, stack) {
+                                              return Container(
+                                                color: Colors.grey[900],
+                                                child: const Icon(Icons.video_library, color: Colors.white24, size: 40),
+                                              );
+                                            },
+                                          )
+                                        : Container(
+                                            decoration: const BoxDecoration(
+                                              gradient: LinearGradient(
+                                                colors: [
+                                                  Color(0xFF1E293B),
+                                                  Color(0xFF0F172A),
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
+                                              ),
+                                            ),
+                                            child: const Center(
+                                              child: Icon(Icons.video_library_rounded, color: Colors.white24, size: 48),
+                                            ),
+                                          )),
                               ),
                               // Dark overlay
                               Positioned.fill(
@@ -328,6 +357,7 @@ class _TrainingScreenState extends State<TrainingScreen> {
             }),
           ],
         ),
+      ),
       ),
     );
   }

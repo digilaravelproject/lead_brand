@@ -116,7 +116,18 @@ class DashboardController extends GetxController {
         }
         if (data != null) {
           final urls = data
-              .map((item) => item['image_url'] as String?)
+              .map((item) {
+                final imgUrl = item['image_url'] as String?;
+                if (imgUrl != null && imgUrl.isNotEmpty) {
+                  if (imgUrl.startsWith('/')) {
+                    return '${AppConstants.imageBaseUrl}$imgUrl';
+                  } else if (!imgUrl.startsWith('http')) {
+                    return '${AppConstants.imageBaseUrl}/$imgUrl';
+                  }
+                  return imgUrl;
+                }
+                return null;
+              })
               .whereType<String>()
               .toList();
           if (urls.isNotEmpty) {

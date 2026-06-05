@@ -17,10 +17,12 @@ class SplashController extends GetxController {
     bool isNew = SharedPrefs.getBool('is_new') ?? false;
     if (isLoggedIn) {
       Get.offAllNamed(RouteHelper.getDashboardRoute());
-    } else if (isNew) {
-      final tempEmail = SharedPrefs.getString('temp_email') ?? '';
-      Get.offAllNamed(RouteHelper.getProfileSetupRoute(), arguments: tempEmail);
     } else {
+      // Clear temp data if user closed app without completing setup
+      if (isNew) {
+        SharedPrefs.remove('is_new');
+        SharedPrefs.remove('temp_email');
+      }
       Get.offAllNamed(RouteHelper.getLoginRoute());
     }
   }

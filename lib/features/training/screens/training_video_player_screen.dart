@@ -64,6 +64,7 @@ class _TrainingVideoPlayerScreenState extends State<TrainingVideoPlayerScreen> {
             ),
           );
         });
+        _videoPlayerController!.play();
       });
     }
   }
@@ -131,95 +132,105 @@ class _TrainingVideoPlayerScreenState extends State<TrainingVideoPlayerScreen> {
           ),
         ),
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              playerWidget,
-              const SizedBox(height: 24),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryColor.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Text(
-                        "TRAINING VIDEO",
-                        style: TextStyle(
-                          color: AppColors.primaryColor,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+      body: Column(
+        children: [
+          playerWidget,
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      widget.title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
+                    child: const Text(
+                      "TRAINING VIDEO",
+                      style: TextStyle(
+                        color: AppColors.primaryColor,
+                        fontSize: 10,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    Obx(() {
-                      if (_trainingController.isDetailsLoading.value) {
-                        return const Padding(
-                          padding: EdgeInsets.only(top: 8.0),
-                          child: Center(
-                            child: SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppColors.primaryColor,
-                              ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    widget.title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Obx(() {
+                    if (_trainingController.isDetailsLoading.value) {
+                      return const Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: Center(
+                          child: SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.primaryColor,
                             ),
                           ),
-                        );
-                      }
-
-                      final details = _trainingController.selectedTraining.value;
-                      final desc = details?.description ?? "No description available for this training video.";
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (details?.category != null)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
-                              child: Text(
-                                details!.category!.categoryName.toUpperCase(),
-                                style: const TextStyle(
-                                  color: AppColors.primaryColor,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          Text(
-                            desc,
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.5),
-                              fontSize: 13,
-                              height: 1.4,
-                            ),
-                          ),
-                        ],
+                        ),
                       );
-                    }),
-                  ],
-                ),
+                    }
+
+                    final details = _trainingController.selectedTraining.value;
+                    final String desc = (details?.description != null && details!.description.isNotEmpty)
+                        ? details.description
+                        : "No description available for this training video.";
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (details?.category != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4.0),
+                            child: Text(
+                              details!.category!.categoryName.toUpperCase(),
+                              style: const TextStyle(
+                                color: AppColors.primaryColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                          ),
+                        const Divider(color: Colors.white12, height: 32),
+                        const Text(
+                          "ABOUT THIS TRAINING",
+                          style: TextStyle(
+                            color: Colors.white38,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          desc,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 13,
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

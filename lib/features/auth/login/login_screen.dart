@@ -87,7 +87,7 @@ class LoginScreen extends GetView<AuthController> {
                                 border: Border.all(color: AppColors.borderColor, width: 1.5),
                               ),
                               child: TextButton(
-                                onPressed: () {},
+                                onPressed: controller.signInWithGoogle,
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [

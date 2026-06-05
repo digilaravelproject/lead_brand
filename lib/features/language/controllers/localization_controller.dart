@@ -33,15 +33,15 @@ class LocalizationController extends GetxController {
         countryCode: 'IN',
       ),
       LanguageModel(
-        imageUrl: ImageConstants.hindi,
+        imageUrl: ImageConstants.marathi,
         languageName: 'Marathi',
         languageCode: 'mr',
         countryCode: 'IN',
       ),
       LanguageModel(
-        imageUrl: ImageConstants.hindi,
+        imageUrl: ImageConstants.gujarati,
         languageName: 'Gujarati',
-        languageCode: 'gr',
+        languageCode: 'gu',
         countryCode: 'IN',
       ),
     ]);

@@ -106,7 +106,7 @@ class SettingsScreen extends StatelessWidget {
             icon: Icons.share_outlined,
             title: 'Share App',
             onTap: () {
-              Share.share('Check out the ${AppConstants.appName}! Download now: ${AppConstants.websiteUrl}');
+              Share.share('Check out the ${AppConstants.appName}! Download now: ${AppConstants.playStoreUrl}');
             },
           ),
           _buildSettingItem(
@@ -201,7 +201,7 @@ class SettingsScreen extends StatelessWidget {
                     child: photo != null && photo.isNotEmpty
                         ? (photo.startsWith('/')
                             ? CachedNetworkImage(
-                                imageUrl: '${AppConstants.baseUrl}$photo',
+                                imageUrl: '${AppConstants.imageBaseUrl}$photo',
                                 fit: BoxFit.cover,
                                 placeholder: (context, url) => const Center(
                                   child: SizedBox(
