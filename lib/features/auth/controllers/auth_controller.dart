@@ -105,7 +105,11 @@ class AuthController extends GetxController {
 
         int isNew = 1;
         if (response.body != null && response.body is Map) {
-          isNew = response.body['is_new'] ?? 1;
+          if (response.body['data'] != null && response.body['data'] is Map && response.body['data']['is_new'] != null) {
+            isNew = response.body['data']['is_new'];
+          } else {
+            isNew = response.body['is_new'] ?? 1;
+          }
         }
 
         if (isNew == 1) {
