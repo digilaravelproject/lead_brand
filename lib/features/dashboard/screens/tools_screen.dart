@@ -163,6 +163,7 @@ class _ToolsScreenState extends State<ToolsScreen> {
                                             Get.toNamed(RouteHelper.getGalleryRoute(), arguments: {
                                               'title': tool.title.replaceAll('\n', ' '),
                                               'images': imageUrls,
+                                              'media': media,
                                             });
                                           }
                                         } else {
@@ -173,10 +174,12 @@ class _ToolsScreenState extends State<ToolsScreen> {
                                               'subtools': tool.subtools,
                                             });
                                           } else {
-                                            final List<String> imageUrls = tool.media?.map((m) => m['full_url'].toString()).toList() ?? [];
+                                            final List<dynamic> media = tool.media ?? [];
+                                            final List<String> imageUrls = media.map((m) => m['full_url'].toString()).toList();
                                             Get.toNamed(RouteHelper.getGalleryRoute(), arguments: {
                                               'title': tool.title.replaceAll('\n', ' '),
                                               'images': imageUrls,
+                                              'media': media,
                                             });
                                           }
                                         }

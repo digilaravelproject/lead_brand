@@ -173,11 +173,6 @@ class DashboardController extends GetxController {
           final List<DashboardFeature> updatedList = [];
           for (var item in toolsList) {
             final toolModel = ToolModel.fromJson(item);
-            
-            // Skip the static tools with IDs 6, 7, 8 if they are in the API response to handle them manually
-            if (toolModel.id == 6 || toolModel.id == 7 || toolModel.id == 8) {
-              continue;
-            }
 
             String title = toolModel.title;
             IconData icon = _getIconData(toolModel.icon);
@@ -185,30 +180,31 @@ class DashboardController extends GetxController {
             
             // Map keys dynamically to match user screenshot design:
             if (toolModel.icon == 'combo_posters') {
-              title = 'Marketing Tools';
               icon = Icons.campaign_rounded;
               color = const Color(0xFF00B0FF);
             } else if (toolModel.icon == 'combo_plans') {
-              title = 'Lead Management';
               icon = Icons.groups_rounded;
               color = const Color(0xFFFFA000);
             } else if (toolModel.icon == 'agent_recruitment') {
-              title = 'Agent Recruitment';
               icon = Icons.people_alt_rounded;
               color = const Color(0xFFAB47BC);
             } else if (toolModel.icon == 'lic_plans') {
-              title = 'LIC Plans';
               icon = Icons.description_rounded;
               color = const Color(0xFF2196F3);
             } else if (toolModel.icon == 'concept_brochures') {
-              title = 'Concept Brochures';
               icon = Icons.menu_book_rounded;
               color = const Color(0xFFFF9800);
             }
 
-            final route = toolModel.subtools.isNotEmpty
-                ? RouteHelper.getComboPlanRoute()
-                : RouteHelper.getGalleryRoute();
+            final route = toolModel.id == 6 
+                ? '/promotional-videos'
+                : (toolModel.id == 7
+                    ? RouteHelper.getVideoAdsRoute()
+                    : (toolModel.id == 8
+                        ? RouteHelper.getPdfCalendarRoute()
+                        : (toolModel.subtools.isNotEmpty
+                            ? RouteHelper.getComboPlanRoute()
+                            : RouteHelper.getGalleryRoute())));
 
             updatedList.add(DashboardFeature(
               id: toolModel.id,
@@ -220,33 +216,6 @@ class DashboardController extends GetxController {
               media: toolModel.media.map((m) => m.toJson()).toList(),
             ));
           }
-
-          // Append the static Promotional Videos (id: 6) to make it 6 items in total
-          updatedList.add(DashboardFeature(
-            id: 6,
-            title: 'Promotional Videos',
-            icon: Icons.play_circle_filled_rounded,
-            route: '/promotional-videos',
-            color: const Color(0xFFEC407A),
-          ));
-
-          // Sort list according to desired screenshot order
-          final List<String> desiredOrder = [
-            'Agent Recruitment',
-            'LIC Plans',
-            'Promotional Videos',
-            'Concept Brochures',
-            'Marketing Tools',
-            'Lead Management',
-          ];
-          
-          updatedList.sort((a, b) {
-            int indexA = desiredOrder.indexOf(a.title);
-            int indexB = desiredOrder.indexOf(b.title);
-            if (indexA == -1) indexA = 99;
-            if (indexB == -1) indexB = 99;
-            return indexA.compareTo(indexB);
-          });
 
           if (updatedList.isNotEmpty) {
             features.assignAll(updatedList);

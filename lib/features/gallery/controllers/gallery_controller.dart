@@ -6,6 +6,8 @@ class GalleryController extends GetxController {
   final columnCount = 3.obs;
   
   final RxList<String> images = <String>[].obs;
+  final RxMap<String, String> imageUrlToPdfUrl = <String, String>{}.obs;
+  final RxMap<String, String> imageUrlToDescription = <String, String>{}.obs;
 
   void toggleColumns() {
     columnCount.value = columnCount.value == 3 ? 2 : 3;
@@ -19,6 +21,23 @@ class GalleryController extends GetxController {
       planName.value = args['title'] ?? 'Gallery';
       final List<dynamic> list = args['images'] ?? [];
       images.assignAll(list.cast<String>());
+      
+      final List<dynamic> mediaList = args['media'] ?? [];
+      for (var m in mediaList) {
+        if (m is Map) {
+          final String? fullUrl = m['full_url']?.toString();
+          final String? pdfUrl = m['pdf_url']?.toString();
+          final String? desc = m['description']?.toString();
+          if (fullUrl != null) {
+            if (pdfUrl != null && pdfUrl.isNotEmpty) {
+              imageUrlToPdfUrl[fullUrl] = pdfUrl;
+            }
+            if (desc != null && desc.isNotEmpty) {
+              imageUrlToDescription[fullUrl] = desc;
+            }
+          }
+        }
+      }
     } else {
       planName.value = args is String ? args : 'Gallery';
       images.assignAll(List.generate(
@@ -29,6 +48,12 @@ class GalleryController extends GetxController {
   }
 
   void openImageViewer(String imageUrl) {
-    Get.toNamed(RouteHelper.getImageViewerRoute(), arguments: imageUrl);
+    final pdfUrl = imageUrlToPdfUrl[imageUrl];
+    final description = imageUrlToDescription[imageUrl];
+    Get.toNamed(RouteHelper.getImageViewerRoute(), arguments: {
+      'imageUrl': imageUrl,
+      'pdfUrl': pdfUrl,
+      'description': description,
+    });
   }
 }

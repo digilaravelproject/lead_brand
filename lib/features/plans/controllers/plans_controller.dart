@@ -132,6 +132,7 @@ class PlansController extends GetxController {
         Get.toNamed(RouteHelper.getGalleryRoute(), arguments: {
           'title': planName,
           'images': imageUrls,
+          'media': media,
         });
         return;
       }

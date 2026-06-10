@@ -35,11 +35,19 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
-            isMinifyEnabled = false
-            isShrinkResources = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+}
+
+configurations.all {
+    exclude(group = "com.antonkarpenko", module = "ffmpeg-kit-full-gpl")
+}
+
+dependencies {
+    implementation("com.antonkarpenko:ffmpeg-kit-video:2.1.0")
 }
 
 flutter {

@@ -28,7 +28,7 @@ class ImageViewerScreen extends StatefulWidget {
 class _ImageViewerScreenState extends State<ImageViewerScreen> {
   final GlobalKey _boundaryKey = GlobalKey();
   bool _isSharing = false;
-  bool _shareWithText = true;
+  bool _shareWithText = false;
   int _selectedStyleIndex = 0;
   late final PageController _pageController;
   final TextEditingController _shareTextController = TextEditingController();
@@ -37,14 +37,20 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _selectedStyleIndex);
-    final lang = SharedPrefs.getString(AppConstants.language) ?? 'en';
-    final defaultTextMap = {
-      'en': 'Hello! I am sharing a customized plan with you. Please check out the details in the attached poster. Let me know if you would like to discuss it further or schedule a consultation.',
-      'hi': 'नमस्ते! मैं आपके साथ एक कस्टमाइज्ड वित्तीय योजना साझा कर रहा हूँ। कृपया संलग्न पोस्टर में विवरण देखें। यदि आप इस पर आगे चर्चा करना चाहते हैं या परामर्श का समय निर्धारित करना चाहते हैं तो मुझे बताएं।',
-      'mr': 'नमस्कार! मी तुमच्यासोबत एक कस्टमाइज्ड आर्थिक योजना शेअर करत आहे. कृपया जोडलेल्या पोस्टरमध्ये तपशील पहा. जर तुम्हाला यावर पुढे चर्चा करायची असेल किंवा सल्लामसलत करायची असेल तर मला कळवा।',
-      'gu': 'નમસ્તે! હું તમારી સાથે એક કસ્ટમાઇઝ્ડ નાણાકીય યોજના શેર કરી રહ્યો છું. કૃપા કરીને સાથે આપેલા પોસ્ટરમાં વિગતો તપાસો. જો તમે આ અંગે વધુ ચર્ચા કરવા માંગતા હો અથવા પરામર્શ નક્કી કરવા માંગતા હો તો મને જણાવો.',
-    };
-    _shareTextController.text = defaultTextMap[lang] ?? defaultTextMap['en']!;
+    
+    final args = Get.arguments;
+    String? apiDescription;
+    if (args is Map) {
+      apiDescription = args['description']?.toString();
+    }
+
+    if (apiDescription != null && apiDescription.trim().isNotEmpty) {
+      _shareTextController.text = apiDescription;
+      _shareWithText = true;
+    } else {
+      _shareTextController.text = '';
+      _shareWithText = false;
+    }
   }
 
   @override
@@ -263,7 +269,9 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final String imageUrl = Get.arguments ?? '';
+    final args = Get.arguments;
+    final String imageUrl = args is Map ? (args['imageUrl'] ?? '') : (args ?? '');
+    final String? pdfUrl = args is Map ? args['pdfUrl'] : null;
     final userJson = SharedPrefs.getString(AppConstants.userData);
     UserSetupModel? user;
     if (userJson != null && userJson.isNotEmpty) {
@@ -294,17 +302,17 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
           onPressed: () => Get.back(),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
-            onPressed: () {
-              const String samplePdfUrl = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
-              final String gDocsUrl = "https://docs.google.com/gview?embedded=true&url=${Uri.encodeComponent(samplePdfUrl)}";
-              Get.to(() => CustomWebView(
-                    url: gDocsUrl,
-                    title: "Sample Plan PDF",
-                  ));
-            },
-          ),
+          if (pdfUrl != null && pdfUrl.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
+              onPressed: () {
+                final String gDocsUrl = "https://docs.google.com/gview?embedded=true&url=${Uri.encodeComponent(pdfUrl)}";
+                Get.to(() => CustomWebView(
+                      url: gDocsUrl,
+                      title: "Plan PDF",
+                    ));
+              },
+            ),
           IconButton(
             icon: const Icon(Icons.info_outline, color: Colors.white),
             onPressed: () {
@@ -357,34 +365,35 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
               ),
 
               // Checkbox only
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                color: Colors.black,
-                child: Row(
-                  children: [
-                    Theme(
-                      data: Theme.of(context).copyWith(
-                        unselectedWidgetColor: Colors.white60,
+              if (_shareTextController.text.trim().isNotEmpty) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  color: Colors.black,
+                  child: Row(
+                    children: [
+                      Theme(
+                        data: Theme.of(context).copyWith(
+                          unselectedWidgetColor: Colors.white60,
+                        ),
+                        child: Checkbox(
+                          value: _shareWithText,
+                          activeColor: AppColors.primaryColor,
+                          onChanged: (val) {
+                            setState(() {
+                              _shareWithText = val ?? false;
+                            });
+                          },
+                        ),
                       ),
-                      child: Checkbox(
-                        value: _shareWithText,
-                        activeColor: AppColors.primaryColor,
-                        onChanged: (val) {
-                          setState(() {
-                            _shareWithText = val ?? false;
-                          });
-                        },
+                      const Text(
+                        "Share with custom text",
+                        style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
                       ),
-                    ),
-                    const Text(
-                      "Share with custom text",
-                      style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
+              ],
 
               // Social Sharing UI
               Container(

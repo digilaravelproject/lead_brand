@@ -38,41 +38,7 @@ class ToolsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _initializeDefaultTools();
     fetchTools();
-  }
-
-  void _initializeDefaultTools() {
-    tools.assignAll(_getStaticTools());
-  }
-
-  List<ToolItem> _getStaticTools() {
-    return [
-      ToolItem(
-        id: 6,
-        title: "Promotional\nVideos",
-        description: "Watch and share promotional videos",
-        icon: Icons.play_circle_fill_rounded,
-        route: '/promotional-videos',
-        color: Colors.red,
-      ),
-      ToolItem(
-        id: 7,
-        title: "Create\nVideo Ads",
-        description: "Create premium short promotional videos",
-        icon: Icons.video_call_rounded,
-        route: RouteHelper.getVideoAdsRoute(),
-        color: Colors.indigo,
-      ),
-      ToolItem(
-        id: 8,
-        title: "Create\nPDF Calendar",
-        description: "Generate custom PDF business calendars",
-        icon: Icons.calendar_today_rounded,
-        route: RouteHelper.getPdfCalendarRoute(),
-        color: Colors.teal,
-      ),
-    ];
   }
 
   Future<void> fetchTools() async {
@@ -92,17 +58,18 @@ class ToolsController extends GetxController {
           int index = 0;
           for (var item in toolsList) {
             final toolModel = ToolModel.fromJson(item);
-            
-            // Skip the three static tools from the API response to avoid duplication
-            if (toolModel.id == 6 || toolModel.id == 7 || toolModel.id == 8) {
-              continue;
-            }
 
             final icon = _getIconData(toolModel.icon);
             final color = _getColor(toolModel.icon, index);
-            final route = toolModel.subtools.isNotEmpty
-                ? RouteHelper.getComboPlanRoute()
-                : RouteHelper.getGalleryRoute();
+            final route = toolModel.id == 6 
+                ? '/promotional-videos'
+                : (toolModel.id == 7
+                    ? RouteHelper.getVideoAdsRoute()
+                    : (toolModel.id == 8
+                        ? RouteHelper.getPdfCalendarRoute()
+                        : (toolModel.subtools.isNotEmpty
+                            ? RouteHelper.getComboPlanRoute()
+                            : RouteHelper.getGalleryRoute())));
 
             updatedList.add(ToolItem(
               id: toolModel.id,
@@ -116,9 +83,6 @@ class ToolsController extends GetxController {
             ));
             index++;
           }
-
-          // Always append the three static tools at the end
-          updatedList.addAll(_getStaticTools());
 
           if (updatedList.isNotEmpty) {
             tools.assignAll(updatedList);

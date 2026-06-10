@@ -74,6 +74,8 @@ class ToolMediaModel {
   final String mediaType;
   final String language;
   final String? thumbnailUrl;
+  final String? pdf;
+  final String? pdfUrl;
 
   ToolMediaModel({
     required this.id,
@@ -83,6 +85,8 @@ class ToolMediaModel {
     required this.mediaType,
     required this.language,
     this.thumbnailUrl,
+    this.pdf,
+    this.pdfUrl,
   });
 
   factory ToolMediaModel.fromJson(Map<String, dynamic> json) {
@@ -94,6 +98,8 @@ class ToolMediaModel {
       mediaType: json['media_type'] ?? '',
       language: json['language'] ?? '',
       thumbnailUrl: json['thumbnail_url'],
+      pdf: json['pdf'],
+      pdfUrl: json['pdf_url'],
     );
   }
 
@@ -106,6 +112,8 @@ class ToolMediaModel {
       'media_type': mediaType,
       'language': language,
       'thumbnail_url': thumbnailUrl,
+      'pdf': pdf,
+      'pdf_url': pdfUrl,
     };
   }
 }
