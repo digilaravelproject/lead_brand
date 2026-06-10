@@ -15,6 +15,8 @@ import '../../auth/controllers/auth_controller.dart';
 import '../../auth/domain/models/complete_setup_response.dart';
 import '../../dashboard/widgets/branding_banner.dart';
 import 'dart:convert';
+import 'poster_original_preview_screen.dart';
+import '../../../core/widgets/custom_web_view.dart';
 
 class ImageViewerScreen extends StatefulWidget {
   const ImageViewerScreen({Key? key}) : super(key: key);
@@ -27,11 +29,14 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
   final GlobalKey _boundaryKey = GlobalKey();
   bool _isSharing = false;
   bool _shareWithText = true;
+  int _selectedStyleIndex = 0;
+  late final PageController _pageController;
   final TextEditingController _shareTextController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: _selectedStyleIndex);
     final lang = SharedPrefs.getString(AppConstants.language) ?? 'en';
     final defaultTextMap = {
       'en': 'Hello! I am sharing a customized plan with you. Please check out the details in the attached poster. Let me know if you would like to discuss it further or schedule a consultation.',
@@ -44,6 +49,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
 
   @override
   void dispose() {
+    _pageController.dispose();
     _shareTextController.dispose();
     super.dispose();
   }
@@ -84,6 +90,177 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
     }
   }
 
+  void _showStyleSelectorBottomSheet(
+    BuildContext context,
+    String imageUrl,
+    String userName,
+    String userPhone,
+    String userEmail,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF0F111A),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return DraggableScrollableSheet(
+              initialChildSize: 0.7,
+              minChildSize: 0.5,
+              maxChildSize: 0.95,
+              expand: false,
+              builder: (context, scrollController) {
+                return Column(
+                  children: [
+                    const SizedBox(height: 12),
+                    // Drag handle
+                    Container(
+                      width: 40,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    Text(
+                      "Choose Poster Style",
+                      style: TextStyle(
+                        color: AppColors.primaryColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    Expanded(
+                      child: GridView.builder(
+                        controller: scrollController,
+                        padding: const EdgeInsets.fromLTRB(12, 0, 12, 20),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.75,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                        ),
+                        itemCount: 100,
+                        itemBuilder: (context, index) {
+                          final isSelected = _selectedStyleIndex == index;
+                          return GestureDetector(
+                            onTap: () {
+                              _pageController.jumpToPage(index);
+                              setState(() {
+                                _selectedStyleIndex = index;
+                              });
+                              setModalState(() {});
+                              Navigator.pop(context);
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF161924),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isSelected ? AppColors.primaryColor : Colors.white10,
+                                  width: isSelected ? 2 : 1,
+                                ),
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    child: Stack(
+                                      children: [
+                                        Positioned.fill(
+                                          child: CachedNetworkImage(
+                                            imageUrl: imageUrl,
+                                            fit: BoxFit.cover,
+                                            placeholder: (context, url) => const Center(
+                                              child: SizedBox(
+                                                width: 20,
+                                                height: 20,
+                                                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryColor),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: 8,
+                                          left: 8,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.black.withOpacity(0.7),
+                                              borderRadius: BorderRadius.circular(6),
+                                              border: Border.all(color: Colors.white24, width: 0.5),
+                                            ),
+                                            child: Text(
+                                              "Style ${index + 1}",
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        if (isSelected)
+                                          Positioned(
+                                            top: 8,
+                                            right: 8,
+                                            child: Container(
+                                              padding: const EdgeInsets.all(4),
+                                              decoration: const BoxDecoration(
+                                                color: AppColors.primaryColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(
+                                                Icons.check,
+                                                color: Colors.black,
+                                                size: 12,
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 35,
+                                    width: double.infinity,
+                                    color: Colors.white,
+                                    child: FittedBox(
+                                      fit: BoxFit.fitWidth,
+                                      child: SizedBox(
+                                        width: 375,
+                                        height: 80,
+                                        child: BrandingBanner(
+                                          fallbackName: userName,
+                                          fallbackPhone: userPhone,
+                                          fallbackEmail: userEmail,
+                                          styleIndex: index,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final String imageUrl = Get.arguments ?? '';
@@ -116,6 +293,30 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Get.back(),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
+            onPressed: () {
+              const String samplePdfUrl = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+              final String gDocsUrl = "https://docs.google.com/gview?embedded=true&url=${Uri.encodeComponent(samplePdfUrl)}";
+              Get.to(() => CustomWebView(
+                    url: gDocsUrl,
+                    title: "Sample Plan PDF",
+                  ));
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.info_outline, color: Colors.white),
+            onPressed: () {
+              Get.to(
+                () => PosterOriginalPreviewScreen(
+                  imageUrl: imageUrl,
+                  text: _shareTextController.text,
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -133,55 +334,52 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
                 ),
               ),
 
-              // Checkbox and editable text field
+              // Swipe indicator row
+              GestureDetector(
+                onTap: () => _showStyleSelectorBottomSheet(context, imageUrl, userName, userPhone, userEmail),
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.swipe_left_alt, color: AppColors.primaryColor, size: 14),
+                      const SizedBox(width: 6),
+                      Text(
+                        "Swipe poster to change style (${_selectedStyleIndex + 1}/100)",
+                        style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(width: 6),
+                      const Icon(Icons.swipe_right_alt, color: AppColors.primaryColor, size: 14),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Checkbox only
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 color: Colors.black,
-                child: Column(
+                child: Row(
                   children: [
-                    Row(
-                      children: [
-                        Theme(
-                          data: Theme.of(context).copyWith(
-                            unselectedWidgetColor: Colors.white60,
-                          ),
-                          child: Checkbox(
-                            value: _shareWithText,
-                            activeColor: AppColors.primaryColor,
-                            onChanged: (val) {
-                              setState(() {
-                                _shareWithText = val ?? false;
-                              });
-                            },
-                          ),
-                        ),
-                        const Text(
-                          "Share with custom text",
-                          style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
-                        ),
-                      ],
-                    ),
-                    if (_shareWithText)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12, right: 12, bottom: 10),
-                        child: TextField(
-                          controller: _shareTextController,
-                          style: const TextStyle(color: Colors.white, fontSize: 13),
-                          decoration: InputDecoration(
-                            hintText: "Enter text to share...",
-                            hintStyle: const TextStyle(color: Colors.white30),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.white24),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: AppColors.primaryColor),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
+                    Theme(
+                      data: Theme.of(context).copyWith(
+                        unselectedWidgetColor: Colors.white60,
                       ),
+                      child: Checkbox(
+                        value: _shareWithText,
+                        activeColor: AppColors.primaryColor,
+                        onChanged: (val) {
+                          setState(() {
+                            _shareWithText = val ?? false;
+                          });
+                        },
+                      ),
+                    ),
+                    const Text(
+                      "Share with custom text",
+                      style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
                   ],
                 ),
               ),
@@ -244,41 +442,53 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
   }
 
   Widget _buildMainPoster(String imageUrl, String name, String phone, String email) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 20, offset: const Offset(0, 8)),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Expanded(
-            child: CachedNetworkImage(
-              imageUrl: imageUrl,
-              fit: BoxFit.cover,
-              width: double.infinity,
-              placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-            ),
+    return PageView.builder(
+      controller: _pageController,
+      itemCount: 100,
+      onPageChanged: (index) {
+        setState(() {
+          _selectedStyleIndex = index;
+        });
+      },
+      itemBuilder: (context, index) {
+        return Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 20, offset: const Offset(0, 8)),
+            ],
           ),
-          Container(
-            height: 80, 
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: Colors.grey.withOpacity(0.08))),
-            ),
-            child: BrandingBanner(
-              fallbackName: name,
-              fallbackPhone: phone,
-              fallbackEmail: email,
-            ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                ),
+              ),
+              Container(
+                height: 80, 
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border(top: BorderSide(color: Colors.grey.withOpacity(0.08))),
+                ),
+                child: BrandingBanner(
+                  fallbackName: name,
+                  fallbackPhone: phone,
+                  fallbackEmail: email,
+                  styleIndex: index,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

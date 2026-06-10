@@ -32,14 +32,13 @@ class DashboardScreen extends GetView<DashboardController> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         toolbarHeight: 70,
-        leadingWidth: 70,
         automaticallyImplyLeading: false,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 16.0),
-          child: Center(
-            child: GestureDetector(
+        titleSpacing: 16,
+        title: Row(
+          children: [
+            GestureDetector(
               onTap: () => Get.toNamed(RouteHelper.getProfileRoute()),
-               child: Obx(() {
+              child: Obx(() {
                 final localPath = authController.imagePath.value;
                 final photo = authController.rxUser.value?.profilePhoto;
                 
@@ -98,61 +97,73 @@ class DashboardScreen extends GetView<DashboardController> {
                 );
               }),
             ),
-          ),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Builder(
-              builder: (context) {
-                final name = AppConstants.appName;
-                final words = name.split(' ');
-                if (words.length > 1) {
-                  final lastWord = words.last;
-                  final prefix = words.sublist(0, words.length - 1).join(' ');
-                  return Row(
-                    children: [
-                      Text(
-                        prefix.toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Text(
-                        lastWord.toUpperCase(),
-                        style: const TextStyle(
-                          color: AppColors.primaryColor,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 16,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  return Text(
-                    name.toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      letterSpacing: 0.5,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Hello, Welcome! 👋",
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.white70,
+                      fontWeight: FontWeight.w500,
                     ),
-                  );
-                }
-              },
-            ),
-            const Text(
-              "Grow Your Insurance Business Digitally",
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
+                  ),
+                  const SizedBox(height: 2),
+                  Builder(
+                    builder: (context) {
+                      final name = AppConstants.appName;
+                      final words = name.split(' ');
+                      if (words.length > 1) {
+                        final lastWord = words.last;
+                        final prefix = words.sublist(0, words.length - 1).join(' ');
+                        return Row(
+                          children: [
+                            Text(
+                              prefix.toUpperCase(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              lastWord.toUpperCase(),
+                              style: const TextStyle(
+                                color: AppColors.primaryColor,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 16,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        );
+                      } else {
+                        return Text(
+                          name.toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            letterSpacing: 0.5,
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  const Text(
+                    "Grow Your Insurance Business Digitally",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -214,122 +225,138 @@ class DashboardScreen extends GetView<DashboardController> {
               physics: const AlwaysScrollableScrollPhysics(),
               child: Column(
                 children: [
-            // Greeting row
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-              child: Row(
-                children: [
-                  Text(
-                    "Hello, Welcome! 👋",
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.white.withOpacity(0.9),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+             const SizedBox(height: 10),
 
-            const SizedBox(height: 5),
-
-            // Hero Banner Image Slider
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Container(
-                width: double.infinity,
+              SizedBox(
                 height: 160,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.primaryColor.withOpacity(0.2), width: 1.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primaryColor.withOpacity(0.05),
-                      blurRadius: 15,
-                      spreadRadius: 2,
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Obx(() {
-                    if (controller.bannerImages.isEmpty) {
-                      return Container(
-                        color: const Color(0xFF0F121A),
+                child: Obx(() {
+                  if (controller.bannerImages.isEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Container(
+                        width: double.infinity,
+                        height: 160,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0F121A),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: AppColors.primaryColor.withOpacity(0.2), width: 1.5),
+                        ),
                         child: const Center(
                           child: CircularProgressIndicator(
                             valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
                           ),
                         ),
-                      );
-                    }
-                    return Stack(
-                      children: [
-                        PageView.builder(
-                          controller: controller.pageController,
-                          onPageChanged: (index) {
-                            controller.currentBannerIndex.value = index;
-                          },
-                          itemCount: controller.bannerImages.length,
-                          itemBuilder: (context, index) {
-                            return Image.network(
-                              controller.bannerImages[index],
-                              fit: BoxFit.cover,
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Container(
-                                  color: const Color(0xFF0F121A),
-                                  child: const Center(
-                                    child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
+                      ),
+                    );
+                  }
+                  return PageView.builder(
+                    controller: controller.pageController,
+                    onPageChanged: (index) {
+                      controller.currentBannerIndex.value = index % controller.bannerImages.length;
+                    },
+                    itemCount: controller.bannerImages.length * 1000,
+                    itemBuilder: (context, index) {
+                      final bannerIndex = index % controller.bannerImages.length;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.white.withOpacity(0.15),
+                                AppColors.primaryColor,
+                                Colors.white.withOpacity(0.05),
+                                AppColors.primaryColor,
+                                Colors.white.withOpacity(0.15),
+                              ],
+                              stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primaryColor.withOpacity(0.15),
+                                blurRadius: 15,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(1.2),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF0F121A),
+                                borderRadius: BorderRadius.circular(19),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(19),
+                                child: Stack(
+                                  children: [
+                                    Positioned.fill(
+                                      child: Image.network(
+                                        controller.bannerImages[bannerIndex],
+                                        fit: BoxFit.cover,
+                                        loadingBuilder: (context, child, loadingProgress) {
+                                          if (loadingProgress == null) return child;
+                                          return Container(
+                                            color: const Color(0xFF0F121A),
+                                            child: const Center(
+                                              child: CircularProgressIndicator(
+                                                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Container(
+                                            color: const Color(0xFF0F121A),
+                                            child: const Center(
+                                              child: Icon(Icons.broken_image, color: Colors.grey, size: 42),
+                                            ),
+                                          );
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  color: const Color(0xFF0F121A),
-                                  child: const Center(
-                                    child: Icon(Icons.broken_image, color: Colors.grey, size: 42),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
-                        Positioned(
-                          bottom: 12,
-                          left: 16,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: List.generate(
-                              controller.bannerImages.length,
-                              (index) => AnimatedContainer(
-                                duration: const Duration(milliseconds: 250),
-                                margin: const EdgeInsets.symmetric(horizontal: 4),
-                                width: controller.currentBannerIndex.value == index ? 16 : 8,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  color: controller.currentBannerIndex.value == index
-                                      ? AppColors.primaryColor
-                                      : Colors.white.withOpacity(0.3),
-                                  borderRadius: BorderRadius.circular(4),
+                                    Positioned(
+                                      bottom: 12,
+                                      left: 16,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: List.generate(
+                                          controller.bannerImages.length,
+                                          (dotIndex) => AnimatedContainer(
+                                            duration: const Duration(milliseconds: 250),
+                                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                                            width: controller.currentBannerIndex.value == dotIndex ? 16 : 8,
+                                            height: 8,
+                                            decoration: BoxDecoration(
+                                              color: controller.currentBannerIndex.value == dotIndex
+                                                  ? AppColors.primaryColor
+                                                  : Colors.white.withOpacity(0.3),
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ],
-                    );
-                  }),
-                ),
+                      );
+                    },
+                  );
+                }),
               ),
-            ),
 
             const SizedBox(height: 20),
 
             // Horizontal Stats Card Row
-           /* SingleChildScrollView(
+            SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -338,7 +365,7 @@ class DashboardScreen extends GetView<DashboardController> {
                     icon: Icons.people_alt_rounded,
                     color: AppColors.leadColor,
                     value: "25",
-                    label: "Hot Leads",
+                    label: "Hot\nLeads",
                     points: [10, 15, 12, 18, 14, 22, 25],
                     trend: "12% this week",
                   ),
@@ -347,7 +374,7 @@ class DashboardScreen extends GetView<DashboardController> {
                     icon: Icons.calendar_month_rounded,
                     color: AppColors.appointmentColor,
                     value: "4",
-                    label: "Appointments",
+                    label: "Appointments\nToday",
                     points: [1, 3, 2, 4, 3, 2, 4],
                     trend: "8% this week",
                   ),
@@ -356,16 +383,16 @@ class DashboardScreen extends GetView<DashboardController> {
                     icon: Icons.access_time_filled_rounded,
                     color: AppColors.followUpColor,
                     value: "8",
-                    label: "Follow-ups",
+                    label: "Follow-ups\nPending",
                     points: [5, 4, 6, 5, 7, 6, 8],
                     trend: "10% this week",
                   ),
                   const SizedBox(width: 12),
                   _buildStatsCard(
-                    icon: Icons.check_circle_rounded,
+                    icon: Icons.school_rounded,
                     color: AppColors.trainingColor,
                     value: "12",
-                    label: "Completed",
+                    label: "Training Videos\nWatched",
                     points: [4, 6, 8, 7, 9, 10, 12],
                     trend: "15% this week",
                   ),
@@ -373,7 +400,7 @@ class DashboardScreen extends GetView<DashboardController> {
               ),
             ),
 
-            const SizedBox(height: 25),*/
+            const SizedBox(height: 10),
 
             // Quick Access header
             Padding(
@@ -394,7 +421,7 @@ class DashboardScreen extends GetView<DashboardController> {
                       final mainScreenController = Get.isRegistered<MainScreenController>()
                           ? Get.find<MainScreenController>()
                           : Get.put(MainScreenController());
-                      mainScreenController.changeTab(1);
+                      mainScreenController.changeTab(2);
                     },
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -429,7 +456,7 @@ class DashboardScreen extends GetView<DashboardController> {
                   crossAxisCount: 3,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
-                  childAspectRatio: 0.85,
+                  childAspectRatio: 1.15,
                 ),
                 itemCount: controller.features.length > 6 ? 6 : controller.features.length,
                 itemBuilder: (context, index) {
@@ -515,7 +542,7 @@ class DashboardScreen extends GetView<DashboardController> {
               ),
             ),
 
-            /*const SizedBox(height: 25),
+            const SizedBox(height: 25),
 
             // Today's Activity Section
             Padding(
@@ -604,7 +631,7 @@ class DashboardScreen extends GetView<DashboardController> {
                   ),
                 ],
               ),
-            ),*/
+            ),
 
             const SizedBox(height: 30),
           ],
@@ -637,81 +664,125 @@ class DashboardScreen extends GetView<DashboardController> {
     required String trend,
   }) {
     return Container(
-      width: 140,
-      padding: const EdgeInsets.all(12),
+      width: 105,
+      height: 100,
       decoration: BoxDecoration(
         color: const Color(0xFF0F121A),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.2), width: 1.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.35), width: 1.0),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.05),
-            blurRadius: 10,
+            color: color.withOpacity(0.04),
+            blurRadius: 6,
             spreadRadius: 1,
-            offset: const Offset(-2, -2),
+            offset: const Offset(-1, -1),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Stack(
+          children: [
+            Positioned(
+              left: -25,
+              top: -25,
+              child: Container(
+                width: 75,
+                height: 75,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
                   shape: BoxShape.circle,
-                ),
-                child: Icon(icon, color: color, size: 18),
-              ),
-              Text(
-                value,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  gradient: RadialGradient(
+                    colors: [
+                      color.withOpacity(0.22),
+                      color.withOpacity(0.0),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Text(
-            label,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-              height: 1.2,
             ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 25,
-            width: double.infinity,
-            child: CustomPaint(
-              painter: MiniGraphPainter(color: color, points: points),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              const Icon(Icons.arrow_upward, color: Colors.green, size: 12),
-              const SizedBox(width: 2),
-              Text(
-                trend,
-                style: const TextStyle(
-                  color: Colors.green,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: color.withOpacity(0.1),
+                          border: Border.all(color: color.withOpacity(0.3), width: 1.0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: color.withOpacity(0.2),
+                              blurRadius: 6,
+                              spreadRadius: 1,
+                            ),
+                          ],
+                        ),
+                        child: Icon(icon, color: color, size: 20),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              value,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                height: 1.1,
+                              ),
+                            ),
+                            Text(
+                              label.replaceAll('\n', ' '),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xFF8F9CAE),
+                                fontSize: 7.5,
+                                fontWeight: FontWeight.w500,
+                                height: 1.1,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  SizedBox(
+                    height: 20,
+                    width: double.infinity,
+                    child: CustomPaint(
+                      painter: MiniGraphPainter(color: color, points: points),
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Row(
+                    children: [
+                      Icon(Icons.arrow_upward, color: Colors.green, size: 8),
+                      const SizedBox(width: 2),
+                      Text(
+                        trend,
+                        style: const TextStyle(
+                          color: Colors.green,
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -723,47 +794,79 @@ class DashboardScreen extends GetView<DashboardController> {
         onTap: () => controller.navigateToFeature(feature),
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
           decoration: BoxDecoration(
             color: const Color(0xFF0F121A),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: feature.color.withOpacity(0.15), width: 1.5),
+            border: Border.all(color: feature.color.withOpacity(0.35), width: 1.0),
             boxShadow: [
               BoxShadow(
-                color: feature.color.withOpacity(0.03),
+                color: feature.color.withOpacity(0.04),
                 blurRadius: 8,
                 spreadRadius: 1,
-                offset: const Offset(-1, -1),
               ),
             ],
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: feature.color.withOpacity(0.12),
-                  shape: BoxShape.circle,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Stack(
+              children: [
+                Positioned(
+                  left: -25,
+                  top: -25,
+                  child: Container(
+                    width: 75,
+                    height: 75,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          feature.color.withOpacity(0.22),
+                          feature.color.withOpacity(0.0),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-                child: Icon(feature.icon, size: 24, color: feature.color),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                feature.title,
-                maxLines: 2,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                  letterSpacing: -0.2,
-                  height: 1.25,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(feature.icon, size: 26, color: feature.color),
+                      const Spacer(),
+                      Text(
+                        feature.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          letterSpacing: -0.2,
+                          height: 1.15,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                Positioned(
+                  bottom: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.06),
+                    ),
+                    child: const Icon(
+                      Icons.chevron_right,
+                      size: 10,
+                      color: Colors.white70,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -925,6 +1028,16 @@ class MiniGraphPainter extends CustomPainter {
     }
 
     canvas.drawPath(path, paint);
+
+    final dotPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    for (int i = 0; i < points.length; i++) {
+      double x = i * dx;
+      double y = size.height - ((points[i] - minY) / rangeY) * (size.height - 4) - 2;
+      canvas.drawCircle(Offset(x, y), 2.8, dotPaint);
+    }
   }
 
   @override

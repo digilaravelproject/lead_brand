@@ -40,11 +40,14 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
   
   final GlobalKey _boundaryKey = GlobalKey();
   bool _isProcessing = false;
+  int _selectedStyleIndex = 0;
+  late final PageController _pageController;
   final PromotionalVideo video = Get.arguments;
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: _selectedStyleIndex);
     if (video.videoUrl != null && video.videoUrl!.isNotEmpty) {
       _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(video.videoUrl!));
       _videoPlayerController!.initialize().then((_) {
@@ -98,7 +101,174 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
     _youtubeController?.dispose();
     _videoPlayerController?.dispose();
     _chewieController?.dispose();
+    _pageController.dispose();
     super.dispose();
+  }
+
+  void _showStyleSelectorBottomSheet(
+    BuildContext context,
+    String userName,
+    String userPhone,
+    String userEmail,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF0F111A),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return DraggableScrollableSheet(
+              initialChildSize: 0.7,
+              minChildSize: 0.5,
+              maxChildSize: 0.95,
+              expand: false,
+              builder: (context, scrollController) {
+                return Column(
+                  children: [
+                    const SizedBox(height: 12),
+                    // Drag handle
+                    Container(
+                      width: 40,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    Text(
+                      "Choose Video Style",
+                      style: TextStyle(
+                        color: AppColors.primaryColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    Expanded(
+                      child: GridView.builder(
+                        controller: scrollController,
+                        padding: const EdgeInsets.fromLTRB(12, 0, 12, 20),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.85,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                        ),
+                        itemCount: 100,
+                        itemBuilder: (context, index) {
+                          final isSelected = _selectedStyleIndex == index;
+                          return GestureDetector(
+                            onTap: () {
+                              _pageController.jumpToPage(index);
+                              setState(() {
+                                _selectedStyleIndex = index;
+                              });
+                              setModalState(() {});
+                              Navigator.pop(context);
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF161924),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isSelected ? AppColors.primaryColor : Colors.white10,
+                                  width: isSelected ? 2 : 1,
+                                ),
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    child: Stack(
+                                      children: [
+                                        const Positioned.fill(
+                                          child: Center(
+                                            child: Icon(
+                                              Icons.play_circle_fill_rounded,
+                                              color: Colors.white30,
+                                              size: 45,
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: 8,
+                                          left: 8,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.black.withOpacity(0.7),
+                                              borderRadius: BorderRadius.circular(6),
+                                              border: Border.all(color: Colors.white24, width: 0.5),
+                                            ),
+                                            child: Text(
+                                              "Style ${index + 1}",
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        if (isSelected)
+                                          Positioned(
+                                            top: 8,
+                                            right: 8,
+                                            child: Container(
+                                              padding: const EdgeInsets.all(4),
+                                              decoration: const BoxDecoration(
+                                                color: AppColors.primaryColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(
+                                                Icons.check,
+                                                color: Colors.black,
+                                                size: 12,
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 35,
+                                    width: double.infinity,
+                                    color: Colors.white,
+                                    child: FittedBox(
+                                      fit: BoxFit.fitWidth,
+                                      child: SizedBox(
+                                        width: 375,
+                                        height: 80,
+                                        child: BrandingBanner(
+                                          fallbackName: userName,
+                                          fallbackPhone: userPhone,
+                                          fallbackEmail: userEmail,
+                                          styleIndex: index,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -173,32 +343,64 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
                 padding: const EdgeInsets.all(10.0),
                 child: FittedBox(
                   fit: BoxFit.contain,
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    color: Colors.black,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Video Player
-                        playerWidget,
-                        
-                        // FLAT SQUARE Branding Frame
-                        Container(
-                          height: 80,
-                          width: double.infinity,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                          ),
-                          child: RepaintBoundary(
-                            key: _boundaryKey,
-                            child: BrandingBanner(
-                              fallbackName: userName,
-                              fallbackPhone: userPhone,
-                              fallbackEmail: userEmail,
+                  child: GestureDetector(
+                    onHorizontalDragEnd: (details) {
+                      if (details.primaryVelocity == null) return;
+                      if (details.primaryVelocity! < 0) {
+                        // Swipe left
+                        final nextIndex = (_selectedStyleIndex + 1) % 100;
+                        _pageController.jumpToPage(nextIndex);
+                        setState(() {
+                          _selectedStyleIndex = nextIndex;
+                        });
+                      } else if (details.primaryVelocity! > 0) {
+                        // Swipe right
+                        final prevIndex = (_selectedStyleIndex - 1 + 100) % 100;
+                        _pageController.jumpToPage(prevIndex);
+                        setState(() {
+                          _selectedStyleIndex = prevIndex;
+                        });
+                      }
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      color: Colors.black,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Video Player
+                          playerWidget,
+                          
+                          // FLAT SQUARE Branding Frame
+                          Container(
+                            height: 80,
+                            width: double.infinity,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                            ),
+                            child: RepaintBoundary(
+                              key: _boundaryKey,
+                              child: PageView.builder(
+                                controller: _pageController,
+                                itemCount: 100,
+                                onPageChanged: (index) {
+                                  setState(() {
+                                    _selectedStyleIndex = index;
+                                  });
+                                },
+                                itemBuilder: (context, index) {
+                                  return BrandingBanner(
+                                    fallbackName: userName,
+                                    fallbackPhone: userPhone,
+                                    fallbackEmail: userEmail,
+                                    styleIndex: index,
+                                  );
+                                },
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -206,6 +408,28 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
             ),
           ),
           
+          // Swipe indicator row
+          GestureDetector(
+            onTap: () => _showStyleSelectorBottomSheet(context, userName, userPhone, userEmail),
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.swipe_left_alt, color: AppColors.primaryColor, size: 14),
+                  const SizedBox(width: 6),
+                  Text(
+                    "Swipe video to change style (${_selectedStyleIndex + 1}/100)",
+                    style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(width: 6),
+                  const Icon(Icons.swipe_right_alt, color: AppColors.primaryColor, size: 14),
+                ],
+              ),
+            ),
+          ),
+
           // Controls
           Container(
             padding: const EdgeInsets.fromLTRB(15, 10, 15, 25), 

@@ -239,7 +239,7 @@ class ProfileScreen extends GetView<AuthController> {
                               ),
                               const SizedBox(height: 15),
                               const Text(
-                                'Destination',
+                                'Designation',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
@@ -249,9 +249,36 @@ class ProfileScreen extends GetView<AuthController> {
                               const SizedBox(height: 8),
                               CustomTextField(
                                 controller: controller.destinationController,
-                                hintText: 'Destination',
-                                prefixIcon: Icons.location_on_outlined,
+                                hintText: 'Designation',
+                                prefixIcon: Icons.badge_outlined,
                                 readOnly: false,
+                                suffixIcon: PopupMenuButton<String>(
+                                  icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textColorHint),
+                                  color: AppColors.cardColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    side: const BorderSide(color: AppColors.borderColor, width: 1.5),
+                                  ),
+                                  onSelected: (String value) {
+                                    controller.destinationController.text = value;
+                                  },
+                                  itemBuilder: (BuildContext context) {
+                                    return [
+                                      'Developer Officer',
+                                      'Insurance advisor',
+                                      'Financial Advisor',
+                                      'Financial planner',
+                                    ].map((String choice) {
+                                      return PopupMenuItem<String>(
+                                        value: choice,
+                                        child: Text(
+                                          choice,
+                                          style: const TextStyle(color: Colors.white, fontSize: 14),
+                                        ),
+                                      );
+                                    }).toList();
+                                  },
+                                ),
                               ),
                               const SizedBox(height: 15),
                               const Text(

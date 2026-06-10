@@ -32,7 +32,7 @@ class DashboardController extends GetxController {
     return Get.find<GetToolsUseCase>();
   }
 
-  final PageController pageController = PageController();
+  final PageController pageController = PageController(initialPage: 1200);
   final RxInt currentBannerIndex = 0.obs;
   final RxList<String> bannerImages = <String>[].obs;
   final RxBool isBannersLoading = false.obs;
@@ -58,46 +58,46 @@ class DashboardController extends GetxController {
   void _initializeFeatures() {
     features.assignAll([
       DashboardFeature(
-        id: 1,
-        title: 'Combo King',
-        icon: Icons.auto_awesome_motion,
-        route: RouteHelper.getComboPlanRoute(),
-        color: Colors.blue,
-      ),
-      DashboardFeature(
-        id: 2,
-        title: 'Combo Poster',
-        icon: Icons.dashboard_customize,
+        id: 5,
+        title: 'Agent Recruitment',
+        icon: Icons.people_alt_rounded,
         route: RouteHelper.getGalleryRoute(),
-        color: Colors.lightBlue,
-      ),
-      DashboardFeature(
-        id: 3,
-        title: 'Concept Brochures',
-        icon: Icons.menu_book,
-        route: RouteHelper.getGalleryRoute(),
-        color: Colors.orange,
+        color: const Color(0xFFAB47BC),
       ),
       DashboardFeature(
         id: 4,
         title: 'LIC Plans',
-        icon: Icons.description,
+        icon: Icons.description_rounded,
         route: RouteHelper.getLicPlansRoute(),
-        color: Colors.green,
-      ),
-      DashboardFeature(
-        id: 5,
-        title: 'Agent Recruitment',
-        icon: Icons.person_add,
-        route: RouteHelper.getGalleryRoute(),
-        color: Colors.purple,
+        color: const Color(0xFF2196F3),
       ),
       DashboardFeature(
         id: 6,
         title: 'Promotional Videos',
-        icon: Icons.play_circle_filled,
+        icon: Icons.play_circle_filled_rounded,
         route: '/promotional-videos',
-        color: Colors.red,
+        color: const Color(0xFFEC407A),
+      ),
+      DashboardFeature(
+        id: 3,
+        title: 'Concept Brochures',
+        icon: Icons.menu_book_rounded,
+        route: RouteHelper.getGalleryRoute(),
+        color: const Color(0xFFFF9800),
+      ),
+      DashboardFeature(
+        id: 2,
+        title: 'Marketing Tools',
+        icon: Icons.campaign_rounded,
+        route: RouteHelper.getGalleryRoute(),
+        color: const Color(0xFF00B0FF),
+      ),
+      DashboardFeature(
+        id: 1,
+        title: 'Lead Management',
+        icon: Icons.groups_rounded,
+        route: RouteHelper.getGalleryRoute(),
+        color: const Color(0xFFFFA000),
       ),
     ]);
   }
@@ -132,6 +132,7 @@ class DashboardController extends GetxController {
               .toList();
           if (urls.isNotEmpty) {
             bannerImages.assignAll(urls);
+            _jumpToInitialPage();
             return;
           }
         }
@@ -143,7 +144,18 @@ class DashboardController extends GetxController {
       if (bannerImages.isEmpty) {
         bannerImages.assignAll(_fallbackBanners);
       }
+      _jumpToInitialPage();
     }
+  }
+
+  void _jumpToInitialPage() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (pageController.hasClients && bannerImages.isNotEmpty) {
+        int targetPage = 1200 - (1200 % bannerImages.length);
+        pageController.jumpToPage(targetPage);
+        currentBannerIndex.value = 0;
+      }
+    });
   }
 
   Future<void> fetchFeatures() async {
@@ -159,7 +171,6 @@ class DashboardController extends GetxController {
 
         if (toolsList != null) {
           final List<DashboardFeature> updatedList = [];
-          int index = 0;
           for (var item in toolsList) {
             final toolModel = ToolModel.fromJson(item);
             
@@ -168,38 +179,74 @@ class DashboardController extends GetxController {
               continue;
             }
 
-            final icon = _getIconData(toolModel.icon);
-            final color = _getColor(toolModel.icon, index);
+            String title = toolModel.title;
+            IconData icon = _getIconData(toolModel.icon);
+            Color color = _getColor(toolModel.icon, 0);
+            
+            // Map keys dynamically to match user screenshot design:
+            if (toolModel.icon == 'combo_posters') {
+              title = 'Marketing Tools';
+              icon = Icons.campaign_rounded;
+              color = const Color(0xFF00B0FF);
+            } else if (toolModel.icon == 'combo_plans') {
+              title = 'Lead Management';
+              icon = Icons.groups_rounded;
+              color = const Color(0xFFFFA000);
+            } else if (toolModel.icon == 'agent_recruitment') {
+              title = 'Agent Recruitment';
+              icon = Icons.people_alt_rounded;
+              color = const Color(0xFFAB47BC);
+            } else if (toolModel.icon == 'lic_plans') {
+              title = 'LIC Plans';
+              icon = Icons.description_rounded;
+              color = const Color(0xFF2196F3);
+            } else if (toolModel.icon == 'concept_brochures') {
+              title = 'Concept Brochures';
+              icon = Icons.menu_book_rounded;
+              color = const Color(0xFFFF9800);
+            }
+
             final route = toolModel.subtools.isNotEmpty
                 ? RouteHelper.getComboPlanRoute()
                 : RouteHelper.getGalleryRoute();
 
-            // We translate "Combo Plans" to "Combo King" to keep the dashboard branding
-            String displayTitle = toolModel.title;
-            if (toolModel.title.toLowerCase().contains('combo') && toolModel.title.toLowerCase().contains('plan')) {
-              displayTitle = 'Combo King';
-            }
-
             updatedList.add(DashboardFeature(
               id: toolModel.id,
-              title: displayTitle,
+              title: title,
               icon: icon,
               route: route,
               color: color,
               subtools: toolModel.subtools.map((s) => s.toJson()).toList(),
               media: toolModel.media.map((m) => m.toJson()).toList(),
             ));
-            index++;
           }
 
           // Append the static Promotional Videos (id: 6) to make it 6 items in total
           updatedList.add(DashboardFeature(
             id: 6,
             title: 'Promotional Videos',
-            icon: Icons.play_circle_filled,
+            icon: Icons.play_circle_filled_rounded,
             route: '/promotional-videos',
-            color: Colors.red,
+            color: const Color(0xFFEC407A),
           ));
+
+          // Sort list according to desired screenshot order
+          final List<String> desiredOrder = [
+            'Agent Recruitment',
+            'LIC Plans',
+            'Promotional Videos',
+            'Concept Brochures',
+            'Marketing Tools',
+            'Lead Management',
+          ];
+          
+          updatedList.sort((a, b) {
+            int indexA = desiredOrder.indexOf(a.title);
+            int indexB = desiredOrder.indexOf(b.title);
+            if (indexA == -1) indexA = 99;
+            if (indexB == -1) indexB = 99;
+            return indexA.compareTo(indexB);
+          });
 
           if (updatedList.isNotEmpty) {
             features.assignAll(updatedList);
@@ -322,24 +369,26 @@ class DashboardController extends GetxController {
     }
   }
 
+  bool _isDisposed = false;
+
   void _startAutoPlay() {
     Future.delayed(const Duration(seconds: 4), () {
-      if (pageController.hasClients) {
-        if (bannerImages.isNotEmpty) {
-          int nextPage = (currentBannerIndex.value + 1) % bannerImages.length;
-          pageController.animateToPage(
-            nextPage,
-            duration: const Duration(milliseconds: 350),
-            curve: Curves.easeInOut,
-          );
-        }
-        _startAutoPlay();
+      if (_isDisposed) return;
+      if (pageController.hasClients && bannerImages.isNotEmpty) {
+        int nextPage = pageController.page!.round() + 1;
+        pageController.animateToPage(
+          nextPage,
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.easeInOut,
+        );
       }
+      _startAutoPlay();
     });
   }
 
   @override
   void onClose() {
+    _isDisposed = true;
     pageController.dispose();
     super.onClose();
   }
