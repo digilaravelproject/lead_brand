@@ -87,6 +87,7 @@ dependencies:
   gal: ^2.2.3
   youtube_explode_dart: ^2.3.0
   google_sign_in: ^7.2.0
+  font_awesome_flutter: ^11.0.0
 
 dev_dependencies:
   flutter_test:

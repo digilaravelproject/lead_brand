@@ -46,12 +46,32 @@ class DashboardController extends GetxController {
   final RxList<DashboardFeature> features = <DashboardFeature>[].obs;
   final RxBool isFeaturesLoading = false.obs;
 
+  // Lead Stats Observables
+  final RxInt hotLeadsCount = 0.obs;
+  final RxString hotLeadsTrend = '0% this week'.obs;
+  final RxBool hotLeadsTrendUp = true.obs;
+
+  final RxInt appointmentsCount = 0.obs;
+  final RxString appointmentsTrend = '0% this week'.obs;
+  final RxBool appointmentsTrendUp = true.obs;
+
+  final RxInt followupsCount = 0.obs;
+  final RxString followupsTrend = '0% this week'.obs;
+  final RxBool followupsTrendUp = true.obs;
+
+  final RxInt doneLeadsCount = 0.obs;
+  final RxString doneLeadsTrend = '0% this week'.obs;
+  final RxBool doneLeadsTrendUp = true.obs;
+
+  final RxBool isLeadStatsLoading = false.obs;
+
   @override
   void onInit() {
     super.onInit();
     _initializeFeatures();
     fetchBanners();
     fetchFeatures();
+    fetchLeadStats();
     _startAutoPlay();
   }
 
@@ -224,6 +244,56 @@ class DashboardController extends GetxController {
       }
     } catch (e) {
       debugPrint('Error fetching features: $e');
+    }
+  }
+
+  Future<void> fetchLeadStats() async {
+    isLeadStatsLoading.value = true;
+    try {
+      final apiClient = Get.find<ApiClient>();
+      final response = await apiClient.get(AppConstants.leadStatsUrl);
+      if (response.isSuccess && response.body != null) {
+        final dynamic data = (response.body is Map && (response.body as Map).containsKey('hot_leads'))
+            ? response.body
+            : (response.rawBody is Map ? response.rawBody['data'] : null);
+        if (data != null) {
+          // Hot Leads
+          final hot = data['hot_leads'];
+          if (hot != null) {
+            hotLeadsCount.value = hot['count'] ?? 0;
+            hotLeadsTrend.value = '${hot['percentage'] ?? 0}% this week';
+            hotLeadsTrendUp.value = (hot['trend'] ?? 'up') == 'up';
+          }
+
+          // Appointments
+          final appt = data['appointments_today'];
+          if (appt != null) {
+            appointmentsCount.value = appt['count'] ?? 0;
+            appointmentsTrend.value = '${appt['percentage'] ?? 0}% this week';
+            appointmentsTrendUp.value = (appt['trend'] ?? 'up') == 'up';
+          }
+
+          // Followups
+          final follow = data['followups_pending'];
+          if (follow != null) {
+            followupsCount.value = follow['count'] ?? 0;
+            followupsTrend.value = '${follow['percentage'] ?? 0}% this week';
+            followupsTrendUp.value = (follow['trend'] ?? 'up') == 'up';
+          }
+
+          // Done Leads
+          final done = data['done_leads'];
+          if (done != null) {
+            doneLeadsCount.value = done['count'] ?? 0;
+            doneLeadsTrend.value = '${done['percentage'] ?? 0}% this week';
+            doneLeadsTrendUp.value = (done['trend'] ?? 'up') == 'up';
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching lead stats: $e');
+    } finally {
+      isLeadStatsLoading.value = false;
     }
   }
 

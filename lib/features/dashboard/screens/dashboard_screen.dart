@@ -219,6 +219,7 @@ class DashboardScreen extends GetView<DashboardController> {
             onRefresh: () async {
               await controller.fetchBanners();
               await controller.fetchFeatures();
+              await controller.fetchLeadStats();
               await authController.fetchUserProfile();
             },
             child: SingleChildScrollView(
@@ -356,49 +357,55 @@ class DashboardScreen extends GetView<DashboardController> {
             const SizedBox(height: 20),
 
             // Horizontal Stats Card Row
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  _buildStatsCard(
-                    icon: Icons.people_alt_rounded,
-                    color: AppColors.leadColor,
-                    value: "25",
-                    label: "Hot\nLeads",
-                    points: [10, 15, 12, 18, 14, 22, 25],
-                    trend: "12% this week",
-                  ),
-                  const SizedBox(width: 12),
-                  _buildStatsCard(
-                    icon: Icons.calendar_month_rounded,
-                    color: AppColors.appointmentColor,
-                    value: "4",
-                    label: "Appointments\nToday",
-                    points: [1, 3, 2, 4, 3, 2, 4],
-                    trend: "8% this week",
-                  ),
-                  const SizedBox(width: 12),
-                  _buildStatsCard(
-                    icon: Icons.access_time_filled_rounded,
-                    color: AppColors.followUpColor,
-                    value: "8",
-                    label: "Follow-ups\nPending",
-                    points: [5, 4, 6, 5, 7, 6, 8],
-                    trend: "10% this week",
-                  ),
-                  const SizedBox(width: 12),
-                  _buildStatsCard(
-                    icon: Icons.school_rounded,
-                    color: AppColors.trainingColor,
-                    value: "12",
-                    label: "Training Videos\nWatched",
-                    points: [4, 6, 8, 7, 9, 10, 12],
-                    trend: "15% this week",
-                  ),
-                ],
-              ),
-            ),
+            Obx(() {
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    _buildStatsCard(
+                      icon: Icons.people_alt_rounded,
+                      color: AppColors.leadColor,
+                      value: "${controller.hotLeadsCount.value}",
+                      label: "Hot\nLeads",
+                      points: [10, 15, 12, 18, 14, 22, 25],
+                      trend: controller.hotLeadsTrend.value,
+                      isTrendUp: controller.hotLeadsTrendUp.value,
+                    ),
+                    const SizedBox(width: 12),
+                    _buildStatsCard(
+                      icon: Icons.calendar_month_rounded,
+                      color: AppColors.appointmentColor,
+                      value: "${controller.appointmentsCount.value}",
+                      label: "Appointments\nToday",
+                      points: [1, 3, 2, 4, 3, 2, 4],
+                      trend: controller.appointmentsTrend.value,
+                      isTrendUp: controller.appointmentsTrendUp.value,
+                    ),
+                    const SizedBox(width: 12),
+                    _buildStatsCard(
+                      icon: Icons.access_time_filled_rounded,
+                      color: AppColors.followUpColor,
+                      value: "${controller.followupsCount.value}",
+                      label: "Follow-ups\nPending",
+                      points: [5, 4, 6, 5, 7, 6, 8],
+                      trend: controller.followupsTrend.value,
+                      isTrendUp: controller.followupsTrendUp.value,
+                    ),
+                    const SizedBox(width: 12),
+                    _buildStatsCard(
+                      icon: Icons.task_alt_rounded,
+                      color: AppColors.successColor,
+                      value: "${controller.doneLeadsCount.value}",
+                      label: "Done\nLeads",
+                      points: [4, 6, 8, 7, 9, 10, 12],
+                      trend: controller.doneLeadsTrend.value,
+                      isTrendUp: controller.doneLeadsTrendUp.value,
+                    ),
+                  ],
+                ),
+              );
+            }),
 
             const SizedBox(height: 10),
 
@@ -662,6 +669,7 @@ class DashboardScreen extends GetView<DashboardController> {
     required String label,
     required List<double> points,
     required String trend,
+    bool isTrendUp = true,
   }) {
     return Container(
       width: 105,
@@ -766,12 +774,12 @@ class DashboardScreen extends GetView<DashboardController> {
                   const SizedBox(height: 3),
                   Row(
                     children: [
-                      Icon(Icons.arrow_upward, color: Colors.green, size: 8),
+                      Icon(isTrendUp ? Icons.arrow_upward : Icons.arrow_downward, color: isTrendUp ? Colors.green : Colors.redAccent, size: 8),
                       const SizedBox(width: 2),
                       Text(
                         trend,
-                        style: const TextStyle(
-                          color: Colors.green,
+                        style: TextStyle(
+                          color: isTrendUp ? Colors.green : Colors.redAccent,
                           fontSize: 8,
                           fontWeight: FontWeight.bold,
                         ),

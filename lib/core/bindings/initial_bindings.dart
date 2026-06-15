@@ -20,6 +20,9 @@ import '../../features/training/domain/usecases/get_trainings_usecase.dart';
 import '../../features/training/domain/usecases/get_training_details_usecase.dart';
 import '../../features/training/domain/usecases/search_trainings_usecase.dart';
 import '../../features/training/controllers/training_controller.dart';
+import '../../features/dashboard/domain/repositories/leads_repository_interface.dart';
+import '../../features/dashboard/domain/repositories/leads_repository.dart';
+import '../../features/dashboard/controllers/leads_controller.dart';
 
 class InitialBindings extends Bindings {
   @override
@@ -29,6 +32,11 @@ class InitialBindings extends Bindings {
     
     // Dashboard
     Get.lazyPut(() => DashboardController(), fenix: true);
+    Get.lazyPut<LeadsRepositoryInterface>(
+      () => LeadsRepository(apiClient: Get.find<ApiClient>()),
+      fenix: true,
+    );
+    Get.lazyPut(() => LeadsController(leadsRepository: Get.find<LeadsRepositoryInterface>()), fenix: true);
     
     // Plans
     Get.lazyPut(() => PlansController(), fenix: true);

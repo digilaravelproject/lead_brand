@@ -13,24 +13,26 @@ import '../../widgets/error_screen.dart';
 
 class ApiChecker {
   static Response checkResponse(Response response, {bool showToaster = false}) {
-    switch (response.statusCode) {
-      case 200:
-        final statusVal = response.data is Map ? response.data['status']?.toString().toLowerCase() : null;
-        if (response.data is Map && (
-            response.data['res'] == 'success' ||
-            response.data['status'] == true ||
-            response.data['success'] == true ||
-            statusVal == 'success')) {
-          return response;
-        } else {
-          if (showToaster) _showErrorMessage(response);
-          throw DioException(
-            requestOptions: response.requestOptions,
-            response: response,
-            type: DioExceptionType.badResponse,
-            error: response.data['msg'] ?? response.data['message'] ?? 'Something went wrong',
-          );
-        }
+    final statusCode = response.statusCode ?? 500;
+    if (statusCode >= 200 && statusCode < 300) {
+      final statusVal = response.data is Map ? response.data['status']?.toString().toLowerCase() : null;
+      if (response.data is Map && (
+          response.data['res'] == 'success' ||
+          response.data['status'] == true ||
+          response.data['success'] == true ||
+          statusVal == 'success')) {
+        return response;
+      } else {
+        if (showToaster) _showErrorMessage(response);
+        throw DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+          type: DioExceptionType.badResponse,
+          error: response.data['msg'] ?? response.data['message'] ?? 'Something went wrong',
+        );
+      }
+    }
+    switch (statusCode) {
       case 401:
         _showErrorMessage(response, 'Unauthorized');
         _logout();
@@ -288,7 +290,7 @@ class ApiChecker {
       );
     }
 
-    if (statusCode != 200) {
+    if (statusCode < 200 || statusCode >= 300) {
       if (response.data != null) {
         try {
           final responseModel = ResponseModel.fromJson(response.data, statusCode: statusCode);
