@@ -251,7 +251,10 @@ class DashboardController extends GetxController {
     isLeadStatsLoading.value = true;
     try {
       final apiClient = Get.find<ApiClient>();
-      final response = await apiClient.get(AppConstants.leadStatsUrl);
+      final response = await apiClient.get(
+        AppConstants.leadStatsUrl,
+        queryParameters: {'day': 'today'},
+      );
       if (response.isSuccess && response.body != null) {
         final dynamic data = (response.body is Map && (response.body as Map).containsKey('hot_leads'))
             ? response.body

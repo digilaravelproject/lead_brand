@@ -566,76 +566,78 @@ class DashboardScreen extends GetView<DashboardController> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0F121A),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withOpacity(0.05), width: 1.5),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: _buildActivityItem(
-                            icon: Icons.phone_rounded,
-                            color: const Color(0xFFAB47BC),
-                            value: "5",
-                            label: "Calls Done",
+                  Obx(() {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0F121A),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.white.withOpacity(0.05), width: 1.5),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: _buildActivityItem(
+                              icon: Icons.people_alt_rounded,
+                              color: AppColors.leadColor,
+                              value: "${controller.hotLeadsCount.value}",
+                              label: "Call Done",
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: _buildDottedConnector(
-                            color1: const Color(0xFFAB47BC),
-                            color2: const Color(0xFFFFB74D),
-                            width: 12,
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: _buildDottedConnector(
+                              color1: AppColors.leadColor,
+                              color2: AppColors.appointmentColor,
+                              width: 12,
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          child: _buildActivityItem(
-                            icon: Icons.person_rounded,
-                            color: const Color(0xFFFFB74D),
-                            value: "3",
-                            label: "Meetings",
+                          Expanded(
+                            child: _buildActivityItem(
+                              icon: Icons.calendar_month_rounded,
+                              color: AppColors.appointmentColor,
+                              value: "${controller.appointmentsCount.value}",
+                              label: "Meetings",
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: _buildDottedConnector(
-                            color1: const Color(0xFFFFB74D),
-                            color2: const Color(0xFF81C784),
-                            width: 12,
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: _buildDottedConnector(
+                              color1: AppColors.appointmentColor,
+                              color2: AppColors.followUpColor,
+                              width: 12,
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          child: _buildActivityItem(
-                            icon: Icons.assignment_turned_in_rounded,
-                            color: const Color(0xFF81C784),
-                            value: "2",
-                            label: "Proposals Sent",
+                          Expanded(
+                            child: _buildActivityItem(
+                              icon: Icons.access_time_filled_rounded,
+                              color: AppColors.followUpColor,
+                              value: "${controller.followupsCount.value}",
+                              label: "Proposals Sent",
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: _buildDottedConnector(
-                            color1: const Color(0xFF81C784),
-                            color2: const Color(0xFF64B5F6),
-                            width: 12,
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: _buildDottedConnector(
+                              color1: AppColors.followUpColor,
+                              color2: AppColors.successColor,
+                              width: 12,
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          child: _buildActivityItem(
-                            icon: Icons.shield_rounded,
-                            color: const Color(0xFF64B5F6),
-                            value: "1",
-                            label: "Policy Sold",
+                          Expanded(
+                            child: _buildActivityItem(
+                              icon: Icons.task_alt_rounded,
+                              color: AppColors.successColor,
+                              value: "${controller.doneLeadsCount.value}",
+                              label: "Policy Sold",
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
+                        ],
+                      ),
+                    );
+                  }),
                 ],
               ),
             ),
