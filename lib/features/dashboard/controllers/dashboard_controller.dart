@@ -335,6 +335,7 @@ class DashboardController extends GetxController {
           Get.toNamed(RouteHelper.getGalleryRoute(), arguments: {
             'title': feature.title,
             'images': imageUrls,
+            'media': media,
           });
         }
       } else {
@@ -349,6 +350,7 @@ class DashboardController extends GetxController {
           Get.toNamed(RouteHelper.getGalleryRoute(), arguments: {
             'title': feature.title,
             'images': imageUrls,
+            'media': feature.media,
           });
         }
       }

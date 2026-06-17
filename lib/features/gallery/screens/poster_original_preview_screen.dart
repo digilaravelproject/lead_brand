@@ -7,11 +7,13 @@ import '../../../core/theme/app_colors.dart';
 class PosterOriginalPreviewScreen extends StatelessWidget {
   final String imageUrl;
   final String text;
+  final String? infoImageUrl;
 
   const PosterOriginalPreviewScreen({
     Key? key,
     required this.imageUrl,
     required this.text,
+    this.infoImageUrl,
   }) : super(key: key);
 
   @override
@@ -28,21 +30,18 @@ class PosterOriginalPreviewScreen extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
-            if (imageUrl.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+      body: Center(
+        child: infoImageUrl != null && infoImageUrl!.isNotEmpty
+            ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: SizedBox(
-                    height: 380,
-                    width: double.infinity,
+                  child: InteractiveViewer(
+                    panEnabled: true,
+                    minScale: 0.5,
+                    maxScale: 4.0,
                     child: CachedNetworkImage(
-                      imageUrl: imageUrl,
+                      imageUrl: infoImageUrl!,
                       fit: BoxFit.contain,
                       placeholder: (context, url) => const Center(
                         child: CircularProgressIndicator(color: AppColors.primaryColor),
@@ -54,16 +53,26 @@ class PosterOriginalPreviewScreen extends StatelessWidget {
                   ),
                 ),
               )
-            else
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 50.0),
-                  child: Text(
-                    'No image available',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
+            : const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.image_not_supported_outlined, color: Colors.white24, size: 60),
+                    SizedBox(height: 16),
+                    Text(
+                      'No information image available',
+                      style: TextStyle(color: Colors.white54, fontSize: 15, fontWeight: FontWeight.w500),
+                    ),
+                  ],
                 ),
               ),
+      ),
+    );
+  }
+}
+
+/*
             if (text.isNotEmpty)
               Container(
                 width: double.infinity,
@@ -147,9 +156,6 @@ class PosterOriginalPreviewScreen extends StatelessWidget {
                   ],
                 ),
               ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+*/
+ // }
+//}

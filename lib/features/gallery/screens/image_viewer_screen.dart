@@ -300,6 +300,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
     final args = Get.arguments;
     final String imageUrl = args is Map ? (args['imageUrl'] ?? '') : (args ?? '');
     final String? pdfUrl = args is Map ? args['pdfUrl'] : null;
+    final String? infoImageUrl = args is Map ? args['infoImageUrl'] : null;
     final userJson = SharedPrefs.getString(AppConstants.userData);
     UserSetupModel? user;
     if (userJson != null && userJson.isNotEmpty) {
@@ -348,6 +349,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
                 () => PosterOriginalPreviewScreen(
                   imageUrl: imageUrl,
                   text: _shareTextController.text,
+                  infoImageUrl: infoImageUrl,
                 ),
               );
             },

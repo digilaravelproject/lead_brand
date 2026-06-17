@@ -8,6 +8,7 @@ class GalleryController extends GetxController {
   final RxList<String> images = <String>[].obs;
   final RxMap<String, String> imageUrlToPdfUrl = <String, String>{}.obs;
   final RxMap<String, String> imageUrlToDescription = <String, String>{}.obs;
+  final RxMap<String, String> imageUrlToInfoImageUrl = <String, String>{}.obs;
 
   void toggleColumns() {
     columnCount.value = columnCount.value == 3 ? 2 : 3;
@@ -28,12 +29,16 @@ class GalleryController extends GetxController {
           final String? fullUrl = m['full_url']?.toString();
           final String? pdfUrl = m['pdf_url']?.toString();
           final String? desc = m['description']?.toString();
+          final String? infoImageUrl = m['info_image_url']?.toString();
           if (fullUrl != null) {
             if (pdfUrl != null && pdfUrl.isNotEmpty) {
               imageUrlToPdfUrl[fullUrl] = pdfUrl;
             }
             if (desc != null && desc.isNotEmpty) {
               imageUrlToDescription[fullUrl] = desc;
+            }
+            if (infoImageUrl != null && infoImageUrl.isNotEmpty) {
+              imageUrlToInfoImageUrl[fullUrl] = infoImageUrl;
             }
           }
         }
@@ -50,10 +55,12 @@ class GalleryController extends GetxController {
   void openImageViewer(String imageUrl) {
     final pdfUrl = imageUrlToPdfUrl[imageUrl];
     final description = imageUrlToDescription[imageUrl];
+    final infoImageUrl = imageUrlToInfoImageUrl[imageUrl];
     Get.toNamed(RouteHelper.getImageViewerRoute(), arguments: {
       'imageUrl': imageUrl,
       'pdfUrl': pdfUrl,
       'description': description,
+      'infoImageUrl': infoImageUrl,
     });
   }
 }
