@@ -34,6 +34,9 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
   int _selectedStyleIndex = 0;
   late final PageController _pageController;
   final TextEditingController _shareTextController = TextEditingController();
+  double? _posterAspectRatio;
+  ImageStreamListener? _aspectRatioListener;
+  ImageStream? _aspectRatioStream;
 
   @override
   void initState() {
@@ -42,8 +45,12 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
     
     final args = Get.arguments;
     String? apiDescription;
+    String imageUrl = '';
     if (args is Map) {
       apiDescription = args['description']?.toString();
+      imageUrl = args['imageUrl'] ?? '';
+    } else if (args != null) {
+      imageUrl = args.toString();
     }
 
     if (apiDescription != null && apiDescription.trim().isNotEmpty) {
@@ -53,10 +60,39 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
       _shareTextController.text = '';
       _shareWithText = false;
     }
+
+    _resolvePosterAspectRatio(imageUrl);
+  }
+
+  void _resolvePosterAspectRatio(String imageUrl) {
+    if (imageUrl.isEmpty) return;
+
+    final imageProvider = NetworkImage(imageUrl);
+    _aspectRatioStream = imageProvider.resolve(const ImageConfiguration());
+    _aspectRatioListener = ImageStreamListener(
+      (ImageInfo info, bool _) {
+        if (!mounted) return;
+        setState(() {
+          _posterAspectRatio = info.image.width / info.image.height;
+        });
+        _aspectRatioStream?.removeListener(_aspectRatioListener!);
+        _aspectRatioListener = null;
+        _aspectRatioStream = null;
+      },
+      onError: (_, __) {
+        _aspectRatioStream?.removeListener(_aspectRatioListener!);
+        _aspectRatioListener = null;
+        _aspectRatioStream = null;
+      },
+    );
+    _aspectRatioStream!.addListener(_aspectRatioListener!);
   }
 
   @override
   void dispose() {
+    if (_aspectRatioListener != null && _aspectRatioStream != null) {
+      _aspectRatioStream!.removeListener(_aspectRatioListener!);
+    }
     _pageController.dispose();
     _shareTextController.dispose();
     super.dispose();
@@ -210,7 +246,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
                                         Positioned.fill(
                                           child: CachedNetworkImage(
                                             imageUrl: imageUrl,
-                                            fit: BoxFit.cover,
+                                            fit: BoxFit.contain,
                                             placeholder: (context, url) => const Center(
                                               child: SizedBox(
                                                 width: 20,
@@ -515,51 +551,72 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
   }
 
   Widget _buildMainPoster(String imageUrl, String name, String phone, String email) {
-    return PageView.builder(
-      controller: _pageController,
-      itemCount: 100,
-      onPageChanged: (index) {
-        setState(() {
-          _selectedStyleIndex = index;
-        });
-      },
-      itemBuilder: (context, index) {
-        return Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 20, offset: const Offset(0, 8)),
-            ],
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded(
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const bannerHeight = 80.0;
+        final imageRatio = _posterAspectRatio ?? (4 / 5);
+
+        double width = constraints.maxWidth;
+        double totalHeight = width / imageRatio + bannerHeight;
+
+        if (totalHeight > constraints.maxHeight) {
+          totalHeight = constraints.maxHeight;
+          width = (totalHeight - bannerHeight) * imageRatio;
+        }
+
+        return PageView.builder(
+          controller: _pageController,
+          itemCount: 100,
+          onPageChanged: (index) {
+            setState(() {
+              _selectedStyleIndex = index;
+            });
+          },
+          itemBuilder: (context, index) {
+            return Center(
+              child: SizedBox(
+                width: width,
+                height: totalHeight,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 20, offset: const Offset(0, 8)),
+                    ],
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: CachedNetworkImage(
+                          imageUrl: imageUrl,
+                          fit: BoxFit.contain,
+                          width: double.infinity,
+                          placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                        ),
+                      ),
+                      SizedBox(
+                        height: bannerHeight,
+                        width: double.infinity,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border(top: BorderSide(color: Colors.grey.withValues(alpha: 0.08))),
+                          ),
+                          child: BrandingBanner(
+                            fallbackName: name,
+                            fallbackPhone: phone,
+                            fallbackEmail: email,
+                            styleIndex: index,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              Container(
-                height: 80, 
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border(top: BorderSide(color: Colors.grey.withValues(alpha: 0.08))),
-                ),
-                child: BrandingBanner(
-                  fallbackName: name,
-                  fallbackPhone: phone,
-                  fallbackEmail: email,
-                  styleIndex: index,
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );

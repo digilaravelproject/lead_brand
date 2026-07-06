@@ -44,6 +44,38 @@ class LocalizationController extends GetxController {
         languageCode: 'gu',
         countryCode: 'IN',
       ),
+
+
+     /* LanguageModel(
+        imageUrl: ImageConstants.marathi,
+        languageName: 'Bengali',
+        languageCode: 'bn',
+        countryCode: 'BN',
+      ),
+      LanguageModel(
+        imageUrl: ImageConstants.gujarati,
+        languageName: 'Telugu',
+        languageCode: 'tl',
+        countryCode: 'TL',
+      ),
+      LanguageModel(
+        imageUrl: ImageConstants.marathi,
+        languageName: 'Tamil',
+        languageCode: 'tm',
+        countryCode: 'TM',
+      ),
+      LanguageModel(
+        imageUrl: ImageConstants.gujarati,
+        languageName: 'Kannada',
+        languageCode: 'kn',
+        countryCode: 'KN',
+      ),
+      LanguageModel(
+        imageUrl: ImageConstants.gujarati,
+        languageName: 'Panjabi',
+        languageCode: 'pn',
+        countryCode: 'PN',
+      ),*/
     ]);
   }
 
