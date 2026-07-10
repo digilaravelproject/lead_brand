@@ -46,7 +46,7 @@ class LocalizationController extends GetxController {
       ),
 
 
-     /* LanguageModel(
+      LanguageModel(
         imageUrl: ImageConstants.marathi,
         languageName: 'Bengali',
         languageCode: 'bn',
@@ -55,13 +55,13 @@ class LocalizationController extends GetxController {
       LanguageModel(
         imageUrl: ImageConstants.gujarati,
         languageName: 'Telugu',
-        languageCode: 'tl',
+        languageCode: 'te',
         countryCode: 'TL',
       ),
       LanguageModel(
         imageUrl: ImageConstants.marathi,
         languageName: 'Tamil',
-        languageCode: 'tm',
+        languageCode: 'ta',
         countryCode: 'TM',
       ),
       LanguageModel(
@@ -73,9 +73,9 @@ class LocalizationController extends GetxController {
       LanguageModel(
         imageUrl: ImageConstants.gujarati,
         languageName: 'Panjabi',
-        languageCode: 'pn',
+        languageCode: 'pa',
         countryCode: 'PN',
-      ),*/
+      ),
     ]);
   }
 
