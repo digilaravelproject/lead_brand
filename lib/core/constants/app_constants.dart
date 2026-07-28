@@ -2,8 +2,10 @@ import '../services/config/env_config.dart';
 
 class AppConstants {
     static String appName = EnvConfig.appName;
-    static const String baseUrl = 'https://sienna-owl-749505.hostingersite.com';
-    static const String imageBaseUrl = 'https://sienna-owl-749505.hostingersite.com';
+   // static const String baseUrl = 'https://sienna-owl-749505.hostingersite.com';
+    static const String baseUrl = 'https://leadbrandapp.leadbrandhub.com';
+   //static const String imageBaseUrl = 'https://sienna-owl-749505.hostingersite.com';
+    static const String imageBaseUrl = 'https://leadbrandapp.leadbrandhub.com';
     static const String fontFamily = 'Poppins';
     static const String defaultTag = 'PCB_APP'; // default tag for log checking
 
