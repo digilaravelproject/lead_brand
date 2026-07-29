@@ -1,6 +1,6 @@
 {
-     "name": "Demo App",
-     "short_name": "Demo App",
+     "name": "AdvisorX Pro",
+     "short_name": "AdvisorX Pro",
      "start_url": ".",
      "display": "standalone",
      "background_color": "#0175C2",

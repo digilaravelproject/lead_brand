@@ -7,7 +7,7 @@
 
     <!-- Application -->
     <application
-        android:label="BLISS"
+        android:label="AdvisorX Pro"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
@@ -43,7 +43,7 @@
 
         <!-- Activity aliases for alternate icons -->
         <activity-alias
-            android:label="BLISS"
+            android:label="AdvisorX Pro"
             android:icon="@mipmap/ic_launcher"
             android:roundIcon="@mipmap/ic_launcher"
             android:name=".icon_1"
@@ -51,7 +51,7 @@
             android:enabled="false"
             android:targetActivity=".MainActivity"/>
         <activity-alias
-            android:label="BLISS"
+            android:label="AdvisorX Pro"
             android:icon="@mipmap/ic_launcher"
             android:roundIcon="@mipmap/ic_launcher"
             android:name=".icon_2"

@@ -63,6 +63,7 @@ class LoginScreen extends GetView<AuthController> {
                               isLoading: controller.isLoading.value,
                               onPressed: controller.login,
                             )),
+                            /*
                             const SizedBox(height: 35),
                             Row(
                               children: const [
@@ -109,6 +110,7 @@ class LoginScreen extends GetView<AuthController> {
                                 ),
                               ),
                             ),
+                            */
                             const Spacer(),
                             const SizedBox(height: 20),
                             const Center(
