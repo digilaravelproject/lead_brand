@@ -65,11 +65,11 @@ class SplashScreen extends GetView<SplashController> {
             painter: DashedCirclePainter(),
           ),
           const Text(
-            "LEAD\nBRAND",
+            "AdvisorX \nPro",
             textAlign: TextAlign.center,
             style: TextStyle(
               color: AppColors.primaryColor,
-              fontSize: 26,
+              fontSize: 22,
               fontWeight: FontWeight.w900,
               letterSpacing: 2,
               height: 1.1,

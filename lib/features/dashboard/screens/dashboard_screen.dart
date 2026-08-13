@@ -423,29 +423,6 @@ class DashboardScreen extends GetView<DashboardController> {
                       color: Colors.white,
                     ),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      final mainScreenController = Get.isRegistered<MainScreenController>()
-                          ? Get.find<MainScreenController>()
-                          : Get.put(MainScreenController());
-                      mainScreenController.changeTab(2);
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Text(
-                          'View All',
-                          style: TextStyle(
-                            color: AppColors.primaryColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                          ),
-                        ),
-                        SizedBox(width: 2),
-                        Icon(Icons.chevron_right, color: AppColors.primaryColor, size: 16),
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -465,7 +442,7 @@ class DashboardScreen extends GetView<DashboardController> {
                   mainAxisSpacing: 10,
                   childAspectRatio: 1.15,
                 ),
-                itemCount: controller.features.length > 6 ? 6 : controller.features.length,
+                itemCount: controller.features.length,
                 itemBuilder: (context, index) {
                   final feature = controller.features[index];
                   return _buildFeatureCard(feature);
