@@ -57,6 +57,11 @@ class LoginScreen extends GetView<AuthController> {
                               keyboardType: TextInputType.emailAddress,
                               errorText: controller.emailErrorText.value,
                             )),
+                            const SizedBox(height: 20),
+                            CustomTextField(
+                              controller: controller.referenceCodeController,
+                              hintText: 'Reference Code (Optional)',
+                            ),
                             const SizedBox(height: 25),
                             Obx(() => CustomButton(
                               text: 'SEND OTP',

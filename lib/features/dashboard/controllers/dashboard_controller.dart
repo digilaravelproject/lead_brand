@@ -1,4 +1,7 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get.dart';
 import '../../../routes/route_helper.dart';
 import '../../../core/services/network/api_client.dart';
@@ -7,6 +10,7 @@ import '../domain/models/tool_model.dart';
 import '../domain/usecases/get_tools_usecase.dart';
 import '../domain/repositories/tools_repository_interface.dart';
 import '../domain/repositories/tools_repository.dart';
+import '../../auth/controllers/auth_controller.dart';
 
 class DashboardController extends GetxController {
   final GetToolsUseCase? _getToolsUseCase;
@@ -69,10 +73,225 @@ class DashboardController extends GetxController {
   void onInit() {
     super.onInit();
     _initializeFeatures();
+    checkSubscriptionStatus();
     fetchBanners();
     fetchFeatures();
     fetchLeadStats();
     _startAutoPlay();
+  }
+
+  Future<void> checkSubscriptionStatus() async {
+    try {
+      final apiClient = Get.find<ApiClient>();
+      final response = await apiClient.get(AppConstants.getUserUrl);
+      if (response.isSuccess && response.body != null) {
+        final data = response.body['data'] ?? response.body;
+        final user = data['user'];
+        final dealer = data['dealer'];
+        final admin = data['admin'];
+
+        if (user != null) {
+          final subscriptionEndsAtStr = user['subscription_ends_at'];
+          if (subscriptionEndsAtStr != null) {
+            final subscriptionEndsAt = DateTime.parse(subscriptionEndsAtStr);
+            if (subscriptionEndsAt.isBefore(DateTime.now())) {
+              _showSubscriptionExpiredDialog(dealer, admin);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint("Error checking subscription: $e");
+    }
+  }
+
+  Future<void> _launchUrl(String scheme, String path) async {
+    final Uri url = Uri(scheme: scheme, path: path);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    }
+  }
+
+  void _showSubscriptionExpiredDialog(Map<String, dynamic>? dealer, Map<String, dynamic>? admin) {
+    String name = '';
+    String phone = '';
+    String altPhone = '';
+    String email = '';
+    String role = '';
+
+    if (dealer != null) {
+      name = dealer['name'] ?? 'Assigned Dealer';
+      phone = dealer['phone_number'] ?? '';
+      altPhone = dealer['alternative_phone_number'] ?? '';
+      email = dealer['email'] ?? '';
+      role = 'Dealer';
+    } else if (admin != null) {
+      name = admin['name'] ?? 'System Admin';
+      phone = admin['phone_number'] ?? '';
+      altPhone = admin['alternative_phone_number'] ?? '';
+      email = admin['email'] ?? '';
+      role = 'Admin';
+    } else {
+      name = 'Support Team';
+      role = 'Support';
+    }
+
+    DateTime? lastQuitTime;
+
+    Get.dialog(
+      WillPopScope(
+        onWillPop: () async {
+          final now = DateTime.now();
+          if (lastQuitTime == null || now.difference(lastQuitTime!) > const Duration(seconds: 2)) {
+            lastQuitTime = now;
+            Get.snackbar(
+              "Exit",
+              "Press back again to close the app",
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: const Color(0xFF0F121A),
+              colorText: Colors.white,
+              margin: const EdgeInsets.all(16),
+              duration: const Duration(seconds: 2),
+            );
+            return false;
+          }
+          SystemNavigator.pop();
+          return true;
+        },
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+          child: AlertDialog(
+            backgroundColor: const Color(0xFF0F121A),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: const BorderSide(color: Color(0xFFEC407A), width: 1.5), // distinct color
+            ),
+            title: Row(
+              children: const [
+                Icon(Icons.warning_amber_rounded, color: Color(0xFFEC407A), size: 28),
+                SizedBox(width: 10),
+                Text(
+                  "Subscription Expired",
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Your subscription has expired, and access to the platform's features is currently restricted.",
+                  style: TextStyle(color: Colors.white70, fontSize: 14, height: 1.4),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Please contact your assigned $role to make a payment and renew your subscription to continue growing your business seamlessly.",
+                  style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500, height: 1.4),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name.toUpperCase(),
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 0.5),
+                      ),
+                      const SizedBox(height: 12),
+                      if (phone.isNotEmpty)
+                        InkWell(
+                          onTap: () => _launchUrl('tel', phone),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.phone_rounded, color: Color(0xFF2196F3), size: 16),
+                                const SizedBox(width: 8),
+                                Text(phone, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600, decoration: TextDecoration.underline)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      if (altPhone.isNotEmpty)
+                        InkWell(
+                          onTap: () => _launchUrl('tel', altPhone),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.phone_android_rounded, color: Color(0xFF2196F3), size: 16),
+                                const SizedBox(width: 8),
+                                Text(altPhone, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600, decoration: TextDecoration.underline)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      if (email.isNotEmpty)
+                        InkWell(
+                          onTap: () => _launchUrl('mailto', email),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.email_rounded, color: Color(0xFF2196F3), size: 16),
+                                const SizedBox(width: 8),
+                                Expanded(child: Text(email, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600, decoration: TextDecoration.underline), overflow: TextOverflow.ellipsis)),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Get.dialog(
+                    AlertDialog(
+                      backgroundColor: const Color(0xFF0F121A),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: BorderSide(color: Colors.white.withOpacity(0.1), width: 1),
+                      ),
+                      title: const Text("Confirm Logout", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      content: const Text("Are you sure you want to log out from this account?", style: TextStyle(color: Colors.white70)),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Get.back(),
+                          child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            if (Get.isRegistered<AuthController>()) {
+                              Get.find<AuthController>().logout();
+                            } else {
+                              Get.put(AuthController()).logout();
+                            }
+                          },
+                          child: const Text("Logout", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                child: const Text("Logout", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+    );
   }
 
   void _initializeFeatures() {

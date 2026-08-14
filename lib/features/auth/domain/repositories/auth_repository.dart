@@ -15,10 +15,13 @@ class AuthRepository implements AuthRepositoryInterface {
   AuthRepository({required this.apiClient});
 
   @override
-  Future<ResponseModel> sendOtp(String email) async {
+  Future<ResponseModel> sendOtp(String email, {String referCode = ""}) async {
     return await apiClient.post(
       AppConstants.sendOtpUrl,
-      data: {'email': email},
+      data: {
+        'email': email,
+        'refer_code': referCode,
+      },
     );
   }
 

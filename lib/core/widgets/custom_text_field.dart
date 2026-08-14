@@ -10,6 +10,7 @@ class CustomTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final bool readOnly;
   final String? errorText;
+  final EdgeInsetsGeometry? contentPadding;
 
   const CustomTextField({
     Key? key,
@@ -21,6 +22,7 @@ class CustomTextField extends StatelessWidget {
     this.suffixIcon,
     this.readOnly = false,
     this.errorText,
+    this.contentPadding,
   }) : super(key: key);
 
   @override
@@ -64,7 +66,8 @@ class CustomTextField extends StatelessWidget {
               prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: AppColors.textColorHint, size: 20) : null,
               suffixIcon: suffixIcon,
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              isDense: true,
+              contentPadding: contentPadding ?? const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             ),
           ),
         ),

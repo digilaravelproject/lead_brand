@@ -63,6 +63,7 @@ class UserSetupModel {
   final String? logo;
   final String email;
   final String? emailVerifiedAt;
+  final String? approvalStatus;
 
   UserSetupModel({
     required this.id,
@@ -73,6 +74,7 @@ class UserSetupModel {
     this.logo,
     required this.email,
     this.emailVerifiedAt,
+    this.approvalStatus,
   });
 
   factory UserSetupModel.fromJson(Map<String, dynamic> json) {
@@ -85,6 +87,7 @@ class UserSetupModel {
       logo: json['logo'],
       email: json['email'] ?? '',
       emailVerifiedAt: json['email_verified_at'],
+      approvalStatus: json['approval_status'],
     );
   }
 
@@ -98,6 +101,7 @@ class UserSetupModel {
       'logo': logo,
       'email': email,
       'email_verified_at': emailVerifiedAt,
+      'approval_status': approvalStatus,
     };
   }
 }

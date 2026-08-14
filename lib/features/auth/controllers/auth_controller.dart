@@ -245,6 +245,7 @@ class AuthController extends GetxController {
   final nameController = TextEditingController();
   final destinationController = TextEditingController();
   final phoneController = TextEditingController();
+  final referenceCodeController = TextEditingController();
   final selectedCountryCode = '+91'.obs;
   final selectedCountryFlag = '🇮🇳'.obs;
   final selectedCountryName = 'India'.obs;
@@ -284,9 +285,11 @@ class AuthController extends GetxController {
       return;
     }
 
+    final referCode = referenceCodeController.text.trim();
+
     isLoading.value = true;
     try {
-      final response = await authRepository.sendOtp(email);
+      final response = await authRepository.sendOtp(email, referCode: referCode);
       if (response.isSuccess) {
         for (var c in otpControllers) {
           c.clear();
@@ -327,7 +330,11 @@ class AuthController extends GetxController {
 
         int isNew = 1;
         if (response.body != null && response.body is Map) {
-          isNew = response.body['is_new'] ?? 1;
+          if (response.body['data'] != null && response.body['data'] is Map && response.body['data']['is_new'] != null) {
+            isNew = response.body['data']['is_new'];
+          } else {
+            isNew = response.body['is_new'] ?? 1;
+          }
         }
 
         if (isNew == 1) {
