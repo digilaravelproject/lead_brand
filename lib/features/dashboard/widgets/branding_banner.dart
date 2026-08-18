@@ -252,7 +252,7 @@ class BrandingBanner extends StatelessWidget {
     final profileWidget = Container(
       width: 72,
       decoration: BoxDecoration(
-        color: Colors.black,
+        color: Colors.transparent,
         border: Border(
           right: photoOnRight ? BorderSide.none : BorderSide(color: dividerCol, width: 1.5),
           left: photoOnRight ? BorderSide(color: dividerCol, width: 1.5) : BorderSide.none,
@@ -265,13 +265,13 @@ class BrandingBanner extends StatelessWidget {
                   imageUrl: profilePhoto.startsWith('/')
                       ? '${AppConstants.imageBaseUrl}$profilePhoto'
                       : profilePhoto,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                   placeholder: (context, url) => _buildFallbackLogo(logo),
                   errorWidget: (context, url, error) => _buildFallbackLogo(logo),
                 )
               : Image.file(
                   File(profilePhoto),
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) => _buildFallbackLogo(logo),
                 ))
           : _buildFallbackLogo(logo),
@@ -355,7 +355,7 @@ class BrandingBanner extends StatelessWidget {
                               displayPhone,
                               style: TextStyle(
                                 color: phoneColor,
-                                  fontSize: 8.2,
+                                  fontSize: 9.2,
                                   fontWeight: FontWeight.w900,
                                 ),
                                 maxLines: 1,
@@ -415,7 +415,7 @@ class BrandingBanner extends StatelessWidget {
                         ? (File(logo).existsSync()
                             ? Image.file(
                                 File(logo),
-                                fit: BoxFit.fill,
+                                fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) => const Center(
                                   child: Icon(
                                    Icons.business,
@@ -430,7 +430,7 @@ class BrandingBanner extends StatelessWidget {
                                     : (logo.startsWith('/')
                                         ? '${AppConstants.imageBaseUrl}$logo'
                                         : '${AppConstants.imageBaseUrl}/$logo'),
-                                fit: BoxFit.fill,
+                                fit: BoxFit.cover,
                                 placeholder: (context, url) => const Center(
                                   child: SizedBox(
                                     width: 12,
@@ -554,30 +554,30 @@ class BrandingBanner extends StatelessWidget {
           imageUrl: logoPath.startsWith('/')
               ? '${AppConstants.imageBaseUrl}$logoPath'
               : logoPath,
-          fit: BoxFit.cover,
+          fit: BoxFit.contain,
           placeholder: (context, url) => Image.asset(
             ImageConstants.logo,
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
           ),
           errorWidget: (context, url, error) => Image.asset(
             ImageConstants.logo,
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
           ),
         );
       } else {
         return Image.file(
           File(logoPath),
-          fit: BoxFit.cover,
+          fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) => Image.asset(
             ImageConstants.logo,
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
           ),
         );
       }
     }
     return Image.asset(
       ImageConstants.logo,
-      fit: BoxFit.cover,
+      fit: BoxFit.contain,
     );
   }
 

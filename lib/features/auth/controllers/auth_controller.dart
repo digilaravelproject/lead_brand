@@ -488,6 +488,8 @@ class AuthController extends GetxController {
           if (dataObj is Map<String, dynamic>) {
             if (dataObj['user'] != null) {
               userData = dataObj['user'] as Map<String, dynamic>;
+              userData['dealer'] = dataObj['dealer'];
+              userData['admin'] = dataObj['admin'];
             } else {
               userData = dataObj;
             }

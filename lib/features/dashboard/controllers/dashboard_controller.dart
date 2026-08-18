@@ -41,6 +41,9 @@ class DashboardController extends GetxController {
   final RxList<String> bannerImages = <String>[].obs;
   final RxBool isBannersLoading = false.obs;
 
+  final RxMap<String, dynamic> dealerInfo = <String, dynamic>{}.obs;
+  final RxMap<String, dynamic> adminInfo = <String, dynamic>{}.obs;
+
   final List<String> _fallbackBanners = [
     "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=600&auto=format&fit=crop",
     "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600&auto=format&fit=crop",
@@ -90,6 +93,9 @@ class DashboardController extends GetxController {
         final dealer = data['dealer'];
         final admin = data['admin'];
 
+        if (dealer != null) dealerInfo.value = dealer;
+        if (admin != null) adminInfo.value = admin;
+
         if (user != null) {
           final subscriptionEndsAtStr = user['subscription_ends_at'];
           if (subscriptionEndsAtStr != null) {
@@ -119,13 +125,13 @@ class DashboardController extends GetxController {
     String email = '';
     String role = '';
 
-    if (dealer != null) {
+    if (dealer != null && dealer.isNotEmpty) {
       name = dealer['name'] ?? 'Assigned Dealer';
       phone = dealer['phone_number'] ?? '';
       altPhone = dealer['alternative_phone_number'] ?? '';
       email = dealer['email'] ?? '';
       role = 'Dealer';
-    } else if (admin != null) {
+    } else if (admin != null && admin.isNotEmpty) {
       name = admin['name'] ?? 'System Admin';
       phone = admin['phone_number'] ?? '';
       altPhone = admin['alternative_phone_number'] ?? '';
@@ -134,6 +140,7 @@ class DashboardController extends GetxController {
     } else {
       name = 'Support Team';
       role = 'Support';
+      email = 'support@leadbrand.com';
     }
 
     DateTime? lastQuitTime;

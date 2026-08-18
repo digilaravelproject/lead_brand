@@ -43,9 +43,9 @@ class AppValidators {
     if (trimmed.isEmpty) {
       return "Email is required";
     }
-    if (!_emailRegex.hasMatch(trimmed)) {
-      return customMessage ?? "Enter a valid email address";
-    }
+    // if (!_emailRegex.hasMatch(trimmed)) {
+    //   return customMessage ?? "Enter a valid email address";
+    // }
     return null;
   }
 }

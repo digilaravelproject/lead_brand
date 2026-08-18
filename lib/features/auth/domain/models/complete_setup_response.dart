@@ -38,10 +38,16 @@ class CompleteSetupData {
   });
 
   factory CompleteSetupData.fromJson(Map<String, dynamic> json) {
+    Map<String, dynamic>? userData = json['user'] != null ? Map<String, dynamic>.from(json['user']) : null;
+    if (userData != null) {
+      if (json.containsKey('dealer')) userData['dealer'] = json['dealer'];
+      if (json.containsKey('admin')) userData['admin'] = json['admin'];
+    }
+    
     return CompleteSetupData(
       accessToken: json['access_token'] ?? '',
       tokenType: json['token_type'] ?? '',
-      user: json['user'] != null ? UserSetupModel.fromJson(json['user']) : null,
+      user: userData != null ? UserSetupModel.fromJson(userData) : null,
     );
   }
 
@@ -64,6 +70,10 @@ class UserSetupModel {
   final String email;
   final String? emailVerifiedAt;
   final String? approvalStatus;
+  final String? subscriptionStartedAt;
+  final String? subscriptionEndsAt;
+  final Map<String, dynamic>? dealer;
+  final Map<String, dynamic>? admin;
 
   UserSetupModel({
     required this.id,
@@ -75,6 +85,10 @@ class UserSetupModel {
     required this.email,
     this.emailVerifiedAt,
     this.approvalStatus,
+    this.subscriptionStartedAt,
+    this.subscriptionEndsAt,
+    this.dealer,
+    this.admin,
   });
 
   factory UserSetupModel.fromJson(Map<String, dynamic> json) {
@@ -88,6 +102,10 @@ class UserSetupModel {
       email: json['email'] ?? '',
       emailVerifiedAt: json['email_verified_at'],
       approvalStatus: json['approval_status'],
+      subscriptionStartedAt: json['subscription_started_at'],
+      subscriptionEndsAt: json['subscription_ends_at'],
+      dealer: json['dealer'],
+      admin: json['admin'],
     );
   }
 
@@ -102,6 +120,10 @@ class UserSetupModel {
       'email': email,
       'email_verified_at': emailVerifiedAt,
       'approval_status': approvalStatus,
+      'subscription_started_at': subscriptionStartedAt,
+      'subscription_ends_at': subscriptionEndsAt,
+      'dealer': dealer,
+      'admin': admin,
     };
   }
 }
