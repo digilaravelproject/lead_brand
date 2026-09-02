@@ -258,23 +258,36 @@ class BrandingBanner extends StatelessWidget {
           left: photoOnRight ? BorderSide(color: dividerCol, width: 1.5) : BorderSide.none,
         ),
       ),
-      clipBehavior: Clip.antiAlias,
-      child: (profilePhoto != null && profilePhoto.isNotEmpty)
-          ? (profilePhoto.startsWith('/') || profilePhoto.startsWith('http')
-              ? CachedNetworkImage(
-                  imageUrl: profilePhoto.startsWith('/')
-                      ? '${AppConstants.imageBaseUrl}$profilePhoto'
-                      : profilePhoto,
-                  fit: BoxFit.contain,
-                  placeholder: (context, url) => _buildFallbackLogo(logo),
-                  errorWidget: (context, url, error) => _buildFallbackLogo(logo),
-                )
-              : Image.file(
-                  File(profilePhoto),
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) => _buildFallbackLogo(logo),
-                ))
-          : _buildFallbackLogo(logo),
+      alignment: Alignment.center,
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        margin: EdgeInsets.zero,
+        decoration: BoxDecoration(
+          color: bgGradient == null ? bg.withOpacity(0.5) : Colors.transparent,
+          border: Border.all(color: primaryText.withOpacity(0.7), width: 3.0),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(5),
+          child: (profilePhoto != null && profilePhoto.isNotEmpty)
+              ? (profilePhoto.startsWith('/') || profilePhoto.startsWith('http')
+                  ? CachedNetworkImage(
+                      imageUrl: profilePhoto.startsWith('/')
+                          ? '${AppConstants.imageBaseUrl}$profilePhoto'
+                          : profilePhoto,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => _buildFallbackLogo(logo),
+                      errorWidget: (context, url, error) => _buildFallbackLogo(logo),
+                    )
+                  : Image.file(
+                      File(profilePhoto),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => _buildFallbackLogo(logo),
+                    ))
+              : _buildFallbackLogo(logo),
+        ),
+      ),
     );
 
     // Build the sub-sections
@@ -396,16 +409,16 @@ class BrandingBanner extends StatelessWidget {
                 // Logo Section
                 if (showLogo)
                   Container(
-                    width: 28,
-                    height: 28,
+                    width: 54,
+                    height: 54,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: logoBg,
-                      border: Border.all(color: Colors.white, width: 1.0),
+                      border: Border.all(color: Colors.white, width: 1.5),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 2,
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 3,
                           offset: const Offset(0, 1),
                         ),
                       ],
@@ -420,7 +433,7 @@ class BrandingBanner extends StatelessWidget {
                                   child: Icon(
                                    Icons.business,
                                     color: Colors.white,
-                                    size: 15,
+                                    size: 26,
                                   ),
                                 ),
                               )
@@ -433,10 +446,10 @@ class BrandingBanner extends StatelessWidget {
                                 fit: BoxFit.cover,
                                 placeholder: (context, url) => const Center(
                                   child: SizedBox(
-                                    width: 12,
-                                    height: 12,
+                                    width: 20,
+                                    height: 20,
                                     child: CircularProgressIndicator(
-                                      strokeWidth: 1.5,
+                                      strokeWidth: 2.0,
                                       color: Colors.white,
                                     ),
                                   ),

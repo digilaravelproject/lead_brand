@@ -11,7 +11,9 @@ import '../domain/usecases/get_tools_usecase.dart';
 import '../domain/repositories/tools_repository_interface.dart';
 import '../domain/repositories/tools_repository.dart';
 import '../../auth/controllers/auth_controller.dart';
-
+import '../../auth/domain/models/complete_setup_response.dart';
+import '../../../core/services/storage/shared_prefs.dart';
+import 'dart:convert';
 class DashboardController extends GetxController {
   final GetToolsUseCase? _getToolsUseCase;
 
@@ -97,6 +99,15 @@ class DashboardController extends GetxController {
         if (admin != null) adminInfo.value = admin;
 
         if (user != null) {
+          try {
+            final userModel = UserSetupModel.fromJson(user as Map<String, dynamic>);
+            final authController = Get.find<AuthController>();
+            authController.rxUser.value = userModel;
+            SharedPrefs.setString(AppConstants.userData, jsonEncode(userModel.toJson()));
+          } catch (e) {
+            debugPrint("Failed to update user model: $e");
+          }
+
           final subscriptionEndsAtStr = user['subscription_ends_at'];
           if (subscriptionEndsAtStr != null) {
             final subscriptionEndsAt = DateTime.parse(subscriptionEndsAtStr);
@@ -105,6 +116,8 @@ class DashboardController extends GetxController {
             }
           }
         }
+      } else if (response.statusCode == 401 || response.statusCode == 500) {
+        _showAccountUnavailableDialog();
       }
     } catch (e) {
       debugPrint("Error checking subscription: $e");
@@ -116,6 +129,81 @@ class DashboardController extends GetxController {
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     }
+  }
+
+  void _showAccountUnavailableDialog() {
+    Get.dialog(
+      PopScope(
+        canPop: false,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          child: AlertDialog(
+            backgroundColor: const Color(0xFF161924),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.redAccent.withOpacity(0.5), width: 1),
+            ),
+            contentPadding: const EdgeInsets.all(24),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.no_accounts_rounded,
+                  color: Colors.redAccent,
+                  size: 64,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Account Unavailable',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Your account has been deleted or is currently unavailable. Please log out and contact the support team if you believe this is a mistake.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Get.back();
+                      Get.find<AuthController>().logout();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      backgroundColor: Colors.redAccent,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      'Log Out',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+    );
   }
 
   void _showSubscriptionExpiredDialog(Map<String, dynamic>? dealer, Map<String, dynamic>? admin) {
