@@ -131,11 +131,12 @@ class ProfileSetupScreen extends GetView<AuthController> {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          CustomTextField(
+                          Obx(() => CustomTextField(
                             controller: controller.whatsappController,
                             hintText: 'Enter your WhatsApp number',
                             prefixIcon: Icons.phone_android,
-                          ),
+                            errorText: controller.whatsappErrorText.value,
+                          )),
                           const SizedBox(height: 25),
                           const Text(
                             'Address',
@@ -146,11 +147,12 @@ class ProfileSetupScreen extends GetView<AuthController> {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          CustomTextField(
+                          Obx(() => CustomTextField(
                             controller: controller.addressController,
                             hintText: 'Enter your address',
                             prefixIcon: Icons.location_on_outlined,
-                          ),
+                            errorText: controller.addressErrorText.value,
+                          )),
                           const SizedBox(height: 25),
                         ],
                       ),

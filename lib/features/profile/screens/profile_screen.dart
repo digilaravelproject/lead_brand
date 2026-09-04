@@ -216,11 +216,12 @@ class ProfileScreen extends GetView<AuthController> {
                                 ),
                               ),
                               const SizedBox(height: 12),
-                              CustomTextField(
+                              Obx(() => CustomTextField(
                                 controller: controller.nameController,
                                 hintText: 'Enter your full name',
                                 prefixIcon: Icons.person_outline,
-                              ),
+                                errorText: controller.nameErrorText.value,
+                              )),
                               const SizedBox(height: 15),
                               const Text(
                                 'Email Address',
@@ -321,6 +322,38 @@ class ProfileScreen extends GetView<AuthController> {
                                   controller.selectedCountryCode.value = phone.countryCode;
                                 },
                               ),
+                              const SizedBox(height: 15),
+                              const Text(
+                                'WhatsApp Number',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Obx(() => CustomTextField(
+                                controller: controller.whatsappController,
+                                hintText: 'WhatsApp Number',
+                                prefixIcon: Icons.phone_android,
+                                errorText: controller.whatsappErrorText.value,
+                              )),
+                              const SizedBox(height: 15),
+                              const Text(
+                                'Address',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Obx(() => CustomTextField(
+                                controller: controller.addressController,
+                                hintText: 'Address',
+                                prefixIcon: Icons.location_on_outlined,
+                                errorText: controller.addressErrorText.value,
+                              )),
                             ],
                           ),
                         ],

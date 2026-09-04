@@ -194,8 +194,8 @@ class MyProfileDetailsScreen extends GetView<AuthController> {
                   title: "License Details",
                   icon: Icons.shield_outlined,
                   children: [
-                    _buildListItem(Icons.info_outline, "License Version", "Standard"), // Placeholder
-                    _buildDivider(),
+                   // _buildListItem(Icons.info_outline, "License Version", "Standard"), // Placeholder
+                    //_buildDivider(),
                     _buildListItem(Icons.calendar_month_outlined, "Activation Date", formatDate(user.subscriptionStartedAt)),
                     _buildDivider(),
                     _buildListItem(Icons.event_busy_outlined, "Expiry Date", formatDate(user.subscriptionEndsAt)),

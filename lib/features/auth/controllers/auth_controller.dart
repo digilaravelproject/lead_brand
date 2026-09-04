@@ -176,6 +176,8 @@ class AuthController extends GetxController {
   final rxUser = Rxn<UserSetupModel>();
   final emailErrorText = RxnString();
   final nameErrorText = RxnString();
+  final whatsappErrorText = RxnString();
+  final addressErrorText = RxnString();
   final otpErrorText = RxnString();
   final List<TextEditingController> otpControllers = List.generate(4, (_) => TextEditingController());
 
@@ -198,6 +200,18 @@ class AuthController extends GetxController {
     nameController.addListener(() {
       if (nameErrorText.value != null) {
         nameErrorText.value = null;
+      }
+    });
+
+    whatsappController.addListener(() {
+      if (whatsappErrorText.value != null) {
+        whatsappErrorText.value = null;
+      }
+    });
+
+    addressController.addListener(() {
+      if (addressErrorText.value != null) {
+        addressErrorText.value = null;
       }
     });
 
@@ -418,9 +432,19 @@ class AuthController extends GetxController {
 
   Future<void> saveProfile() async {
     final name = nameController.text.trim();
+    final whatsapp = whatsappController.text.trim();
+    final address = addressController.text.trim();
+
     final nameError = AppValidators.validateEmpty(name, fieldName: "Name");
     nameErrorText.value = nameError;
-    if (nameError != null) {
+
+    final whatsappError = AppValidators.validateEmpty(whatsapp, fieldName: "WhatsApp Number");
+    whatsappErrorText.value = whatsappError;
+
+    final addressError = AppValidators.validateEmpty(address, fieldName: "Address");
+    addressErrorText.value = addressError;
+
+    if (nameError != null || whatsappError != null || addressError != null) {
       return;
     }
 
@@ -436,8 +460,6 @@ class AuthController extends GetxController {
     }
 
     final email = Get.arguments as String? ?? emailController.text.trim();
-    final whatsapp = whatsappController.text.trim();
-    final address = addressController.text.trim();
 
     isLoading.value = true;
     try {
@@ -550,7 +572,14 @@ class AuthController extends GetxController {
 
     final nameError = AppValidators.validateEmpty(name, fieldName: 'Name');
     nameErrorText.value = nameError;
-    if (nameError != null) {
+
+    final whatsappError = AppValidators.validateEmpty(whatsapp, fieldName: "WhatsApp Number");
+    whatsappErrorText.value = whatsappError;
+
+    final addressError = AppValidators.validateEmpty(address, fieldName: "Address");
+    addressErrorText.value = addressError;
+
+    if (nameError != null || whatsappError != null || addressError != null) {
       return false;
     }
 

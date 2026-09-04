@@ -409,8 +409,8 @@ class BrandingBanner extends StatelessWidget {
                 // Logo Section
                 if (showLogo)
                   Container(
-                    width: 54,
-                    height: 54,
+                    width: 28,
+                    height: 28,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: logoBg,
@@ -433,7 +433,7 @@ class BrandingBanner extends StatelessWidget {
                                   child: Icon(
                                    Icons.business,
                                     color: Colors.white,
-                                    size: 26,
+                                    size: 14,
                                   ),
                                 ),
                               )
@@ -458,7 +458,7 @@ class BrandingBanner extends StatelessWidget {
                                   child: Icon(
                                     Icons.business,
                                     color: Colors.white,
-                                    size: 15,
+                                    size: 14,
                                   ),
                                 ),
                               ))
@@ -466,7 +466,7 @@ class BrandingBanner extends StatelessWidget {
                             child: Icon(
                               Icons.business,
                               color: Colors.white,
-                              size: 15,
+                              size: 14,
                             ),
                           ),
                   ),

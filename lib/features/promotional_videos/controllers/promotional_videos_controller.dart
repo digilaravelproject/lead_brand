@@ -19,8 +19,16 @@ class PromotionalVideo {
   });
 }
 
+class PromotionalSubtool {
+  final String title;
+  final List<PromotionalVideo> videos;
+
+  PromotionalSubtool({required this.title, required this.videos});
+}
+
 class PromotionalVideosController extends GetxController {
   final RxList<PromotionalVideo> videos = <PromotionalVideo>[].obs;
+  final RxList<PromotionalSubtool> subtools = <PromotionalSubtool>[].obs;
   final RxBool isLoading = false.obs;
 
   @override
@@ -48,23 +56,53 @@ class PromotionalVideosController extends GetxController {
             orElse: () => null,
           );
 
-          if (promoTool != null && promoTool['media'] != null) {
-            final List<dynamic> mediaList = promoTool['media'] as List;
-            final List<PromotionalVideo> loadedVideos = [];
-            for (var m in mediaList) {
-              final String fullUrl = m['full_url'] ?? '';
-              final String title = m['title'] ?? 'Promotional Video';
-              final int id = m['id'] ?? 0;
-              final String thumbnail = m['thumbnail_url'] ?? "https://picsum.photos/seed/video_$id/500/300";
+          if (promoTool != null) {
+            if (promoTool['media'] != null) {
+              final List<dynamic> mediaList = promoTool['media'] as List;
+              final List<PromotionalVideo> loadedVideos = [];
+              for (var m in mediaList) {
+                final String fullUrl = m['full_url'] ?? '';
+                final String title = m['title'] ?? 'Promotional Video';
+                final int id = m['id'] ?? 0;
+                final String thumbnail = m['thumbnail_url'] ?? "https://picsum.photos/seed/video_$id/500/300";
 
-              loadedVideos.add(PromotionalVideo(
-                title: title,
-                thumbnailUrl: thumbnail.isNotEmpty ? thumbnail : "https://picsum.photos/seed/video_$id/500/300",
-                videoUrl: fullUrl,
-              ));
+                loadedVideos.add(PromotionalVideo(
+                  title: title,
+                  thumbnailUrl: thumbnail.isNotEmpty ? thumbnail : "https://picsum.photos/seed/video_$id/500/300",
+                  videoUrl: fullUrl,
+                ));
+              }
+              if (loadedVideos.isNotEmpty) {
+                videos.assignAll(loadedVideos);
+              }
             }
-            if (loadedVideos.isNotEmpty) {
-              videos.assignAll(loadedVideos);
+
+            if (promoTool['subtools'] != null) {
+              final List<dynamic> subtoolsList = promoTool['subtools'] as List;
+              final List<PromotionalSubtool> loadedSubtools = [];
+              for (var s in subtoolsList) {
+                final String subTitle = s['title'] ?? 'Category';
+                final List<dynamic> sMedia = s['media'] ?? [];
+                final List<PromotionalVideo> sVideos = [];
+                for (var m in sMedia) {
+                  final String fullUrl = m['full_url'] ?? '';
+                  final String title = m['title'] ?? 'Video';
+                  final int id = m['id'] ?? 0;
+                  final String thumbnail = m['thumbnail_url'] ?? "https://picsum.photos/seed/video_$id/500/300";
+
+                  sVideos.add(PromotionalVideo(
+                    title: title,
+                    thumbnailUrl: thumbnail.isNotEmpty ? thumbnail : "https://picsum.photos/seed/video_$id/500/300",
+                    videoUrl: fullUrl,
+                  ));
+                }
+                if (sVideos.isNotEmpty) {
+                  loadedSubtools.add(PromotionalSubtool(title: subTitle, videos: sVideos));
+                }
+              }
+              if (loadedSubtools.isNotEmpty) {
+                subtools.assignAll(loadedSubtools);
+              }
             }
           }
         }
