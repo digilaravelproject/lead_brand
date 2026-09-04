@@ -17,4 +17,5 @@ class AppRoutes {
   static const String privacyPolicy = '/privacy-policy';
   static const String aboutUs = '/about-us';
   static const String notifications = '/notifications';
+  static const String editProfile = '/edit-profile';
 }

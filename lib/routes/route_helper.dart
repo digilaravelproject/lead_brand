@@ -7,6 +7,7 @@ import '../features/splash/bindings/splash_binding.dart';
 import '../features/dashboard/screens/main_screen.dart';
 import '../features/profile/screens/profile_setup_screen.dart';
 import '../features/profile/screens/profile_screen.dart';
+import '../features/profile/screens/my_profile_details_screen.dart';
 import '../features/plans/screens/combo_plan_screen.dart';
 import '../features/gallery/screens/gallery_screen.dart';
 import '../features/gallery/screens/image_viewer_screen.dart';
@@ -36,6 +37,7 @@ class RouteHelper {
   static String getVideoAdsRoute() => AppRoutes.videoAds;
   static String getPdfCalendarRoute() => AppRoutes.pdfCalendar;
   static String getProfileRoute() => AppRoutes.profile;
+  static String getEditProfileRoute() => AppRoutes.editProfile;
   static String getSettingsRoute() => AppRoutes.settings;
   static String getLicPlansRoute() => AppRoutes.licPlans;
   static String getFaqRoute() => AppRoutes.faq;
@@ -102,6 +104,12 @@ class RouteHelper {
     ),
     GetPage(
       name: AppRoutes.profile,
+      page: () => const MyProfileDetailsScreen(),
+      binding: AuthBinding(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: AppRoutes.editProfile,
       page: () => const ProfileScreen(),
       binding: AuthBinding(),
       transition: Transition.rightToLeft,

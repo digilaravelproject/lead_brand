@@ -45,7 +45,7 @@ class AuthRepository implements AuthRepositoryInterface {
   }
 
   @override
-  Future<ResponseModel> completeSetup(String email, String name, String? profilePhotoPath) async {
+  Future<ResponseModel> completeSetup(String email, String name, String whatsappNumber, String address, String? profilePhotoPath) async {
     if (profilePhotoPath != null && profilePhotoPath.isNotEmpty) {
       final multipartBody = [
         MultipartBody('profile_photo', XFile(profilePhotoPath)),
@@ -55,6 +55,8 @@ class AuthRepository implements AuthRepositoryInterface {
         {
           'email': email,
           'name': name,
+          'whatsapp_number': whatsappNumber,
+          'address': address,
         },
         multipartBody,
         [],
@@ -65,6 +67,8 @@ class AuthRepository implements AuthRepositoryInterface {
         data: {
           'email': email,
           'name': name,
+          'whatsapp_number': whatsappNumber,
+          'address': address,
           'profile_photo': null,
         },
       );
@@ -81,6 +85,8 @@ class AuthRepository implements AuthRepositoryInterface {
     required String name,
     required String phoneNumber,
     required String destination,
+    required String whatsappNumber,
+    required String address,
     String? profilePhotoPath,
     String? logoPath,
   }) async {
@@ -88,6 +94,8 @@ class AuthRepository implements AuthRepositoryInterface {
       'name': name,
       'phone_number': phoneNumber,
       'destination': destination,
+      'whatsapp_number': whatsappNumber,
+      'address': address,
     };
 
     final List<MultipartBody> multipartBody = [];

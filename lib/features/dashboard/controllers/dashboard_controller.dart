@@ -212,24 +212,45 @@ class DashboardController extends GetxController {
     String altPhone = '';
     String email = '';
     String role = '';
+    String price = '';
+    String offerPrice = '';
 
     if (dealer != null && dealer.isNotEmpty) {
       name = dealer['name'] ?? 'Assigned Dealer';
-      phone = dealer['phone_number'] ?? '';
-      altPhone = dealer['alternative_phone_number'] ?? '';
+      phone = dealer['phone_number']?.toString() ?? '';
+      altPhone = dealer['alternative_phone_number']?.toString() ?? '';
       email = dealer['email'] ?? '';
       role = 'Dealer';
+      price = dealer['price']?.toString() ?? '';
+      offerPrice = dealer['offer_price']?.toString() ?? '';
     } else if (admin != null && admin.isNotEmpty) {
       name = admin['name'] ?? 'System Admin';
-      phone = admin['phone_number'] ?? '';
-      altPhone = admin['alternative_phone_number'] ?? '';
+      phone = admin['phone_number']?.toString() ?? '';
+      altPhone = admin['alternative_phone_number']?.toString() ?? '';
       email = admin['email'] ?? '';
       role = 'Admin';
+      price = admin['price']?.toString() ?? '';
+      offerPrice = admin['offer_price']?.toString() ?? '';
     } else {
       name = 'Support Team';
       role = 'Support';
       email = 'support@leadbrand.com';
     }
+
+    String formatPrice(String p) {
+      if (p.isEmpty || p == 'null') return '';
+      double? val = double.tryParse(p);
+      if (val != null) {
+        if (val == val.toInt()) {
+          return val.toInt().toString();
+        }
+        return val.toStringAsFixed(2);
+      }
+      return p;
+    }
+    
+    price = formatPrice(price);
+    offerPrice = formatPrice(offerPrice);
 
     DateTime? lastQuitTime;
 
@@ -255,137 +276,342 @@ class DashboardController extends GetxController {
         },
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-          child: AlertDialog(
-            backgroundColor: const Color(0xFF0F121A),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-              side: const BorderSide(color: Color(0xFFEC407A), width: 1.5), // distinct color
-            ),
-            title: Row(
-              children: const [
-                Icon(Icons.warning_amber_rounded, color: Color(0xFFEC407A), size: 28),
-                SizedBox(width: 10),
-                Text(
-                  "Subscription Expired",
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-              ],
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+          child: Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.topCenter,
               children: [
-                const Text(
-                  "Your subscription has expired, and access to the platform's features is currently restricted.",
-                  style: TextStyle(color: Colors.white70, fontSize: 14, height: 1.4),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  "Please contact your assigned $role to make a payment and renew your subscription to continue growing your business seamlessly.",
-                  style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500, height: 1.4),
-                ),
-                const SizedBox(height: 16),
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.only(top: 40),
+                  padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.white.withOpacity(0.1)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        name.toUpperCase(),
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 0.5),
+                    color: const Color(0xFF0F121A),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: const Color(0xFFE91E63).withOpacity(0.5), width: 1.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFE91E63).withOpacity(0.15),
+                        blurRadius: 30,
+                        spreadRadius: 2,
                       ),
-                      const SizedBox(height: 12),
-                      if (phone.isNotEmpty)
-                        InkWell(
-                          onTap: () => _launchUrl('tel', phone),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.phone_rounded, color: Color(0xFF2196F3), size: 16),
-                                const SizedBox(width: 8),
-                                Text(phone, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600, decoration: TextDecoration.underline)),
-                              ],
-                            ),
-                          ),
-                        ),
-                      if (altPhone.isNotEmpty)
-                        InkWell(
-                          onTap: () => _launchUrl('tel', altPhone),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.phone_android_rounded, color: Color(0xFF2196F3), size: 16),
-                                const SizedBox(width: 8),
-                                Text(altPhone, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600, decoration: TextDecoration.underline)),
-                              ],
-                            ),
-                          ),
-                        ),
-                      if (email.isNotEmpty)
-                        InkWell(
-                          onTap: () => _launchUrl('mailto', email),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.email_rounded, color: Color(0xFF2196F3), size: 16),
-                                const SizedBox(width: 8),
-                                Expanded(child: Text(email, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600, decoration: TextDecoration.underline), overflow: TextOverflow.ellipsis)),
-                              ],
-                            ),
-                          ),
-                        ),
                     ],
                   ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Get.dialog(
-                    AlertDialog(
-                      backgroundColor: const Color(0xFF0F121A),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        side: BorderSide(color: Colors.white.withOpacity(0.1), width: 1),
-                      ),
-                      title: const Text("Confirm Logout", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                      content: const Text("Are you sure you want to log out from this account?", style: TextStyle(color: Colors.white70)),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Get.back(),
-                          child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RichText(
+                          textAlign: TextAlign.center,
+                          text: const TextSpan(
+                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                            children: [
+                              TextSpan(text: "Subscription ", style: TextStyle(color: Colors.white)),
+                              TextSpan(text: "Expired!", style: TextStyle(color: Color(0xFFE91E63))),
+                            ],
+                          ),
                         ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(height: 1, width: 40, color: const Color(0xFFE91E63).withOpacity(0.5)),
+                            const SizedBox(width: 8),
+                            Transform.rotate(
+                              angle: 3.14159 / 4,
+                              child: Container(
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: const Color(0xFFE91E63), width: 1.5),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(height: 1, width: 40, color: const Color(0xFFE91E63).withOpacity(0.5)),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          "Your subscription has expired, and access to the platform's features is currently restricted.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.5),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF161924),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE91E63).withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.notifications_active_outlined, color: Color(0xFFE91E63), size: 24),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: RichText(
+                                  text: TextSpan(
+                                    style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.5),
+                                    children: [
+                                      TextSpan(text: "Please contact your assigned $role to make a payment and renew your subscription to continue "),
+                                      const TextSpan(text: "growing your business seamlessly.", style: TextStyle(color: Color(0xFFE91E63))),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.topCenter,
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1E212D),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: Colors.white.withOpacity(0.05)),
+                              ),
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(color: Colors.white.withOpacity(0.1)),
+                                          color: const Color(0xFF0F121A),
+                                        ),
+                                        child: const Icon(Icons.workspace_premium_rounded, color: Colors.amber, size: 28),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              role.toUpperCase(),
+                                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 0.5),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            const Text(
+                                              "Access all premium features",
+                                              style: TextStyle(color: Colors.white54, fontSize: 11),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      if (price.isNotEmpty || offerPrice.isNotEmpty)
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            if (price.isNotEmpty && price != offerPrice)
+                                              Text(
+                                                "₹$price",
+                                                style: const TextStyle(
+                                                  color: Colors.white54,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                  decoration: TextDecoration.lineThrough,
+                                                ),
+                                              ),
+                                            Text(
+                                              "₹${offerPrice.isNotEmpty ? offerPrice : price}",
+                                              style: const TextStyle(
+                                                color: Colors.greenAccent,
+                                                fontSize: 24,
+                                                fontWeight: FontWeight.w900,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Positioned(
+                              top: -12,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE91E63),
+                                  borderRadius: BorderRadius.circular(6),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFFE91E63).withOpacity(0.4),
+                                      blurRadius: 8,
+                                      spreadRadius: 1,
+                                    ),
+                                  ],
+                                ),
+                                child: const Text(
+                                  "RENEWAL PLAN",
+                                  style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF161924),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 44,
+                                height: 44,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color(0xFFE91E63),
+                                ),
+                                child: const Icon(Icons.person, color: Colors.white, size: 24),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      name.toUpperCase(),
+                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    if (email.isNotEmpty && email != 'null')
+                                      InkWell(
+                                        onTap: () => _launchUrl('mailto', email),
+                                        child: Row(
+                                          children: [
+                                            const Icon(Icons.email_outlined, color: Color(0xFFE91E63), size: 16),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Text(
+                                                email,
+                                                style: const TextStyle(color: Colors.white70, fontSize: 13, decoration: TextDecoration.underline),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    if (phone.isNotEmpty && phone != 'null')
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 6),
+                                        child: InkWell(
+                                          onTap: () => _launchUrl('tel', phone),
+                                          child: Row(
+                                            children: [
+                                              const Icon(Icons.phone_outlined, color: Color(0xFFE91E63), size: 16),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                phone,
+                                                style: const TextStyle(color: Colors.white70, fontSize: 13, decoration: TextDecoration.underline),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
                         TextButton(
                           onPressed: () {
-                            if (Get.isRegistered<AuthController>()) {
-                              Get.find<AuthController>().logout();
-                            } else {
-                              Get.put(AuthController()).logout();
-                            }
+                            Get.dialog(
+                              AlertDialog(
+                                backgroundColor: const Color(0xFF0F121A),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  side: BorderSide(color: Colors.white.withOpacity(0.1), width: 1),
+                                ),
+                                title: const Text("Confirm Logout", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                content: const Text("Are you sure you want to log out from this account?", style: TextStyle(color: Colors.white70)),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Get.back(),
+                                    child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      if (Get.isRegistered<AuthController>()) {
+                                        Get.find<AuthController>().logout();
+                                      } else {
+                                        Get.put(AuthController()).logout();
+                                      }
+                                    },
+                                    child: const Text("Logout", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+                                  ),
+                                ],
+                              ),
+                            );
                           },
-                          child: const Text("Logout", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+                          child: const Text("Logout", style: TextStyle(color: Colors.white54, fontSize: 14, fontWeight: FontWeight.w600)),
                         ),
                       ],
                     ),
-                  );
-                },
-                child: const Text("Logout", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
-              ),
-            ],
+                  ),
+                ),
+                Positioned(
+                  top: 0,
+                  child: Container(
+                    width: 76,
+                    height: 76,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF161924),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0xFFE91E63).withOpacity(0.5), width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFE91E63).withOpacity(0.2),
+                          blurRadius: 15,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: const Icon(Icons.warning_amber_rounded, color: Color(0xFFE91E63), size: 36),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
       barrierDismissible: false,
+    );
+  }
+
+  Widget _buildFeatureItem(IconData icon, String text) {
+    return Column(
+      children: [
+        Icon(icon, color: const Color(0xFFE91E63), size: 24),
+        const SizedBox(height: 8),
+        Text(
+          text,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white70, fontSize: 10, height: 1.3),
+        ),
+      ],
     );
   }
 

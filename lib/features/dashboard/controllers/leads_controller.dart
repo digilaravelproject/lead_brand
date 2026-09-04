@@ -38,10 +38,13 @@ class LeadsController extends GetxController {
   final followUpCount = 0.obs;
   final doneCount = 0.obs;
 
+  final defaultMessage = "".obs;
+
   @override
   void onInit() {
     super.onInit();
     fetchLeads();
+    fetchMessages();
     // Dynamically trigger fetchLeads without full-screen loading overlay when search query or filter updates
     ever(selectedFilter, (_) => fetchLeads(showLoader: false));
     debounce(searchQuery, (_) => fetchLeads(showLoader: false), time: const Duration(milliseconds: 500));
@@ -111,6 +114,20 @@ class LeadsController extends GetxController {
       _loadDefaultLeads();
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchMessages() async {
+    try {
+      final response = await leadsRepository.getMessages();
+      if (response.isSuccess && response.body != null) {
+        if (response.body['messages'] != null && 
+            (response.body['messages'] as List).isNotEmpty) {
+          defaultMessage.value = response.body['messages'][0]['message'] ?? "";
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching messages: $e');
     }
   }
 

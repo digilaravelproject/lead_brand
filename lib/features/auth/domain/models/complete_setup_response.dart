@@ -72,6 +72,8 @@ class UserSetupModel {
   final String? approvalStatus;
   final String? subscriptionStartedAt;
   final String? subscriptionEndsAt;
+  final String? whatsappNumber;
+  final String? address;
   final Map<String, dynamic>? dealer;
   final Map<String, dynamic>? admin;
 
@@ -87,6 +89,8 @@ class UserSetupModel {
     this.approvalStatus,
     this.subscriptionStartedAt,
     this.subscriptionEndsAt,
+    this.whatsappNumber,
+    this.address,
     this.dealer,
     this.admin,
   });
@@ -104,6 +108,8 @@ class UserSetupModel {
       approvalStatus: json['approval_status'],
       subscriptionStartedAt: json['subscription_started_at'],
       subscriptionEndsAt: json['subscription_ends_at'],
+      whatsappNumber: json['whatsapp_number'],
+      address: json['address'],
       dealer: json['dealer'],
       admin: json['admin'],
     );
@@ -122,6 +128,8 @@ class UserSetupModel {
       'approval_status': approvalStatus,
       'subscription_started_at': subscriptionStartedAt,
       'subscription_ends_at': subscriptionEndsAt,
+      'whatsapp_number': whatsappNumber,
+      'address': address,
       'dealer': dealer,
       'admin': admin,
     };

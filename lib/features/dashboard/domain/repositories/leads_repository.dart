@@ -52,4 +52,9 @@ class LeadsRepository implements LeadsRepositoryInterface {
   Future<ResponseModel> deleteLead(int id) async {
     return await apiClient.delete('${AppConstants.leadsUrl}/$id');
   }
+
+  @override
+  Future<ResponseModel> getMessages() async {
+    return await apiClient.get(AppConstants.messagesUrl);
+  }
 }

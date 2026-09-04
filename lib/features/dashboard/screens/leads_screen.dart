@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/app_validators.dart';
 import '../controllers/leads_controller.dart';
@@ -1021,6 +1023,44 @@ class LeadsScreen extends GetView<LeadsController> {
                                                   fontSize: 12,
                                                 ),
                                               ),
+                                              const SizedBox(height: 12),
+                                              Row(
+                                                children: [
+                                                  _buildActionIcon(
+                                                    iconWidget: const Icon(Icons.phone, color: Colors.greenAccent, size: 16),
+                                                    color: Colors.greenAccent,
+                                                    onTap: () async {
+                                                      final Uri launchUri = Uri(scheme: 'tel', path: lead.phoneNumber);
+                                                      await launchUrl(launchUri);
+                                                    },
+                                                  ),
+                                                  const SizedBox(width: 12),
+                                                  _buildActionIcon(
+                                                    iconWidget: const Icon(Icons.message, color: Colors.blueAccent, size: 16),
+                                                    color: Colors.blueAccent,
+                                                    onTap: () async {
+                                                      final Uri launchUri = Uri(
+                                                        scheme: 'sms',
+                                                        path: lead.phoneNumber,
+                                                      );
+                                                      // For SMS on some platforms, query params via sms: format are tricky. 
+                                                      // Using standard approach with replace to add body query correctly.
+                                                      final urlString = '${launchUri.toString()}?body=${Uri.encodeComponent(controller.defaultMessage.value)}';
+                                                      await launchUrl(Uri.parse(urlString));
+                                                    },
+                                                  ),
+                                                  const SizedBox(width: 12),
+                                                  _buildActionIcon(
+                                                    iconWidget: const FaIcon(FontAwesomeIcons.whatsapp, color: Color(0xFF25D366), size: 16),
+                                                    color: const Color(0xFF25D366),
+                                                    onTap: () async {
+                                                      final cleanPhone = lead.phoneNumber.replaceAll(RegExp(r'[^0-9]'), '');
+                                                      final waUrl = Uri.parse('https://wa.me/$cleanPhone?text=${Uri.encodeComponent(controller.defaultMessage.value)}');
+                                                      await launchUrl(waUrl, mode: LaunchMode.externalApplication);
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -1151,6 +1191,20 @@ class LeadsScreen extends GetView<LeadsController> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildActionIcon({required Widget iconWidget, required Color color, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.15),
+          shape: BoxShape.circle,
+        ),
+        child: iconWidget,
+      ),
     );
   }
 }

@@ -229,6 +229,12 @@ class AuthController extends GetxController {
         if (destinationController.text.isEmpty) {
           destinationController.text = user.destination ?? '';
         }
+        if (whatsappController.text.isEmpty) {
+          whatsappController.text = user.whatsappNumber ?? '';
+        }
+        if (addressController.text.isEmpty) {
+          addressController.text = user.address ?? '';
+        }
         if (profilePhotoUrl.value.isEmpty) {
           profilePhotoUrl.value = user.profilePhoto ?? '';
         }
@@ -246,6 +252,8 @@ class AuthController extends GetxController {
   final destinationController = TextEditingController();
   final phoneController = TextEditingController();
   final referenceCodeController = TextEditingController();
+  final whatsappController = TextEditingController();
+  final addressController = TextEditingController();
   final selectedCountryCode = '+91'.obs;
   final selectedCountryFlag = '🇮🇳'.obs;
   final selectedCountryName = 'India'.obs;
@@ -428,10 +436,12 @@ class AuthController extends GetxController {
     }
 
     final email = Get.arguments as String? ?? emailController.text.trim();
+    final whatsapp = whatsappController.text.trim();
+    final address = addressController.text.trim();
 
     isLoading.value = true;
     try {
-      final response = await authRepository.completeSetup(email, name, imagePath.value);
+      final response = await authRepository.completeSetup(email, name, whatsapp, address, imagePath.value);
       if (response.isSuccess) {
         if (response.body != null) {
           final responseData = response.body['data'] ?? response.body;
@@ -501,6 +511,8 @@ class AuthController extends GetxController {
           emailController.text = user.email;
           destinationController.text = user.destination ?? '';
           phoneController.text = user.phoneNumber ?? '';
+          whatsappController.text = user.whatsappNumber ?? '';
+          addressController.text = user.address ?? '';
           profilePhotoUrl.value = user.profilePhoto ?? '';
           logoUrl.value = user.logo ?? '';
 
@@ -533,6 +545,8 @@ class AuthController extends GetxController {
     final name = nameController.text.trim();
     final dest = destinationController.text.trim();
     final phone = phoneController.text.trim();
+    final whatsapp = whatsappController.text.trim();
+    final address = addressController.text.trim();
 
     final nameError = AppValidators.validateEmpty(name, fieldName: 'Name');
     nameErrorText.value = nameError;
@@ -569,6 +583,8 @@ class AuthController extends GetxController {
         name: name,
         phoneNumber: phone,
         destination: dest,
+        whatsappNumber: whatsapp,
+        address: address,
         profilePhotoPath: imagePath.value,
         logoPath: logoPath.value,
       );
@@ -618,9 +634,16 @@ class AuthController extends GetxController {
               email: currentUserVal.email,
               destination: dest.isNotEmpty ? dest : currentUserVal.destination,
               phoneNumber: phone.isNotEmpty ? phone : currentUserVal.phoneNumber,
+              whatsappNumber: whatsapp.isNotEmpty ? whatsapp : currentUserVal.whatsappNumber,
+              address: address.isNotEmpty ? address : currentUserVal.address,
               profilePhoto: profilePhotoUrl.value,
               logo: logoUrl.value,
               emailVerifiedAt: currentUserVal.emailVerifiedAt,
+              approvalStatus: currentUserVal.approvalStatus,
+              subscriptionStartedAt: currentUserVal.subscriptionStartedAt,
+              subscriptionEndsAt: currentUserVal.subscriptionEndsAt,
+              dealer: currentUserVal.dealer,
+              admin: currentUserVal.admin,
             );
             final userJson = jsonEncode(updatedUser.toJson());
             await SharedPrefs.setString(AppConstants.userData, userJson);
@@ -664,6 +687,8 @@ class AuthController extends GetxController {
       nameController.clear();
       destinationController.clear();
       phoneController.clear();
+      whatsappController.clear();
+      addressController.clear();
       imagePath.value = '';
       logoPath.value = '';
       profilePhotoUrl.value = '';

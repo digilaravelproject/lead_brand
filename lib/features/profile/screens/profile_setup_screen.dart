@@ -122,6 +122,36 @@ class ProfileSetupScreen extends GetView<AuthController> {
                             errorText: controller.nameErrorText.value,
                           )),
                           const SizedBox(height: 25),
+                          const Text(
+                            'WhatsApp Number',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          CustomTextField(
+                            controller: controller.whatsappController,
+                            hintText: 'Enter your WhatsApp number',
+                            prefixIcon: Icons.phone_android,
+                          ),
+                          const SizedBox(height: 25),
+                          const Text(
+                            'Address',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          CustomTextField(
+                            controller: controller.addressController,
+                            hintText: 'Enter your address',
+                            prefixIcon: Icons.location_on_outlined,
+                          ),
+                          const SizedBox(height: 25),
                         ],
                       ),
                     ],
