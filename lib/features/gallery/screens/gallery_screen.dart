@@ -279,16 +279,40 @@ class GalleryScreen extends GetView<GalleryController> {
                               ),
                             ),
                             if (isLocked)
-                              BackdropFilter(
-                                filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+                              Positioned(
+                                top: 6,
+                                right: 6,
                                 child: Container(
-                                  color: Colors.black.withOpacity(0.3),
-                                  child: const Center(
-                                    child: Icon(
-                                      Icons.lock_rounded,
-                                      color: Colors.white,
-                                      size: 32,
-                                    ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFE65100), // Deep orange color like screenshot
+                                    borderRadius: BorderRadius.circular(4),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.3),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.workspace_premium,
+                                        color: Colors.white,
+                                        size: 11,
+                                      ),
+                                      SizedBox(width: 3),
+                                      Text(
+                                        "PRO",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
