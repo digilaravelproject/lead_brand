@@ -33,6 +33,7 @@ class BrandingBanner extends StatelessWidget {
 
     final String displayName = user?.name.isNotEmpty == true ? user!.name : fallbackName;
     final String displayPhone = user?.phoneNumber?.isNotEmpty == true ? user!.phoneNumber! : fallbackPhone;
+    final String displayWhatsapp = user?.whatsappNumber?.isNotEmpty == true ? user!.whatsappNumber! : displayPhone;
     final String displayEmail = user?.email.isNotEmpty == true ? user!.email : fallbackEmail;
     final String displayDesignation = user?.destination?.isNotEmpty == true ? user!.destination! : "SOFTWARE COMPANY";
     final String? profilePhoto = user?.profilePhoto;
@@ -346,14 +347,14 @@ class BrandingBanner extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // WhatsApp & Phone
+                    // Phone
                     if (showPhone)
                       Row(
                         children: [
                           Container(
                             padding: const EdgeInsets.all(0.8),
                             decoration: const BoxDecoration(
-                              color: Color(0xFF25D366),
+                              color: Colors.blueAccent,
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -366,6 +367,38 @@ class BrandingBanner extends StatelessWidget {
                           Expanded(
                             child: Text(
                               displayPhone,
+                              style: TextStyle(
+                                color: phoneColor,
+                                  fontSize: 9.2,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                    if (showPhone) const SizedBox(height: 1),
+                    // WhatsApp
+                    if (showPhone)
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(0.8),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF25D366),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.chat,
+                              color: Colors.white,
+                              size: 6.5,
+                            ),
+                          ),
+                          const SizedBox(width: 3),
+                          Expanded(
+                            child: Text(
+                              displayWhatsapp,
                               style: TextStyle(
                                 color: phoneColor,
                                   fontSize: 9.2,

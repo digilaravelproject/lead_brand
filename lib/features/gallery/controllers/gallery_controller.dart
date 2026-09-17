@@ -3,7 +3,7 @@ import '../../../routes/route_helper.dart';
 
 class GalleryController extends GetxController {
   final planName = ''.obs;
-  final columnCount = 3.obs;
+  final columnCount = 2.obs;
   
   final RxList<String> images = <String>[].obs;
   final RxMap<String, String> imageUrlToPdfUrl = <String, String>{}.obs;
@@ -11,7 +11,7 @@ class GalleryController extends GetxController {
   final RxMap<String, String> imageUrlToInfoImageUrl = <String, String>{}.obs;
 
   void toggleColumns() {
-    columnCount.value = columnCount.value == 3 ? 2 : 3;
+    columnCount.value = columnCount.value == 2 ? 3 : 2;
   }
 
   @override

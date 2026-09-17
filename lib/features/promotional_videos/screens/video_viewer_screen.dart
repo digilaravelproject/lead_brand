@@ -244,7 +244,7 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
                                       fit: BoxFit.fitWidth,
                                       child: SizedBox(
                                         width: 375,
-                                        height: 80,
+                                        height: 95,
                                         child: BrandingBanner(
                                           fallbackName: userName,
                                           fallbackPhone: userPhone,
@@ -373,7 +373,7 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
                           
                           // FLAT SQUARE Branding Frame
                           Container(
-                            height: 80,
+                            height: 95,
                             width: double.infinity,
                             decoration: const BoxDecoration(
                               color: Colors.white,
@@ -466,7 +466,7 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
     if (_isProcessing) return;
     
     final double bannerWidth = MediaQuery.of(context).size.width;
-    final double bannerHeight = 80;
+    final double bannerHeight = 95;
     final double ratio = bannerHeight / bannerWidth;
 
     final bool isLocal = video.localPath != null && video.localPath!.isNotEmpty;
@@ -617,7 +617,7 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
       final appDocDir = await getApplicationDocumentsDirectory();
       final outputPath = "${appDocDir.path}/branded_video_${DateTime.now().millisecondsSinceEpoch}.mp4";
 
-      final ffmpegCommand = '-y -i "$localVideoPath" -i "$bannerImagePath" -filter_complex "[1:v][0:v]scale2ref=w=iw:h=2*trunc(iw*$ratio/2)[scaled_overlay][main_video];[main_video]pad=iw:ih+2*trunc(iw*$ratio/2):0:0:color=white[padded_video];[padded_video][scaled_overlay]overlay=0:H-h" -c:a copy "$outputPath"';
+      final ffmpegCommand = '-y -i "$localVideoPath" -i "$bannerImagePath" -filter_complex "[1:v][0:v]scale2ref=w=iw:h=2*trunc(iw*$ratio/2)[scaled_overlay][main_video];[main_video]pad=iw:ih+2*trunc(iw*$ratio/2):0:0:color=white[padded_video];[padded_video][scaled_overlay]overlay=0:H-h" -c:v libx264 -pix_fmt yuv420p -c:a copy "$outputPath"';
 
       final session = await FFmpegKit.execute(ffmpegCommand);
       final returnCode = await session.getReturnCode();

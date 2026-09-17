@@ -304,7 +304,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
                                       fit: BoxFit.fitWidth,
                                       child: SizedBox(
                                         width: 375,
-                                        height: 80,
+                                        height: 95,
                                         child: BrandingBanner(
                                           fallbackName: userName,
                                           fallbackPhone: userPhone,
@@ -553,7 +553,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
   Widget _buildMainPoster(String imageUrl, String name, String phone, String email) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        const bannerHeight = 80.0;
+        const bannerHeight = 95.0;
         final imageRatio = _posterAspectRatio ?? (4 / 5);
 
         double width = constraints.maxWidth;
