@@ -591,7 +591,7 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
         statusText.value = "Downloading video file... This may take a moment.";
         localVideoPath = await _downloadNetworkVideo(video.videoUrl!);
         if (localVideoPath == null) {
-          if (mounted) Navigator.of(context).pop();
+          if (mounted) Navigator.of(context, rootNavigator: true).pop();
           Get.snackbar("Download Failed", "Could not download the video file.", backgroundColor: AppColors.errorColor, colorText: Colors.white);
           return;
         }
@@ -599,7 +599,7 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
         statusText.value = "Downloading video from YouTube... This may take a moment.";
         localVideoPath = await _downloadYoutubeVideo(video.youtubeId!);
         if (localVideoPath == null) {
-          if (mounted) Navigator.of(context).pop();
+          if (mounted) Navigator.of(context, rootNavigator: true).pop();
           Get.snackbar("Download Failed", "Could not download the YouTube video stream.", backgroundColor: AppColors.errorColor, colorText: Colors.white);
           return;
         }
@@ -608,7 +608,7 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
       statusText.value = "Capturing branding banner template...";
       final bannerImagePath = await _captureBanner();
       if (bannerImagePath == null) {
-        if (mounted) Navigator.of(context).pop();
+        if (mounted) Navigator.of(context, rootNavigator: true).pop();
         Get.snackbar("Processing Failed", "Could not capture the design style template.", backgroundColor: AppColors.errorColor, colorText: Colors.white);
         return;
       }
@@ -617,7 +617,7 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
       final appDocDir = await getApplicationDocumentsDirectory();
       final outputPath = "${appDocDir.path}/branded_video_${DateTime.now().millisecondsSinceEpoch}.mp4";
 
-      final ffmpegCommand = '-y -i "$localVideoPath" -i "$bannerImagePath" -filter_complex "[1:v][0:v]scale2ref=w=iw:h=2*trunc(iw*$ratio/2)[scaled_overlay][main_video];[main_video]pad=iw:ih+2*trunc(iw*$ratio/2):0:0:color=white[padded_video];[padded_video][scaled_overlay]overlay=0:H-h" -c:v libx264 -pix_fmt yuv420p -c:a copy "$outputPath"';
+      final ffmpegCommand = '-y -i "$localVideoPath" -i "$bannerImagePath" -filter_complex "[1:v][0:v]scale2ref=w=iw:h=2*trunc(iw*$ratio/2)[scaled_overlay][main_video];[main_video]pad=iw:ih+2*trunc(iw*$ratio/2):0:0:color=white[padded_video];[padded_video][scaled_overlay]overlay=0:H-h" -c:a copy "$outputPath"';
 
       final session = await FFmpegKit.execute(ffmpegCommand);
       final returnCode = await session.getReturnCode();
@@ -629,7 +629,9 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
         } catch (e) {
           debugPrint("Gal save error: $e");
         }
-        if (mounted) Navigator.of(context).pop(); // Close dialog safely
+        if (mounted) Navigator.of(context, rootNavigator: true).pop(); // Close dialog safely
+        
+        await Future.delayed(const Duration(milliseconds: 300));
         Get.to(() => BrandedVideoPreviewScreen(videoPath: outputPath));
         Get.snackbar(
           "Success!", 
@@ -641,7 +643,7 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
           margin: const EdgeInsets.all(15),
         );
       } else {
-        if (mounted) Navigator.of(context).pop(); // Close dialog safely
+        if (mounted) Navigator.of(context, rootNavigator: true).pop(); // Close dialog safely
         final logs = await session.getLogs();
         debugPrint("FFmpeg failed with code $returnCode. Logs: $logs");
         Get.snackbar(
@@ -652,7 +654,7 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
         );
       }
     } catch (e) {
-      if (mounted) Navigator.of(context).pop(); // Close dialog safely
+      if (mounted) Navigator.of(context, rootNavigator: true).pop(); // Close dialog safely
       debugPrint("Error during FFmpeg processing: $e");
       Get.snackbar("Error", "An unexpected error occurred: $e", backgroundColor: AppColors.errorColor, colorText: Colors.white);
     } finally {
