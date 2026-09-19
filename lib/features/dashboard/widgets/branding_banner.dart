@@ -251,44 +251,30 @@ class BrandingBanner extends StatelessWidget {
     }
 
     final profileWidget = Container(
-      width: 72,
+      width: 95,
       decoration: BoxDecoration(
-        color: Colors.transparent,
+        color: bgGradient == null ? bg : Colors.transparent,
         border: Border(
-          right: photoOnRight ? BorderSide.none : BorderSide(color: dividerCol, width: 1.5),
-          left: photoOnRight ? BorderSide(color: dividerCol, width: 1.5) : BorderSide.none,
+          right: photoOnRight ? BorderSide.none : BorderSide(color: dividerCol, width: 1),
+          left: photoOnRight ? BorderSide(color: dividerCol, width: 1) : BorderSide.none,
         ),
       ),
-      alignment: Alignment.center,
-      child: Container(
-        width: double.infinity,
-        height: double.infinity,
-        margin: EdgeInsets.zero,
-        decoration: BoxDecoration(
-          color: bgGradient == null ? bg.withOpacity(0.5) : Colors.transparent,
-          border: Border.all(color: primaryText.withOpacity(0.7), width: 3.0),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(5),
-          child: (profilePhoto != null && profilePhoto.isNotEmpty)
-              ? (profilePhoto.startsWith('/') || profilePhoto.startsWith('http')
-                  ? CachedNetworkImage(
-                      imageUrl: profilePhoto.startsWith('/')
-                          ? '${AppConstants.imageBaseUrl}$profilePhoto'
-                          : profilePhoto,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => _buildFallbackLogo(logo),
-                      errorWidget: (context, url, error) => _buildFallbackLogo(logo),
-                    )
-                  : Image.file(
-                      File(profilePhoto),
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => _buildFallbackLogo(logo),
-                    ))
-              : _buildFallbackLogo(logo),
-        ),
-      ),
+      child: (profilePhoto != null && profilePhoto.isNotEmpty)
+          ? (profilePhoto.startsWith('/') || profilePhoto.startsWith('http')
+              ? CachedNetworkImage(
+                  imageUrl: profilePhoto.startsWith('/')
+                      ? '${AppConstants.imageBaseUrl}$profilePhoto'
+                      : profilePhoto,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => _buildFallbackLogo(logo),
+                  errorWidget: (context, url, error) => _buildFallbackLogo(logo),
+                )
+              : Image.file(
+                  File(profilePhoto),
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => _buildFallbackLogo(logo),
+                ))
+          : _buildFallbackLogo(logo),
     );
 
     // Build the sub-sections
@@ -369,15 +355,15 @@ class BrandingBanner extends StatelessWidget {
                               displayPhone,
                               style: TextStyle(
                                 color: phoneColor,
-                                  fontSize: 9.2,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                                fontSize: 9.2,
+                                fontWeight: FontWeight.w900,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
+                      ),
                     if (showPhone) const SizedBox(height: 1),
                     // WhatsApp
                     if (showPhone)
@@ -401,113 +387,113 @@ class BrandingBanner extends StatelessWidget {
                               displayWhatsapp,
                               style: TextStyle(
                                 color: phoneColor,
-                                  fontSize: 9.2,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                                fontSize: 9.2,
+                                fontWeight: FontWeight.w900,
                               ),
-                            ),
-                          ],
-                        ),
-                      if (showPhone && showEmail) const SizedBox(height: 1),
-                      // Email
-                      if (showEmail)
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.email,
-                              color: textColor.withOpacity(0.7),
-                              size: 8,
-                            ),
-                            const SizedBox(width: 3),
-                            Expanded(
-                              child: Text(
-                                displayEmail,
-                                style: TextStyle(
-                                  color: textColor.withOpacity(0.9),
-                                  fontSize: 6.8,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 5),
-                // Logo Section
-                if (showLogo)
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: logoBg,
-                      border: Border.all(color: Colors.white, width: 1.5),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
-                          blurRadius: 3,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: (logo != null && logo.isNotEmpty)
-                        ? (File(logo).existsSync()
-                            ? Image.file(
-                                File(logo),
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) => const Center(
-                                  child: Icon(
-                                   Icons.business,
-                                    color: Colors.white,
-                                    size: 14,
-                                  ),
-                                ),
-                              )
-                            : CachedNetworkImage(
-                                imageUrl: logo.startsWith('http')
-                                    ? logo
-                                    : (logo.startsWith('/')
-                                        ? '${AppConstants.imageBaseUrl}$logo'
-                                        : '${AppConstants.imageBaseUrl}/$logo'),
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) => const Center(
-                                  child: SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.0,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) => const Center(
-                                  child: Icon(
-                                    Icons.business,
-                                    color: Colors.white,
-                                    size: 14,
-                                  ),
-                                ),
-                              ))
-                        : const Center(
-                            child: Icon(
-                              Icons.business,
-                              color: Colors.white,
-                              size: 14,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
+                        ],
+                      ),
+                    if (showPhone && showEmail) const SizedBox(height: 1),
+                    // Email
+                    if (showEmail)
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.email,
+                            color: textColor.withOpacity(0.7),
+                            size: 8,
+                          ),
+                          const SizedBox(width: 3),
+                          Expanded(
+                            child: Text(
+                              displayEmail,
+                              style: TextStyle(
+                                color: textColor.withOpacity(0.9),
+                                fontSize: 6.8,
+                                fontWeight: FontWeight.w700,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 5),
+              // Logo Section
+              if (showLogo)
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: logoBg,
+                    border: Border.all(color: Colors.white, width: 1.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 3,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
                   ),
-              ],
-            ),
-          ],
-        ),
-      );
+                  clipBehavior: Clip.antiAlias,
+                  child: (logo != null && logo.isNotEmpty)
+                      ? (File(logo).existsSync()
+                          ? Image.file(
+                              File(logo),
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => const Center(
+                                child: Icon(
+                                  Icons.business,
+                                  color: Colors.white,
+                                  size: 22,
+                                ),
+                              ),
+                            )
+                          : CachedNetworkImage(
+                              imageUrl: logo.startsWith('http')
+                                  ? logo
+                                  : (logo.startsWith('/')
+                                      ? '${AppConstants.imageBaseUrl}$logo'
+                                      : '${AppConstants.imageBaseUrl}/$logo'),
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => const Center(
+                                child: SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.0,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => const Center(
+                                child: Icon(
+                                  Icons.business,
+                                  color: Colors.white,
+                                  size: 22,
+                                ),
+                              ),
+                            ))
+                      : const Center(
+                          child: Icon(
+                            Icons.business,
+                            color: Colors.white,
+                            size: 22,
+                          ),
+                        ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
 
     final consultancySectionWidget = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -517,7 +503,7 @@ class BrandingBanner extends StatelessWidget {
           consultancyTitle,
           style: TextStyle(
             color: primaryText,
-            fontSize: 7.2,
+            fontSize: 7.5,
             fontWeight: FontWeight.w900,
           ),
           maxLines: 1,
@@ -545,10 +531,9 @@ class BrandingBanner extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (!photoOnRight && showProfilePhoto) profileWidget,
-          if (!photoOnRight && showProfilePhoto) const SizedBox(width: 5),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(top: 3, bottom: 3, right: 5, left: 5),
+              padding: const EdgeInsets.only(top: 3, bottom: 3, right: 6, left: 6),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -557,14 +542,14 @@ class BrandingBanner extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         // Left-side inside columns based on layout mirroring
-                        if (!photoOnRight) Expanded(flex: 6, child: infoSectionWidget),
-                        if (photoOnRight && showConsultancy) Expanded(flex: 4, child: consultancySectionWidget),
+                        if (!photoOnRight) Expanded(flex: 11, child: infoSectionWidget),
+                        if (photoOnRight && showConsultancy) Expanded(flex: 8, child: consultancySectionWidget),
                         
-                        if (showConsultancy) const SizedBox(width: 5),
+                        if (showConsultancy) const SizedBox(width: 8),
                         
                         // Right-side inside columns based on layout mirroring
-                        if (!photoOnRight && showConsultancy) Expanded(flex: 4, child: consultancySectionWidget),
-                        if (photoOnRight) Expanded(flex: 6, child: infoSectionWidget),
+                        if (!photoOnRight && showConsultancy) Expanded(flex: 8, child: consultancySectionWidget),
+                        if (photoOnRight) Expanded(flex: 11, child: infoSectionWidget),
                       ],
                     ),
                   ),
@@ -586,7 +571,6 @@ class BrandingBanner extends StatelessWidget {
               ),
             ),
           ),
-          if (photoOnRight && showProfilePhoto) const SizedBox(width: 5),
           if (photoOnRight && showProfilePhoto) profileWidget,
         ],
       ),
@@ -600,30 +584,30 @@ class BrandingBanner extends StatelessWidget {
           imageUrl: logoPath.startsWith('/')
               ? '${AppConstants.imageBaseUrl}$logoPath'
               : logoPath,
-          fit: BoxFit.contain,
+          fit: BoxFit.cover,
           placeholder: (context, url) => Image.asset(
             ImageConstants.logo,
-            fit: BoxFit.contain,
+            fit: BoxFit.cover,
           ),
           errorWidget: (context, url, error) => Image.asset(
             ImageConstants.logo,
-            fit: BoxFit.contain,
+            fit: BoxFit.cover,
           ),
         );
       } else {
         return Image.file(
           File(logoPath),
-          fit: BoxFit.contain,
+          fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) => Image.asset(
             ImageConstants.logo,
-            fit: BoxFit.contain,
+            fit: BoxFit.cover,
           ),
         );
       }
     }
     return Image.asset(
       ImageConstants.logo,
-      fit: BoxFit.contain,
+      fit: BoxFit.cover,
     );
   }
 
@@ -712,16 +696,16 @@ class BrandingBanner extends StatelessWidget {
         children: [
           Icon(
             Icons.diamond,
-            size: 3.8,
+            size: 4.2,
             color: bulletColor,
           ),
-          const SizedBox(width: 2),
+          const SizedBox(width: 2.5),
           Expanded(
             child: Text(
               item,
               style: TextStyle(
                 color: textColor.withOpacity(0.85),
-                fontSize: 5.8,
+                fontSize: 6.2,
                 fontWeight: FontWeight.w700,
               ),
               maxLines: 1,
