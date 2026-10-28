@@ -7,6 +7,6 @@ class DefaultRes {
   DefaultRes._();
 
   static const String PROJECT_NAME = 'bless_app';
-  static const String PROJECT_VERSION = '1.0.0+1';
+  static const String PROJECT_VERSION = '1.0.2+2';
   static const String ENV = '.env';
 }

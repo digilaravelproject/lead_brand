@@ -7,7 +7,7 @@ class AssetsRes {
   AssetsRes._();
 
   static const String PROJECT_NAME = 'bless_app';
-  static const String PROJECT_VERSION = '1.0.0+1';
+  static const String PROJECT_VERSION = '1.0.2+2';
   static const String GUJARATI = 'assets/language/gujarati.png';
   static const String MARATHI = 'assets/language/marathi.png';
 }
