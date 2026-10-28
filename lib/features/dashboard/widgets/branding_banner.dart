@@ -134,7 +134,7 @@ class BrandingBanner extends StatelessWidget {
         secondaryText = Colors.white70;
         phoneColor = const Color(0xFFFFD700);
         sloganColor = const Color(0xFFFFD700);
-        disclaimerColor = Colors.white54;
+        disclaimerColor = Colors.white.withValues(alpha: 0.88);
         logoBg = const Color(0xFF121722);
         dividerCol = const Color(0xFF1A2333);
         break;
@@ -145,7 +145,7 @@ class BrandingBanner extends StatelessWidget {
         secondaryText = Colors.white70;
         phoneColor = const Color(0xFF778DA9);
         sloganColor = const Color(0xFF778DA9);
-        disclaimerColor = Colors.white54;
+        disclaimerColor = Colors.white.withValues(alpha: 0.88);
         logoBg = const Color(0xFF1B263B);
         dividerCol = const Color(0xFF415A77);
         break;
@@ -156,7 +156,7 @@ class BrandingBanner extends StatelessWidget {
         secondaryText = Colors.white70;
         phoneColor = const Color(0xFF5ED3A5);
         sloganColor = const Color(0xFF5ED3A5);
-        disclaimerColor = Colors.white54;
+        disclaimerColor = Colors.white.withValues(alpha: 0.88);
         logoBg = const Color(0xFF11251E);
         dividerCol = const Color(0xFF244F42);
         break;
@@ -167,7 +167,7 @@ class BrandingBanner extends StatelessWidget {
         secondaryText = Colors.white70;
         phoneColor = const Color(0xFFFFD700);
         sloganColor = const Color(0xFFFFD700);
-        disclaimerColor = Colors.white54;
+        disclaimerColor = Colors.white.withValues(alpha: 0.88);
         logoBg = const Color(0xFF2D070C);
         dividerCol = const Color(0xFF6B1A24);
         break;
@@ -178,7 +178,7 @@ class BrandingBanner extends StatelessWidget {
         secondaryText = const Color(0xFF4B5563);
         phoneColor = const Color(0xFF111827);
         sloganColor = const Color(0xFF4B5563);
-        disclaimerColor = const Color(0xFF6B7280);
+        disclaimerColor = const Color(0xFF1F2937);
         logoBg = const Color(0xFFE5E7EB);
         dividerCol = const Color(0xFFD1D5DB);
         break;
@@ -193,7 +193,7 @@ class BrandingBanner extends StatelessWidget {
         secondaryText = Colors.white70;
         phoneColor = Colors.white;
         sloganColor = Colors.yellowAccent;
-        disclaimerColor = Colors.white60;
+        disclaimerColor = Colors.white.withValues(alpha: 0.92);
         logoBg = const Color(0x33FFFFFF);
         dividerCol = Colors.white30;
         break;
@@ -208,7 +208,7 @@ class BrandingBanner extends StatelessWidget {
         secondaryText = Colors.white70;
         phoneColor = Colors.yellowAccent;
         sloganColor = Colors.white;
-        disclaimerColor = Colors.white60;
+        disclaimerColor = Colors.white.withValues(alpha: 0.92);
         logoBg = const Color(0x33FFFFFF);
         dividerCol = Colors.white30;
         break;
@@ -219,7 +219,7 @@ class BrandingBanner extends StatelessWidget {
         secondaryText = Colors.white70;
         phoneColor = const Color(0xFF38BDF8);
         sloganColor = const Color(0xFF38BDF8);
-        disclaimerColor = Colors.white54;
+        disclaimerColor = Colors.white.withValues(alpha: 0.88);
         logoBg = const Color(0xFF0F172A);
         dividerCol = const Color(0xFF334155);
         break;
@@ -230,7 +230,7 @@ class BrandingBanner extends StatelessWidget {
         secondaryText = Colors.black87;
         phoneColor = const Color(0xFFD32F2F);
         sloganColor = const Color(0xFF2E7D32);
-        disclaimerColor = Colors.black54;
+        disclaimerColor = Colors.black87;
         logoBg = const Color(0xFFFBBF24);
         dividerCol = Colors.grey[200]!;
         borderDecor = BoxDecoration(
@@ -245,13 +245,13 @@ class BrandingBanner extends StatelessWidget {
         secondaryText = Colors.black87;
         phoneColor = const Color(0xFFD32F2F);
         sloganColor = const Color(0xFF2E7D32);
-        disclaimerColor = Colors.black54;
+        disclaimerColor = Colors.black87;
         logoBg = const Color(0xFFFBBF24);
         dividerCol = Colors.grey[200]!;
     }
 
     final profileWidget = Container(
-      width: 105,
+      width: 110,
       padding: const EdgeInsets.all(3.0),
       decoration: BoxDecoration(
         color: bgGradient == null ? bg : Colors.transparent,
@@ -565,9 +565,9 @@ class BrandingBanner extends StatelessWidget {
                     disclaimer,
                     style: TextStyle(
                       color: disclaimerColor,
-                      fontSize: 4.5,
-                      fontWeight: FontWeight.w500,
-                      height: 1.15,
+                      fontSize: 6.2,
+                      fontWeight: FontWeight.w600,
+                      height: 1.18,
                     ),
                     textAlign: TextAlign.justify,
                     maxLines: 2,
