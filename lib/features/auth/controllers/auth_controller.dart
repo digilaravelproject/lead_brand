@@ -16,6 +16,7 @@ import '../domain/models/complete_setup_response.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+import '../../../core/utils/image_crop_helper.dart';
 
 class AuthController extends GetxController {
   final AuthRepositoryInterface authRepository;
@@ -41,15 +42,26 @@ class AuthController extends GetxController {
       );
       print("pickImage result: ${image?.path}");
       if (image != null) {
-        final file = File(image.path);
+        // Crop image to fixed 1:1 square ratio with quality and resolution check
+        final String? croppedPath = await ImageCropHelper.cropSquareImage(
+          sourcePath: image.path,
+          title: 'Crop Profile Picture',
+        );
+
+        if (croppedPath == null) {
+          // User cancelled crop or image validation failed
+          return;
+        }
+
+        final file = File(croppedPath);
         final sizeInBytes = await file.length();
         final sizeInMb = sizeInBytes / (1024 * 1024);
-        print("Image size: $sizeInMb MB");
+        print("Cropped Image size: $sizeInMb MB");
         if (sizeInMb > 5) {
           CustomSnackbar.showError('Selected image is too large. Please select an image under 5MB.');
           return;
         }
-        imagePath.value = image.path;
+        imagePath.value = croppedPath;
         print("imagePath updated to: ${imagePath.value}");
         if (SharedPrefs.getBool(AppConstants.isLoggedIn) == true) {
           await updateProfileChanges();
@@ -67,14 +79,25 @@ class AuthController extends GetxController {
         source: ImageSource.gallery,
       );
       if (logo != null) {
-        final file = File(logo.path);
+        // Crop logo to fixed 1:1 square ratio with quality and resolution check
+        final String? croppedPath = await ImageCropHelper.cropSquareImage(
+          sourcePath: logo.path,
+          title: 'Crop Company Logo',
+        );
+
+        if (croppedPath == null) {
+          // User cancelled crop or image validation failed
+          return;
+        }
+
+        final file = File(croppedPath);
         final sizeInBytes = await file.length();
         final sizeInMb = sizeInBytes / (1024 * 1024);
         if (sizeInMb > 5) {
           CustomSnackbar.showError('Selected logo is too large. Please select an image under 5MB.');
           return;
         }
-        logoPath.value = logo.path;
+        logoPath.value = croppedPath;
         if (SharedPrefs.getBool(AppConstants.isLoggedIn) == true) {
           await updateProfileChanges();
         }

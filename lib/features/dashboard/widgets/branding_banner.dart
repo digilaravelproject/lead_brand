@@ -251,7 +251,8 @@ class BrandingBanner extends StatelessWidget {
     }
 
     final profileWidget = Container(
-      width: 95,
+      width: 105,
+      padding: const EdgeInsets.all(3.0),
       decoration: BoxDecoration(
         color: bgGradient == null ? bg : Colors.transparent,
         border: Border(
@@ -259,22 +260,26 @@ class BrandingBanner extends StatelessWidget {
           left: photoOnRight ? BorderSide(color: dividerCol, width: 1) : BorderSide.none,
         ),
       ),
-      child: (profilePhoto != null && profilePhoto.isNotEmpty)
-          ? (profilePhoto.startsWith('/') || profilePhoto.startsWith('http')
-              ? CachedNetworkImage(
-                  imageUrl: profilePhoto.startsWith('/')
-                      ? '${AppConstants.imageBaseUrl}$profilePhoto'
-                      : profilePhoto,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => _buildFallbackLogo(logo),
-                  errorWidget: (context, url, error) => _buildFallbackLogo(logo),
-                )
-              : Image.file(
-                  File(profilePhoto),
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => _buildFallbackLogo(logo),
-                ))
-          : _buildFallbackLogo(logo),
+      alignment: Alignment.center,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: (profilePhoto != null && profilePhoto.isNotEmpty)
+            ? (profilePhoto.startsWith('/') || profilePhoto.startsWith('http')
+                ? CachedNetworkImage(
+                    imageUrl: profilePhoto.startsWith('/')
+                        ? '${AppConstants.imageBaseUrl}$profilePhoto'
+                        : profilePhoto,
+                    fit: BoxFit.contain,
+                    placeholder: (context, url) => _buildFallbackLogo(logo),
+                    errorWidget: (context, url, error) => _buildFallbackLogo(logo),
+                  )
+                : Image.file(
+                    File(profilePhoto),
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => _buildFallbackLogo(logo),
+                  ))
+            : _buildFallbackLogo(logo),
+      ),
     );
 
     // Build the sub-sections
@@ -497,7 +502,7 @@ class BrandingBanner extends StatelessWidget {
 
     final consultancySectionWidget = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           consultancyTitle,
@@ -509,12 +514,13 @@ class BrandingBanner extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 1),
+        const SizedBox(height: 1.5),
         Expanded(
           child: SingleChildScrollView(
             physics: const NeverScrollableScrollPhysics(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: _buildConsultancyItems(lang, primaryText, textColor),
             ),
           ),
@@ -533,7 +539,7 @@ class BrandingBanner extends StatelessWidget {
           if (!photoOnRight && showProfilePhoto) profileWidget,
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(top: 3, bottom: 3, right: 6, left: 6),
+              padding: const EdgeInsets.only(top: 3, bottom: 5, right: 6, left: 6),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -553,15 +559,15 @@ class BrandingBanner extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 1.5),
+                  const SizedBox(height: 2),
                   // Disclaimer Section
                   Text(
                     disclaimer,
                     style: TextStyle(
                       color: disclaimerColor,
-                      fontSize: 4.2,
+                      fontSize: 4.5,
                       fontWeight: FontWeight.w500,
-                      height: 1.05,
+                      height: 1.15,
                     ),
                     textAlign: TextAlign.justify,
                     maxLines: 2,
@@ -584,30 +590,30 @@ class BrandingBanner extends StatelessWidget {
           imageUrl: logoPath.startsWith('/')
               ? '${AppConstants.imageBaseUrl}$logoPath'
               : logoPath,
-          fit: BoxFit.cover,
+          fit: BoxFit.contain,
           placeholder: (context, url) => Image.asset(
             ImageConstants.logo,
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
           ),
           errorWidget: (context, url, error) => Image.asset(
             ImageConstants.logo,
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
           ),
         );
       } else {
         return Image.file(
           File(logoPath),
-          fit: BoxFit.cover,
+          fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) => Image.asset(
             ImageConstants.logo,
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
           ),
         );
       }
     }
     return Image.asset(
       ImageConstants.logo,
-      fit: BoxFit.cover,
+      fit: BoxFit.contain,
     );
   }
 

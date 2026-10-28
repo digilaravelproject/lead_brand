@@ -88,6 +88,7 @@ dependencies:
   google_sign_in: ^7.2.0
   font_awesome_flutter: ^11.0.0
   ffmpeg_kit_flutter_new: ^4.6.2
+  image_cropper: ^12.2.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

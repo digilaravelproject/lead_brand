@@ -7,18 +7,14 @@ import 'package:get/get.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:gal/gal.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
-import '../../../core/constants/image_constants.dart';
 import '../../../core/services/storage/shared_prefs.dart';
-import '../../auth/controllers/auth_controller.dart';
 import '../../auth/domain/models/complete_setup_response.dart';
 import '../../video_ads/controllers/video_ads_controller.dart';
 import '../../dashboard/widgets/branding_banner.dart';
@@ -237,14 +233,14 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
                                     ),
                                   ),
                                   Container(
-                                    height: 35,
+                                    height: 38,
                                     width: double.infinity,
                                     color: Colors.white,
                                     child: FittedBox(
                                       fit: BoxFit.fitWidth,
                                       child: SizedBox(
                                         width: 375,
-                                        height: 95,
+                                        height: 105,
                                         child: BrandingBanner(
                                           fallbackName: userName,
                                           fallbackPhone: userPhone,
@@ -373,7 +369,7 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
                           
                           // FLAT SQUARE Branding Frame
                           Container(
-                            height: 95,
+                            height: 105,
                             width: double.infinity,
                             decoration: const BoxDecoration(
                               color: Colors.white,
@@ -466,7 +462,7 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
     if (_isProcessing) return;
     
     final double bannerWidth = MediaQuery.of(context).size.width;
-    final double bannerHeight = 95;
+    final double bannerHeight = 105;
     final double ratio = bannerHeight / bannerWidth;
 
     final bool isLocal = video.localPath != null && video.localPath!.isNotEmpty;
