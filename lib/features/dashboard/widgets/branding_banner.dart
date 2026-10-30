@@ -508,13 +508,14 @@ class BrandingBanner extends StatelessWidget {
           consultancyTitle,
           style: TextStyle(
             color: primaryText,
-            fontSize: 7.0,
+            fontSize: 8.4,
             fontWeight: FontWeight.w900,
+            letterSpacing: 0.2,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 1.0),
+        const SizedBox(height: 1.5),
         Expanded(
           child: SingleChildScrollView(
             physics: const NeverScrollableScrollPhysics(),
@@ -548,14 +549,14 @@ class BrandingBanner extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         // Left-side inside columns based on layout mirroring
-                        if (!photoOnRight) Expanded(flex: 11, child: infoSectionWidget),
-                        if (photoOnRight && showConsultancy) Expanded(flex: 8, child: consultancySectionWidget),
+                        if (!photoOnRight) Expanded(flex: 10, child: infoSectionWidget),
+                        if (photoOnRight && showConsultancy) Expanded(flex: 9, child: consultancySectionWidget),
                         
                         if (showConsultancy) const SizedBox(width: 6),
                         
                         // Right-side inside columns based on layout mirroring
-                        if (!photoOnRight && showConsultancy) Expanded(flex: 8, child: consultancySectionWidget),
-                        if (photoOnRight) Expanded(flex: 11, child: infoSectionWidget),
+                        if (!photoOnRight && showConsultancy) Expanded(flex: 9, child: consultancySectionWidget),
+                        if (photoOnRight) Expanded(flex: 10, child: infoSectionWidget),
                       ],
                     ),
                   ),
@@ -696,22 +697,22 @@ class BrandingBanner extends StatelessWidget {
     final List<String> items = consultancyItemsMap[lang] ?? consultancyItemsMap['en']!;
 
     return items.map((item) => Padding(
-      padding: const EdgeInsets.symmetric(vertical: 0.1),
+      padding: const EdgeInsets.symmetric(vertical: 0.15),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             Icons.diamond,
-            size: 3.6,
+            size: 4.2,
             color: bulletColor,
           ),
-          const SizedBox(width: 2.0),
+          const SizedBox(width: 2.2),
           Expanded(
             child: Text(
               item,
               style: TextStyle(
-                color: textColor.withOpacity(0.85),
-                fontSize: 5.6,
+                color: textColor.withOpacity(0.9),
+                fontSize: 6.8,
                 fontWeight: FontWeight.w700,
                 height: 1.15,
               ),
