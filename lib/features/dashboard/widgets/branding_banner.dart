@@ -251,8 +251,8 @@ class BrandingBanner extends StatelessWidget {
     }
 
     final profileWidget = Container(
-      width: 110,
-      padding: const EdgeInsets.all(3.0),
+      width: 78,
+      padding: const EdgeInsets.all(2.5),
       decoration: BoxDecoration(
         color: bgGradient == null ? bg : Colors.transparent,
         border: Border(
@@ -294,20 +294,20 @@ class BrandingBanner extends StatelessWidget {
             slogan,
             style: TextStyle(
               color: sloganColor,
-              fontSize: 7.2,
+              fontSize: 6.8,
               fontWeight: FontWeight.w900,
               fontStyle: FontStyle.italic,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 1),
+          const SizedBox(height: 0.5),
           // Name
           Text(
             displayName.toUpperCase(),
             style: TextStyle(
               color: primaryText,
-              fontSize: 10.8,
+              fontSize: 9.8,
               fontWeight: FontWeight.w900,
               letterSpacing: 0.3,
               height: 1.1,
@@ -315,21 +315,21 @@ class BrandingBanner extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 1),
+          const SizedBox(height: 0.5),
           // Designation
           if (showDesignation)
             Text(
               displayDesignation.toUpperCase(),
               style: TextStyle(
                 color: secondaryText,
-                fontSize: 6.5,
+                fontSize: 5.8,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 0.3,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-          if (showDesignation) const SizedBox(height: 1.5),
+          if (showDesignation) const SizedBox(height: 1.0),
           // Phone, Email and Logo Row
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -351,16 +351,16 @@ class BrandingBanner extends StatelessWidget {
                             child: const Icon(
                               Icons.phone,
                               color: Colors.white,
-                              size: 6.5,
+                              size: 5.8,
                             ),
                           ),
-                          const SizedBox(width: 3),
+                          const SizedBox(width: 2.5),
                           Expanded(
                             child: Text(
                               displayPhone,
                               style: TextStyle(
                                 color: phoneColor,
-                                fontSize: 9.2,
+                                fontSize: 8.5,
                                 fontWeight: FontWeight.w900,
                               ),
                               maxLines: 1,
@@ -369,7 +369,7 @@ class BrandingBanner extends StatelessWidget {
                           ),
                         ],
                       ),
-                    if (showPhone) const SizedBox(height: 1),
+                    if (showPhone) const SizedBox(height: 0.8),
                     // WhatsApp
                     if (showPhone)
                       Row(
@@ -383,16 +383,16 @@ class BrandingBanner extends StatelessWidget {
                             child: const Icon(
                               Icons.chat,
                               color: Colors.white,
-                              size: 6.5,
+                              size: 5.8,
                             ),
                           ),
-                          const SizedBox(width: 3),
+                          const SizedBox(width: 2.5),
                           Expanded(
                             child: Text(
                               displayWhatsapp,
                               style: TextStyle(
                                 color: phoneColor,
-                                fontSize: 9.2,
+                                fontSize: 8.5,
                                 fontWeight: FontWeight.w900,
                               ),
                               maxLines: 1,
@@ -401,7 +401,7 @@ class BrandingBanner extends StatelessWidget {
                           ),
                         ],
                       ),
-                    if (showPhone && showEmail) const SizedBox(height: 1),
+                    if (showPhone && showEmail) const SizedBox(height: 0.8),
                     // Email
                     if (showEmail)
                       Row(
@@ -409,15 +409,15 @@ class BrandingBanner extends StatelessWidget {
                           Icon(
                             Icons.email,
                             color: textColor.withOpacity(0.7),
-                            size: 8,
+                            size: 7.0,
                           ),
-                          const SizedBox(width: 3),
+                          const SizedBox(width: 2.5),
                           Expanded(
                             child: Text(
                               displayEmail,
                               style: TextStyle(
                                 color: textColor.withOpacity(0.9),
-                                fontSize: 6.8,
+                                fontSize: 6.2,
                                 fontWeight: FontWeight.w700,
                               ),
                               maxLines: 1,
@@ -429,20 +429,20 @@ class BrandingBanner extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 5),
+              const SizedBox(width: 4),
               // Logo Section
               if (showLogo)
                 Container(
-                  width: 42,
-                  height: 42,
+                  width: 34,
+                  height: 34,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: logoBg,
-                    border: Border.all(color: Colors.white, width: 1.5),
+                    border: Border.all(color: Colors.white, width: 1.2),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.15),
-                        blurRadius: 3,
+                        blurRadius: 2.5,
                         offset: const Offset(0, 1),
                       ),
                     ],
@@ -457,7 +457,7 @@ class BrandingBanner extends StatelessWidget {
                                 child: Icon(
                                   Icons.business,
                                   color: Colors.white,
-                                  size: 22,
+                                  size: 18,
                                 ),
                               ),
                             )
@@ -470,10 +470,10 @@ class BrandingBanner extends StatelessWidget {
                               fit: BoxFit.cover,
                               placeholder: (context, url) => const Center(
                                 child: SizedBox(
-                                  width: 18,
-                                  height: 18,
+                                  width: 15,
+                                  height: 15,
                                   child: CircularProgressIndicator(
-                                    strokeWidth: 2.0,
+                                    strokeWidth: 1.8,
                                     color: Colors.white,
                                   ),
                                 ),
@@ -482,7 +482,7 @@ class BrandingBanner extends StatelessWidget {
                                 child: Icon(
                                   Icons.business,
                                   color: Colors.white,
-                                  size: 22,
+                                  size: 18,
                                 ),
                               ),
                             ))
@@ -490,7 +490,7 @@ class BrandingBanner extends StatelessWidget {
                           child: Icon(
                             Icons.business,
                             color: Colors.white,
-                            size: 22,
+                            size: 18,
                           ),
                         ),
                 ),
@@ -508,13 +508,13 @@ class BrandingBanner extends StatelessWidget {
           consultancyTitle,
           style: TextStyle(
             color: primaryText,
-            fontSize: 7.5,
+            fontSize: 7.0,
             fontWeight: FontWeight.w900,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 1.5),
+        const SizedBox(height: 1.0),
         Expanded(
           child: SingleChildScrollView(
             physics: const NeverScrollableScrollPhysics(),
@@ -539,7 +539,7 @@ class BrandingBanner extends StatelessWidget {
           if (!photoOnRight && showProfilePhoto) profileWidget,
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(top: 3, bottom: 5, right: 6, left: 6),
+              padding: const EdgeInsets.only(top: 2.5, bottom: 3.5, right: 5, left: 5),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -551,7 +551,7 @@ class BrandingBanner extends StatelessWidget {
                         if (!photoOnRight) Expanded(flex: 11, child: infoSectionWidget),
                         if (photoOnRight && showConsultancy) Expanded(flex: 8, child: consultancySectionWidget),
                         
-                        if (showConsultancy) const SizedBox(width: 8),
+                        if (showConsultancy) const SizedBox(width: 6),
                         
                         // Right-side inside columns based on layout mirroring
                         if (!photoOnRight && showConsultancy) Expanded(flex: 8, child: consultancySectionWidget),
@@ -559,18 +559,18 @@ class BrandingBanner extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 1.5),
                   // Disclaimer Section
                   Text(
                     disclaimer,
                     style: TextStyle(
                       color: disclaimerColor,
-                      fontSize: 5.8,
+                      fontSize: 5.0,
                       fontWeight: FontWeight.w600,
-                      height: 1.15,
+                      height: 1.12,
                     ),
                     textAlign: TextAlign.justify,
-                    maxLines: 3,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -702,16 +702,16 @@ class BrandingBanner extends StatelessWidget {
         children: [
           Icon(
             Icons.diamond,
-            size: 4.2,
+            size: 3.8,
             color: bulletColor,
           ),
-          const SizedBox(width: 2.5),
+          const SizedBox(width: 2.0),
           Expanded(
             child: Text(
               item,
               style: TextStyle(
                 color: textColor.withOpacity(0.85),
-                fontSize: 6.2,
+                fontSize: 5.5,
                 fontWeight: FontWeight.w700,
               ),
               maxLines: 1,
