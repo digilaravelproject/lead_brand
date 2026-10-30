@@ -702,7 +702,7 @@ class BrandingBanner extends StatelessWidget {
         children: [
           Icon(
             Icons.diamond,
-            size: 3.8,
+            size: 3.6,
             color: bulletColor,
           ),
           const SizedBox(width: 2.0),
@@ -711,8 +711,9 @@ class BrandingBanner extends StatelessWidget {
               item,
               style: TextStyle(
                 color: textColor.withOpacity(0.85),
-                fontSize: 5.5,
+                fontSize: 5.6,
                 fontWeight: FontWeight.w700,
+                height: 1.15,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

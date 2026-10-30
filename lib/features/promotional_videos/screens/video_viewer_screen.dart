@@ -233,14 +233,14 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
                                     ),
                                   ),
                                   Container(
-                                    height: 30,
+                                    height: 34,
                                     width: double.infinity,
                                     color: Colors.white,
                                     child: FittedBox(
                                       fit: BoxFit.fitWidth,
                                       child: SizedBox(
                                         width: 375,
-                                        height: 82,
+                                        height: 94,
                                         child: BrandingBanner(
                                           fallbackName: userName,
                                           fallbackPhone: userPhone,
@@ -369,7 +369,7 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
                           
                           // FLAT SQUARE Branding Frame
                           Container(
-                            height: 82,
+                            height: 94,
                             width: double.infinity,
                             decoration: const BoxDecoration(
                               color: Colors.white,
@@ -462,7 +462,7 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
     if (_isProcessing) return;
     
     final double bannerWidth = MediaQuery.of(context).size.width;
-    final double bannerHeight = 82;
+    final double bannerHeight = 94;
     final double ratio = bannerHeight / bannerWidth;
 
     final bool isLocal = video.localPath != null && video.localPath!.isNotEmpty;
